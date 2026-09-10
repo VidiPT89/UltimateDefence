@@ -9,6 +9,7 @@ final class FPSSceneView: SCNView {
     var onAim: ((Bool) -> Void)?
     var onCycle: ((Int) -> Void)?
     var onFocus: ((Bool) -> Void)?
+    var fireArmed = false
     private var tracking = false
 
     override var acceptsFirstResponder: Bool { true }
@@ -38,10 +39,17 @@ final class FPSSceneView: SCNView {
         onKey?(event.keyCode, false)
     }
 
+    override func flagsChanged(with event: NSEvent) {
+        onKey?(56, event.modifierFlags.contains(.shift))
+        onKey?(59, event.modifierFlags.contains(.control))
+    }
+
     override func mouseDown(with event: NSEvent) {
         window?.makeFirstResponder(self)
         onFocus?(true)
-        onFire?(true)
+        if fireArmed {
+            onFire?(true)
+        }
     }
 
     override func mouseUp(with event: NSEvent) {
@@ -104,9 +112,14 @@ struct GameSceneView: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: FPSSceneView, context: Context) {
-        nsView.setPointerLocked(session.capturedMouse && session.screen == .playing)
-        if session.screen != .playing {
+        nsView.window?.acceptsMouseMovedEvents = true
+        if session.screen == .playing {
+            nsView.window?.makeFirstResponder(nsView)
+            nsView.setPointerLocked(session.capturedMouse)
+            nsView.fireArmed = session.capturedMouse
+        } else {
             nsView.setPointerLocked(false)
+            nsView.fireArmed = false
         }
     }
 

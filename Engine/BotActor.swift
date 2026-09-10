@@ -10,46 +10,58 @@ final class BotActor {
     var lastShot: TimeInterval = 0
     var plantProgress: TimeInterval = 0
     private var wander: Float
+    private let leftLeg: SCNNode
+    private let rightLeg: SCNNode
 
     var isAlive: Bool { health > 0 }
 
     init(id: Int, at spawn: SIMD3<Float>) {
         self.id = id
         wander = Float(id) * 0.7
-        let body = SCNCapsule(capRadius: 0.38, height: 1.5)
-        body.firstMaterial = Self.pbr(NSColor(calibratedRed: 0.18, green: 0.19, blue: 0.2, alpha: 1), metal: 0.35, rough: 0.45)
-        node = SCNNode(geometry: body)
+        node = SCNNode()
         node.name = "\(NodeName.botPrefix)\(id)"
-        node.position = SCNVector3(spawn.x, 1.15, spawn.z)
+        node.position = SCNVector3(spawn.x, 0, spawn.z)
 
-        let vest = SCNBox(width: 0.72, height: 0.55, length: 0.42, chamferRadius: 0.04)
-        vest.firstMaterial = Self.pbr(NSColor(calibratedRed: 0.72, green: 0.28, blue: 0.12, alpha: 1), metal: 0.15, rough: 0.55)
-        let vestNode = SCNNode(geometry: vest)
-        vestNode.position = SCNVector3(0, 0.15, 0)
-        node.addChildNode(vestNode)
+        let pants = NSColor(calibratedRed: 0.42, green: 0.36, blue: 0.26, alpha: 1)
+        let jacket = NSColor(calibratedRed: 0.38, green: 0.40, blue: 0.34, alpha: 1)
+        let skin = NSColor(calibratedRed: 0.76, green: 0.58, blue: 0.44, alpha: 1)
+        let boot = NSColor(calibratedRed: 0.12, green: 0.10, blue: 0.08, alpha: 1)
 
-        let headGeom = SCNSphere(radius: 0.22)
-        headGeom.firstMaterial = Self.pbr(NSColor(calibratedRed: 0.78, green: 0.58, blue: 0.46, alpha: 1), metal: 0.05, rough: 0.7)
+        leftLeg = Self.box(0.16, 0.72, 0.18, at: SCNVector3(-0.12, 0.46, 0), color: pants)
+        rightLeg = Self.box(0.16, 0.72, 0.18, at: SCNVector3(0.12, 0.46, 0), color: pants)
+        node.addChildNode(leftLeg)
+        node.addChildNode(rightLeg)
+        node.addChildNode(Self.box(0.22, 0.12, 0.28, at: SCNVector3(-0.12, 0.08, 0.02), color: boot))
+        node.addChildNode(Self.box(0.22, 0.12, 0.28, at: SCNVector3(0.12, 0.08, 0.02), color: boot))
+
+        let hips = Self.box(0.42, 0.22, 0.24, at: SCNVector3(0, 0.92, 0), color: pants)
+        node.addChildNode(hips)
+        let torso = Self.box(0.46, 0.52, 0.28, at: SCNVector3(0, 1.28, 0), color: jacket)
+        torso.name = "\(NodeName.botPrefix)\(id)"
+        node.addChildNode(torso)
+
+        let headGeom = SCNBox(width: 0.24, height: 0.28, length: 0.24, chamferRadius: 0)
+        headGeom.firstMaterial = MapTextures.goldSrc(skin)
         head = SCNNode(geometry: headGeom)
         head.name = "\(NodeName.botPrefix)\(id)\(NodeName.headSuffix)"
-        let visor = SCNBox(width: 0.38, height: 0.12, length: 0.18, chamferRadius: 0.02)
-        visor.firstMaterial = Self.pbr(NSColor(calibratedRed: 0.98, green: 0.45, blue: 0.08, alpha: 1), metal: 0.8, rough: 0.18)
-        visor.firstMaterial?.emission.contents = NSColor(calibratedRed: 0.98, green: 0.61, blue: 0, alpha: 1)
-        visor.firstMaterial?.emission.intensity = 0.6
-        let visorNode = SCNNode(geometry: visor)
-        visorNode.position = SCNVector3(0, 0.04, 0.16)
-        head.addChildNode(visorNode)
-        head.position = SCNVector3(0, 0.95, 0)
+        head.position = SCNVector3(0, 1.68, 0)
         node.addChildNode(head)
 
-        let rifle = SCNBox(width: 0.08, height: 0.08, length: 0.72, chamferRadius: 0.01)
-        rifle.firstMaterial = Self.pbr(NSColor(calibratedRed: 0.22, green: 0.23, blue: 0.24, alpha: 1), metal: 0.7, rough: 0.28)
-        let rifleNode = SCNNode(geometry: rifle)
-        rifleNode.position = SCNVector3(0.32, 0.22, -0.28)
-        node.addChildNode(rifleNode)
+        let beanie = Self.box(0.26, 0.1, 0.26, at: SCNVector3(0, 0.16, 0), color: NSColor(calibratedRed: 0.18, green: 0.16, blue: 0.12, alpha: 1))
+        head.addChildNode(beanie)
+        let beard = Self.box(0.16, 0.08, 0.06, at: SCNVector3(0, -0.1, 0.12), color: NSColor(calibratedRed: 0.18, green: 0.12, blue: 0.08, alpha: 1))
+        head.addChildNode(beard)
 
-        let shape = SCNPhysicsShape(geometry: body, options: nil)
-        node.physicsBody = SCNPhysicsBody(type: .kinematic, shape: shape)
+        node.addChildNode(Self.box(0.14, 0.5, 0.14, at: SCNVector3(-0.32, 1.22, 0.02), color: jacket))
+        node.addChildNode(Self.box(0.14, 0.5, 0.14, at: SCNVector3(0.32, 1.22, 0.02), color: jacket))
+
+        let rifle = Self.box(0.07, 0.08, 0.78, at: SCNVector3(0.28, 1.18, -0.28), color: NSColor(calibratedRed: 0.18, green: 0.16, blue: 0.12, alpha: 1))
+        rifle.eulerAngles.x = -0.12
+        node.addChildNode(rifle)
+        node.addChildNode(Self.box(0.05, 0.18, 0.12, at: SCNVector3(0.28, 1.04, -0.12), color: NSColor(calibratedRed: 0.42, green: 0.26, blue: 0.12, alpha: 1)))
+
+        let bodyShape = SCNBox(width: 0.55, height: 1.75, length: 0.4, chamferRadius: 0)
+        node.physicsBody = SCNPhysicsBody(type: .kinematic, shape: SCNPhysicsShape(geometry: bodyShape, options: nil))
         node.physicsBody?.categoryBitMask = PhysicsCategory.bot
         head.physicsBody = SCNPhysicsBody(type: .kinematic, shape: SCNPhysicsShape(geometry: headGeom, options: nil))
         head.physicsBody?.categoryBitMask = PhysicsCategory.bot
@@ -68,36 +80,42 @@ final class BotActor {
         let pos = SIMD3(Float(node.position.x), Float(node.position.y), Float(node.position.z))
         let playerPos = player.worldPosition
         let toPlayer = Collision.distanceXZ(pos, playerPos)
-        let seesPlayer = toPlayer < 28 && player.isAlive && hasLineOfSight(from: pos, to: playerPos, world: world)
+        let seesPlayer = toPlayer < 32 && player.isAlive && hasLineOfSight(from: pos, to: playerPos, world: world)
 
         let planter = id == 0
         let target: SIMD3<Float>
-        if bombPlanted {
+        if bombPlanted && seesPlayer {
             target = playerPos
-        } else if planter && toPlayer > 10 {
-            target = site
-        } else if seesPlayer && toPlayer < 18 {
+        } else if seesPlayer && toPlayer < 14 {
             target = playerPos
         } else if planter {
             target = site
+        } else if seesPlayer {
+            target = playerPos
         } else {
             target = site
         }
 
         var dir = SIMD3(target.x - pos.x, 0, target.z - pos.z)
         let len = simd_length(dir)
-        if len > 0.4 {
+        let holdingAngle = seesPlayer && toPlayer < 16
+        if len > 0.55, !holdingAngle || toPlayer > 9 {
             dir /= len
-            wander += dt
-            let side = SIMD3(-dir.z, 0, dir.x) * sin(wander * (seesPlayer ? 2.4 : 1)) * (seesPlayer ? 0.7 : 0.35)
-            let speed = GameRules.botSpeed * (plantProgress > 0 ? 0.35 : 1)
+            wander += dt * (seesPlayer ? 2.2 : 1.1)
+            let side = SIMD3(-dir.z, 0, dir.x) * sin(wander) * (seesPlayer ? 0.85 : 0.4)
+            let speed = GameRules.botSpeed * (plantProgress > 0 ? 0.3 : 1)
             let next = pos + (dir + side) * speed * dt
-            let resolved = Collision.resolve(position: pos, proposed: next, radius: 0.5, walls: walls)
-            node.position = SCNVector3(resolved.x, resolved.y, resolved.z)
+            let resolved = Collision.resolve(position: pos, proposed: next, radius: 0.45, walls: walls)
+            node.position = SCNVector3(resolved.x, 0, resolved.z)
             node.eulerAngles.y = CGFloat(atan2(-dir.x, -dir.z))
+            let swing = sin(wander * 8) * 0.18
+            leftLeg.eulerAngles.x = CGFloat(swing)
+            rightLeg.eulerAngles.x = CGFloat(-swing)
+        } else if seesPlayer {
+            node.eulerAngles.y = CGFloat(atan2(-(playerPos.x - pos.x), -(playerPos.z - pos.z)))
         }
 
-        if seesPlayer, now - lastShot > TimeInterval(0.48) + TimeInterval(id) * 0.05 {
+        if seesPlayer, now - lastShot > TimeInterval(0.42) + TimeInterval(id) * 0.06 {
             lastShot = now
             return .shoot
         }
@@ -118,33 +136,39 @@ final class BotActor {
         if !isAlive {
             node.physicsBody = nil
             head.physicsBody = nil
-            let drop = SCNAction.moveBy(x: 0, y: -0.9, z: 0, duration: 0.45)
-            drop.timingMode = .easeIn
+            let drop = SCNAction.rotateBy(x: 1.2, y: 0.2, z: 0.4, duration: 0.4)
             node.runAction(.sequence([
-                .group([drop, .fadeOut(duration: 0.45)]),
+                .group([drop, .moveBy(x: 0, y: 0.1, z: 0, duration: 0.12)]),
+                .fadeOut(duration: 0.35),
                 .removeFromParentNode()
             ]))
         }
     }
 
     private func hasLineOfSight(from: SIMD3<Float>, to: SIMD3<Float>, world: SCNNode) -> Bool {
-        let origin = SCNVector3(from.x, from.y + 0.4, from.z)
+        let origin = SCNVector3(from.x, from.y + 1.5, from.z)
         let dest = SCNVector3(to.x, to.y, to.z)
         let hits = world.hitTestWithSegment(from: origin, to: dest, options: [
             SCNHitTestOption.searchMode.rawValue: SCNHitTestSearchMode.closest.rawValue
         ])
         guard let first = hits.first else { return true }
-        let name = first.node.name ?? first.node.parent?.name ?? ""
-        return name == NodeName.player || name == NodeName.camera || name == "weaponRig"
+        var current: SCNNode? = first.node
+        while let node = current {
+            let name = node.name ?? ""
+            if name == NodeName.player || name == NodeName.camera || name == "weaponRig" {
+                return true
+            }
+            current = node.parent
+        }
+        return false
     }
 
-    private static func pbr(_ color: NSColor, metal: CGFloat, rough: CGFloat) -> SCNMaterial {
-        let mat = SCNMaterial()
-        mat.lightingModel = .physicallyBased
-        mat.diffuse.contents = color
-        mat.metalness.contents = metal
-        mat.roughness.contents = rough
-        return mat
+    private static func box(_ w: CGFloat, _ h: CGFloat, _ l: CGFloat, at: SCNVector3, color: NSColor) -> SCNNode {
+        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0)
+        g.firstMaterial = MapTextures.goldSrc(color)
+        let n = SCNNode(geometry: g)
+        n.position = at
+        return n
     }
 }
 

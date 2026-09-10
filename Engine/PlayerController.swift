@@ -23,6 +23,10 @@ final class PlayerController {
     var grounded = true
     var vertical: Float = 0
     var aiming = false
+    var walking = false
+    var crouching = false
+    var punch: Float = 0
+    var roundStart: TimeInterval = 0
     private var lastSlot: WeaponSlot?
 
     var isAlive: Bool { health > 0 }
@@ -34,15 +38,13 @@ final class PlayerController {
         node.position = SCNVector3(spawn.x, spawn.y, spawn.z)
         cameraNode.name = NodeName.camera
         cameraNode.camera = SCNCamera()
-        cameraNode.camera?.fieldOfView = 68
-        cameraNode.camera?.zFar = 140
-        cameraNode.camera?.wantsHDR = true
-        cameraNode.camera?.bloomIntensity = 0.55
-        cameraNode.camera?.motionBlurIntensity = 0.18
-        cameraNode.camera?.vignettingIntensity = 0.35
-        cameraNode.camera?.vignettingPower = 0.65
-        cameraNode.camera?.screenSpaceAmbientOcclusionIntensity = 0.4
-        cameraNode.camera?.screenSpaceAmbientOcclusionRadius = 2.4
+        cameraNode.camera?.fieldOfView = 90
+        cameraNode.camera?.zFar = 160
+        cameraNode.camera?.wantsHDR = false
+        cameraNode.camera?.bloomIntensity = 0
+        cameraNode.camera?.motionBlurIntensity = 0
+        cameraNode.camera?.vignettingIntensity = 0
+        cameraNode.camera?.screenSpaceAmbientOcclusionIntensity = 0
         cameraNode.position = SCNVector3Zero
         if cameraNode.parent !== node {
             node.addChildNode(cameraNode)
@@ -81,10 +83,13 @@ final class PlayerController {
         if keys.contains(2) || keys.contains(124) { dir += right() } // D
         let length = simd_length(dir)
         moving = length > 0.001
-        let layoutEye: Float = 1.6
-        let sprintingNow = keys.contains(56) && !aiming
-        sprinting = sprintingNow && moving
-        let targetFOV: CGFloat = aiming ? 48 : 68
+        crouching = keys.contains(59)
+        walking = keys.contains(56) && moving && !crouching
+        sprinting = moving && !walking && !crouching && !aiming
+        let standEye: Float = 1.64
+        let crouchEye: Float = 1.18
+        let layoutEye = crouching ? crouchEye : standEye
+        let targetFOV: CGFloat = aiming ? 70 : 90
         if let cam = cameraNode.camera {
             cam.fieldOfView += (targetFOV - cam.fieldOfView) * CGFloat(min(1, dt * 10))
         }
@@ -94,6 +99,7 @@ final class PlayerController {
         }
         vertical -= GameRules.gravity * dt
         var y = Float(node.position.y) + vertical * dt
+        punch = max(0, punch - dt * 2.4)
         if y <= layoutEye {
             y = layoutEye
             vertical = 0
@@ -107,11 +113,12 @@ final class PlayerController {
             return
         }
         dir /= length
-        bob += dt * (sprintingNow ? 14 : 11)
-        cameraNode.position = SCNVector3(sin(bob) * 0.018, sin(bob * 2) * 0.045, 0)
-        let speed = GameRules.playerSpeed
-            * (sprintingNow ? GameRules.sprintMultiplier : 1)
-            * (aiming ? 0.72 : 1)
+        bob += dt * (walking ? 7 : crouching ? 6 : 12)
+        cameraNode.position = SCNVector3(sin(bob) * 0.012, sin(bob * 2) * 0.028, 0)
+        var speed = GameRules.playerSpeed
+        if walking { speed *= GameRules.walkMultiplier }
+        if crouching { speed *= GameRules.crouchMultiplier }
+        if aiming { speed *= 0.78 }
         let proposed = SIMD3(Float(node.position.x), y, Float(node.position.z)) + dir * speed * dt
         let resolved = Collision.resolve(
             position: SIMD3(Float(node.position.x), y, Float(node.position.z)),
@@ -156,6 +163,7 @@ final class PlayerController {
         isAlive
             && shooting
             && now >= reloadingUntil
+            && now - roundStart >= 0.25
             && now - lastShot >= currentStats.fireInterval
             && (mag[slot] ?? 0) > 0
     }

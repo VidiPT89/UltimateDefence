@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		096E3E38DA174BADC4A6C9F6 /* MatchConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B56FD732AEF947219518DFB /* MatchConfig.swift */; };
 		14210416560DF4CA18554448 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B8C5F52F991BADB3B5B57E7 /* L10n.swift */; };
+		1595EEF3AA0953EC017B8C64 /* GridMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC243F6813D644A28D72668 /* GridMap.swift */; };
 		1FC3351CC8ED974F7C852057 /* BotActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F353C5B66BE5DBFC692629A /* BotActor.swift */; };
 		36BCE65EA78A51D93BEF4861 /* GameRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE643867503408AC169E47 /* GameRules.swift */; };
 		3B269A4C526D770B195A67B9 /* MenuViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDBDA6CE0248F473EE4116B /* MenuViews.swift */; };
@@ -72,6 +73,7 @@
 		A904DB37884AD527D5495B15 /* MapTextures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapTextures.swift; sourceTree = "<group>"; };
 		B05AE6CD1527F7FF852DFB2F /* GameSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneView.swift; sourceTree = "<group>"; };
 		B39E71E51F1610A6A861740C /* HUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDView.swift; sourceTree = "<group>"; };
+		CDC243F6813D644A28D72668 /* GridMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridMap.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -136,6 +138,7 @@
 				9420E157C4A4A2DC783AD852 /* Collision.swift */,
 				39C12CCAD1489F8611E89BED /* FX.swift */,
 				0BEAB5AD22D5DDFDE621415C /* GameWorld.swift */,
+				CDC243F6813D644A28D72668 /* GridMap.swift */,
 				52ABF2451B82F0ED2B103754 /* MapBuilder.swift */,
 				3A59CDE0CB7938A7911EC75B /* MapKit.swift */,
 				A904DB37884AD527D5495B15 /* MapTextures.swift */,
@@ -221,9 +224,11 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					619BDE8760858796771A697F = {
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					89C2F3E852AE28B4157B24E6 = {
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -280,6 +285,7 @@
 				97C8288C3A5A698AEB31FA1A /* GameSceneView.swift in Sources */,
 				A20E4A06A1B9AC36B62BF8F3 /* GameSession.swift in Sources */,
 				5E7EBD1EC56F6F9E01C39439 /* GameWorld.swift in Sources */,
+				1595EEF3AA0953EC017B8C64 /* GridMap.swift in Sources */,
 				A6908A33105D18A86826A3F7 /* HUDView.swift in Sources */,
 				14210416560DF4CA18554448 /* L10n.swift in Sources */,
 				623D639505B8CF302C71F388 /* LanguageManager.swift in Sources */,
@@ -371,7 +377,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = S769436W24;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -391,7 +396,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = S769436W24;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -474,7 +478,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = S769436W24;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -493,7 +496,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = S769436W24;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;

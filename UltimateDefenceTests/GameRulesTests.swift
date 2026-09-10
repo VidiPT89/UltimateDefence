@@ -181,6 +181,19 @@ final class GameRulesTests: XCTestCase {
         }
     }
 
+    func testRoutePointsAreWalkable() {
+        for arena in ArenaMap.allCases {
+            let layout = MapBuilder.make(arena).1
+            let points = layout.attackPaths.flatMap { $0 } + layout.defendPosts
+            for point in points {
+                XCTAssertFalse(
+                    Collision.isBlocked(point, radius: 0.4, walls: layout.walls),
+                    "Blocked route point on \(arena.rawValue) at \(point.x),\(point.z)"
+                )
+            }
+        }
+    }
+
     func testAttackPathsMoveTowardTheSite() {
         for arena in ArenaMap.allCases {
             let layout = MapBuilder.make(arena).1

@@ -57,4 +57,14 @@ final class GameRulesTests: XCTestCase {
         let resolved = Collision.resolve(position: start, proposed: proposed, radius: 0.5, walls: [wall])
         XCTAssertLessThan(resolved.z, -1)
     }
+
+    func testLocalizationCoversEveryKey() {
+        for key in L10nKey.allCases {
+            let pt = L10n.string(key, language: .portuguese)
+            let en = L10n.string(key, language: .english)
+            XCTAssertFalse(pt.isEmpty, "Missing PT for \(key)")
+            XCTAssertFalse(en.isEmpty, "Missing EN for \(key)")
+            XCTAssertNotEqual(pt, key.rawValue)
+        }
+    }
 }

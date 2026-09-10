@@ -7,6 +7,7 @@ final class GameSession: ObservableObject {
     @Published var mag = WeaponStats.rifle.magazine
     @Published var reserve = WeaponStats.rifle.reserve
     @Published var weaponName = WeaponStats.rifle.name
+    @Published var slot: WeaponSlot = .rifle
     @Published var timeLeft = GameRules.roundTime
     @Published var bombPlanted = false
     @Published var bombTimeLeft = GameRules.bombTime
@@ -24,16 +25,5 @@ final class GameSession: ObservableObject {
         case menu
         case playing
         case result
-    }
-
-    var resultTitle: String {
-        switch outcome {
-        case .defendersWinElimination: return "Vitória: eliminação"
-        case .defendersWinTime: return "Vitória: o tempo esgotou"
-        case .defendersWinDefuse: return "Vitória: artefacto desarmado"
-        case .attackersWinPlant: return "Derrota: o artefacto explodiu"
-        case .attackersWinElimination: return "Derrota: foste abatido"
-        case .inProgress: return ""
-        }
     }
 }

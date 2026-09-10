@@ -20,6 +20,8 @@ targets:
       - path: Models
       - path: Engine
       - path: Views
+      - path: Managers
+      - path: Localization
       - path: Resources
     info:
       path: Info.plist

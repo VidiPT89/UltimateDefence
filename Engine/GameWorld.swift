@@ -188,6 +188,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         session.mag = player.currentMag
         session.reserve = player.reserve[player.slot] ?? 0
         session.weaponName = player.currentStats.name
+        session.slot = player.slot
         session.timeLeft = bombPlanted ? max(0, GameRules.bombTime - bombElapsed) : max(0, GameRules.roundTime - roundElapsed)
         session.bombPlanted = bombPlanted
         session.bombTimeLeft = max(0, GameRules.bombTime - bombElapsed)

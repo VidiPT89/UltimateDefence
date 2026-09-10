@@ -13,6 +13,9 @@
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
 - ✅ Industrial 3D compound with cover, lighting, particle dust and an animated bomb site
 - ✅ Cinematic HUD: health, ammo, round timer and defuse progress
+- ✅ Bilingual PT-PT / English language switch
+- ✅ Dark, Light and System appearance, with iVidi.dev orange, burnt yellow and black
+- ✅ Animated splash with developer credits, then the main menu
 - ✅ Native macOS window with pointer lock while you play
 
 ## 🛠️ Tech Stack

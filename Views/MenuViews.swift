@@ -2,66 +2,56 @@ import SwiftUI
 
 struct MainMenuView: View {
     let onPlay: () -> Void
+    @EnvironmentObject private var language: LanguageManager
+    @EnvironmentObject private var theme: ThemeManager
+    @Environment(\.colorScheme) private var scheme
     @State private var pulse = false
 
     var body: some View {
         TimelineView(.animation) { timeline in
             let t = timeline.date.timeIntervalSinceReferenceDate
             ZStack {
-                UDTheme.ink.ignoresSafeArea()
+                UDTheme.pageBackground(for: scheme).ignoresSafeArea()
                 animatedBackdrop(t)
-                VStack(spacing: 28) {
+                VStack(spacing: 22) {
                     Spacer()
-                    Text("ULTIMATE DEFENCE")
-                        .font(.system(size: 48, weight: .heavy, design: .rounded))
-                        .tracking(3)
-                        .foregroundStyle(.white)
-                        .shadow(color: UDTheme.ember.opacity(0.55), radius: pulse ? 28 : 10)
-                    Text("Defende o site A. Elimina os atacantes ou impede o artefacto.")
+                    Text(language.t(.appName).uppercased())
+                        .font(.system(size: 46, weight: .heavy, design: .rounded))
+                        .tracking(2.4)
+                        .foregroundStyle(UDTheme.primaryText(for: scheme))
+                        .shadow(color: UDTheme.orange.opacity(scheme == .dark ? 0.5 : 0.2), radius: pulse ? 24 : 8)
+                    Text(language.t(.tagline))
                         .font(.system(size: 16, weight: .medium, design: .rounded))
-                        .foregroundStyle(UDTheme.steel)
+                        .foregroundStyle(UDTheme.muted(for: scheme))
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: 480)
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        controlRow("WASD", "Mover")
-                        controlRow("Rato + clique", "Olhar e disparar")
-                        controlRow("1 / 2 · R · E", "Armas, recarregar, desarmar")
-                        controlRow("Esc", "Menu")
-                    }
-                    .padding(20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(Color.white.opacity(0.04))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
-                            )
-                    )
+                    settingsCard
+                    controlsCard
 
                     Button(action: onPlay) {
                         HStack(spacing: 10) {
-                            Text("INICIAR RONDA")
-                                .font(.system(size: 17, weight: .bold, design: .rounded))
-                                .tracking(1.4)
+                            Text(language.t(.startRound).uppercased())
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .tracking(1.2)
                             Image(systemName: "play.fill")
-                                .font(.system(size: 12, weight: .bold))
+                                .font(.system(size: 11, weight: .bold))
                                 .frame(width: 28, height: 28)
-                                .background(Circle().fill(Color.black.opacity(0.18)))
+                                .background(Circle().fill(Color("Black").opacity(0.16)))
                         }
-                        .padding(.leading, 26)
+                        .padding(.leading, 24)
                         .padding(.trailing, 10)
                         .padding(.vertical, 10)
-                        .foregroundStyle(UDTheme.ink)
-                        .background(UDTheme.ember)
+                        .foregroundStyle(Color("Black"))
+                        .background(UDTheme.orange)
                         .clipShape(Capsule())
-                        .shadow(color: UDTheme.ember.opacity(0.45), radius: 16, y: 8)
+                        .shadow(color: UDTheme.orange.opacity(0.4), radius: 14, y: 6)
                     }
                     .buttonStyle(.plain)
                     .scaleEffect(pulse ? 1.03 : 1)
                     Spacer()
                 }
-                .padding(48)
+                .padding(44)
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true)) {
@@ -71,42 +61,85 @@ struct MainMenuView: View {
         }
     }
 
+    private var settingsCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(language.t(.settings))
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(UDTheme.muted(for: scheme))
+            Picker(language.t(.language), selection: Binding(
+                get: { language.currentLanguage },
+                set: { language.setLanguage($0) }
+            )) {
+                ForEach(AppLanguage.allCases, id: \.self) { lang in
+                    Text(lang.displayName).tag(lang)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Picker(language.t(.theme), selection: Binding(
+                get: { theme.currentTheme },
+                set: { theme.setTheme($0) }
+            )) {
+                Text(language.t(.darkMode)).tag(AppTheme.dark)
+                Text(language.t(.lightMode)).tag(AppTheme.light)
+                Text(language.t(.systemMode)).tag(AppTheme.system)
+            }
+            .pickerStyle(.segmented)
+        }
+        .padding(18)
+        .frame(maxWidth: 520)
+        .background(cardBackground)
+    }
+
+    private var controlsCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            controlRow("WASD", language.t(.move))
+            controlRow("Rato + clique", language.t(.lookShoot))
+            controlRow("1 / 2 · R · E", language.t(.weaponsReloadDefuse))
+            controlRow("Esc", language.t(.escapeMenu))
+        }
+        .padding(18)
+        .frame(maxWidth: 520, alignment: .leading)
+        .background(cardBackground)
+    }
+
+    private var cardBackground: some View {
+        RoundedRectangle(cornerRadius: 18, style: .continuous)
+            .fill(UDTheme.cardFill(for: scheme))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(UDTheme.orange.opacity(0.28), lineWidth: 1)
+            )
+    }
+
     private func animatedBackdrop(_ t: TimeInterval) -> some View {
         ZStack {
             RadialGradient(
-                colors: [UDTheme.ember.opacity(0.28), Color.clear],
-                center: UnitPoint(x: 0.5 + 0.08 * sin(t * 0.4), y: 0.35),
+                colors: [UDTheme.orange.opacity(scheme == .dark ? 0.28 : 0.18), Color.clear],
+                center: UnitPoint(x: 0.5 + 0.08 * sin(t * 0.4), y: 0.32),
                 startRadius: 20,
                 endRadius: 520
             )
             RadialGradient(
-                colors: [UDTheme.amber.opacity(0.12), Color.clear],
-                center: UnitPoint(x: 0.72, y: 0.8),
+                colors: [UDTheme.burnt.opacity(0.16), Color.clear],
+                center: UnitPoint(x: 0.74, y: 0.82),
                 startRadius: 10,
-                endRadius: 420
+                endRadius: 400
             )
-            ForEach(0..<18, id: \.self) { i in
-                Capsule()
-                    .fill(Color.white.opacity(0.04))
-                    .frame(width: 1, height: 90 + CGFloat(i % 5) * 18)
-                    .offset(
-                        x: CGFloat((i - 9) * 48),
-                        y: CGFloat(sin(t * 0.7 + Double(i)) * 24)
-                    )
-            }
         }
         .ignoresSafeArea()
+        .allowsHitTesting(false)
     }
 
     private func controlRow(_ keys: String, _ label: String) -> some View {
         HStack {
             Text(keys)
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(UDTheme.ember)
-                .frame(width: 140, alignment: .leading)
+                .foregroundStyle(UDTheme.orange)
+                .frame(width: 148, alignment: .leading)
             Text(label)
                 .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(UDTheme.steel)
+                .foregroundStyle(UDTheme.muted(for: scheme))
         }
     }
 }
@@ -115,6 +148,8 @@ struct ResultView: View {
     @ObservedObject var session: GameSession
     let onAgain: () -> Void
     let onMenu: () -> Void
+    @EnvironmentObject private var language: LanguageManager
+    @Environment(\.colorScheme) private var scheme
 
     private var victory: Bool {
         switch session.outcome {
@@ -125,33 +160,51 @@ struct ResultView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.62).ignoresSafeArea()
-            VStack(spacing: 22) {
-                Text(victory ? "OBJECTIVO CUMPRIDO" : "LINHA QUEBRADA")
+            Color("Black").opacity(scheme == .dark ? 0.62 : 0.28).ignoresSafeArea()
+            VStack(spacing: 18) {
+                Text(language.t(victory ? .objectiveComplete : .lineBroken).uppercased())
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .tracking(2)
-                    .foregroundStyle(victory ? UDTheme.mint : UDTheme.ember)
-                Text(session.resultTitle)
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .tracking(1.6)
+                    .foregroundStyle(victory ? UDTheme.burnt : UDTheme.orange)
+                Text(resultCopy)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(UDTheme.primaryText(for: scheme))
                     .multilineTextAlignment(.center)
-                HStack(spacing: 14) {
-                    Button("Nova ronda", action: onAgain)
-                    Button("Menu", action: onMenu)
+                HStack(spacing: 12) {
+                    capsuleButton(language.t(.newRound), action: onAgain)
+                    capsuleButton(language.t(.menu), action: onMenu)
                 }
-                .buttonStyle(.plain)
+            }
+            .padding(32)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 26, style: .continuous)
+                    .stroke(UDTheme.orange.opacity(0.35), lineWidth: 1)
+            )
+        }
+    }
+
+    private func capsuleButton(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color("Black"))
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
-            }
-            .padding(36)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
-            )
-            .shadow(color: (victory ? UDTheme.mint : UDTheme.ember).opacity(0.25), radius: 30)
+                .background(UDTheme.orange)
+                .clipShape(Capsule())
         }
-        .transition(.opacity.combined(with: .scale(scale: 0.96)))
+        .buttonStyle(.plain)
+    }
+
+    private var resultCopy: String {
+        switch session.outcome {
+        case .defendersWinElimination: return language.t(.victoryElimination)
+        case .defendersWinTime: return language.t(.victoryTime)
+        case .defendersWinDefuse: return language.t(.victoryDefuse)
+        case .attackersWinPlant: return language.t(.defeatPlant)
+        case .attackersWinElimination: return language.t(.defeatEliminated)
+        case .inProgress: return ""
+        }
     }
 }

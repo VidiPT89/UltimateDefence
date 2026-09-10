@@ -7,12 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		14210416560DF4CA18554448 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B8C5F52F991BADB3B5B57E7 /* L10n.swift */; };
 		1FC3351CC8ED974F7C852057 /* BotActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F353C5B66BE5DBFC692629A /* BotActor.swift */; };
 		36BCE65EA78A51D93BEF4861 /* GameRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE643867503408AC169E47 /* GameRules.swift */; };
 		3B269A4C526D770B195A67B9 /* MenuViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDBDA6CE0248F473EE4116B /* MenuViews.swift */; };
 		5E7EBD1EC56F6F9E01C39439 /* GameWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BEAB5AD22D5DDFDE621415C /* GameWorld.swift */; };
+		623D639505B8CF302C71F388 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF1842BCDE0955C2B7DEC6C /* LanguageManager.swift */; };
+		66BD506521C7312101D48193 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4C5A7B4DE7DD19D8F362BE /* SplashView.swift */; };
 		6A0726D14BCFE810909D56F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A80285572682944FE46267DB /* Assets.xcassets */; };
 		75CA6581CDADC20EC77ACC79 /* GameRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B71BC957B2C007D927F3647 /* GameRulesTests.swift */; };
+		79B7E6B1EB26479F3DEED9E0 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EED2D740B41C6DBEB79DACD /* ThemeManager.swift */; };
 		954101E433CF55DFE4EA8678 /* PlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B4DD48650809730878F70F /* PlayerController.swift */; };
 		97C8288C3A5A698AEB31FA1A /* GameSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05AE6CD1527F7FF852DFB2F /* GameSceneView.swift */; };
 		9B456D6DCC89FFCCBAAF92C0 /* UltimateDefenceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73776F14207A17635276CA62 /* UltimateDefenceApp.swift */; };
@@ -41,13 +45,17 @@
 		29A6E07F683EF914F09B9C10 /* UltimateDefence.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UltimateDefence.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CD2A6D9951865A6B5634E93 /* UDTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDTheme.swift; sourceTree = "<group>"; };
 		39C12CCAD1489F8611E89BED /* FX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FX.swift; sourceTree = "<group>"; };
+		3B8C5F52F991BADB3B5B57E7 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
+		3EF1842BCDE0955C2B7DEC6C /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
 		4A24C22D61AB8F4B68D8AE83 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		52ABF2451B82F0ED2B103754 /* MapBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapBuilder.swift; sourceTree = "<group>"; };
 		5FDBDA6CE0248F473EE4116B /* MenuViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViews.swift; sourceTree = "<group>"; };
 		69DE643867503408AC169E47 /* GameRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRules.swift; sourceTree = "<group>"; };
+		6B4C5A7B4DE7DD19D8F362BE /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		73776F14207A17635276CA62 /* UltimateDefenceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UltimateDefenceApp.swift; sourceTree = "<group>"; };
 		87B4DD48650809730878F70F /* PlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerController.swift; sourceTree = "<group>"; };
 		8B71BC957B2C007D927F3647 /* GameRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRulesTests.swift; sourceTree = "<group>"; };
+		8EED2D740B41C6DBEB79DACD /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		909757D56B96DA4E6592071E /* GameSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSession.swift; sourceTree = "<group>"; };
 		923AEC0AA8A3C51B52854F48 /* UltimateDefenceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UltimateDefenceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9420E157C4A4A2DC783AD852 /* Collision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collision.swift; sourceTree = "<group>"; };
@@ -81,6 +89,7 @@
 				B39E71E51F1610A6A861740C /* HUDView.swift */,
 				5FDBDA6CE0248F473EE4116B /* MenuViews.swift */,
 				4A24C22D61AB8F4B68D8AE83 /* RootView.swift */,
+				6B4C5A7B4DE7DD19D8F362BE /* SplashView.swift */,
 				2CD2A6D9951865A6B5634E93 /* UDTheme.swift */,
 			);
 			path = Views;
@@ -91,12 +100,22 @@
 			children = (
 				73776F14207A17635276CA62 /* UltimateDefenceApp.swift */,
 				AA758219A3EFB605B4866949 /* Engine */,
+				96064A99953C469B2A75A720 /* Localization */,
+				D78C91D9AB1F80FB7310F63E /* Managers */,
 				B8B0AD02AAF8F0AD873F6114 /* Models */,
 				AF124D8C3886C23B13DC03AD /* Resources */,
 				03B9058CA4680F00856E291A /* UltimateDefenceTests */,
 				27874F59CBD67DB978937575 /* Views */,
 				1A5D07670C23D1ED82892D08 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		96064A99953C469B2A75A720 /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+				3B8C5F52F991BADB3B5B57E7 /* L10n.swift */,
+			);
+			path = Localization;
 			sourceTree = "<group>";
 		};
 		AA758219A3EFB605B4866949 /* Engine */ = {
@@ -127,6 +146,15 @@
 				909757D56B96DA4E6592071E /* GameSession.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		D78C91D9AB1F80FB7310F63E /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				3EF1842BCDE0955C2B7DEC6C /* LanguageManager.swift */,
+				8EED2D740B41C6DBEB79DACD /* ThemeManager.swift */,
+			);
+			path = Managers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -239,10 +267,14 @@
 				A20E4A06A1B9AC36B62BF8F3 /* GameSession.swift in Sources */,
 				5E7EBD1EC56F6F9E01C39439 /* GameWorld.swift in Sources */,
 				A6908A33105D18A86826A3F7 /* HUDView.swift in Sources */,
+				14210416560DF4CA18554448 /* L10n.swift in Sources */,
+				623D639505B8CF302C71F388 /* LanguageManager.swift in Sources */,
 				E1610D5374B7C9D919BE0F0E /* MapBuilder.swift in Sources */,
 				3B269A4C526D770B195A67B9 /* MenuViews.swift in Sources */,
 				954101E433CF55DFE4EA8678 /* PlayerController.swift in Sources */,
 				D401D3F6A10E5D9D979F2646 /* RootView.swift in Sources */,
+				66BD506521C7312101D48193 /* SplashView.swift in Sources */,
+				79B7E6B1EB26479F3DEED9E0 /* ThemeManager.swift in Sources */,
 				B129A89248304018A4F02D92 /* UDTheme.swift in Sources */,
 				9B456D6DCC89FFCCBAAF92C0 /* UltimateDefenceApp.swift in Sources */,
 			);

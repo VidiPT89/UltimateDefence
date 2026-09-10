@@ -14,13 +14,6 @@ enum NodeName {
     static let trim = "trim"
 }
 
-enum WallOpening {
-    case north(center: Float, width: Float)
-    case south(center: Float, width: Float)
-    case east(center: Float, width: Float)
-    case west(center: Float, width: Float)
-}
-
 struct MapLayout {
     let walls: [AABB]
     let floors: [Platform]
@@ -38,8 +31,6 @@ final class MapKit {
     var walls: [AABB] = []
     var floors: [Platform] = []
     private let wallTexture: NSImage
-    private let thickness: Float = 0.8
-    private let doorHeight: Float = 2.6
 
     init(sky: NSImage, fog: NSColor, wall: NSImage, ground: NSImage, groundSize: CGFloat) {
         wallTexture = wall
@@ -55,28 +46,6 @@ final class MapKit {
         floor.position = SCNVector3(0, -0.2, 0)
         floor.name = NodeName.ground
         scene.rootNode.addChildNode(floor)
-    }
-
-    func room(minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float = 4.0, openings: [WallOpening] = []) {
-        var north: [(Float, Float)] = []
-        var south: [(Float, Float)] = []
-        var east: [(Float, Float)] = []
-        var west: [(Float, Float)] = []
-        for opening in openings {
-            switch opening {
-            case .north(let center, let width): north.append((center, width))
-            case .south(let center, let width): south.append((center, width))
-            case .east(let center, let width): east.append((center, width))
-            case .west(let center, let width): west.append((center, width))
-            }
-        }
-        spanX(z: maxZ, minX: minX, maxX: maxX, gaps: north, h: h)
-        spanX(z: minZ, minX: minX, maxX: maxX, gaps: south, h: h)
-        spanZ(x: maxX, minZ: minZ, maxZ: maxZ, gaps: east, h: h)
-        spanZ(x: minX, minZ: minZ, maxZ: maxZ, gaps: west, h: h)
-        for opening in openings {
-            doorway(opening, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, h: h)
-        }
     }
 
     func wall(
@@ -140,17 +109,6 @@ final class MapKit {
         walls.append(AABB(minX: x - 0.4, maxX: x + 0.4, minZ: z - 0.4, maxZ: z + 0.4, blocksSight: false))
     }
 
-    func hall(minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float = 4.0) {
-        let alongZ = (maxZ - minZ) >= (maxX - minX)
-        if alongZ {
-            wall(x: minX, z: (minZ + maxZ) / 2, w: thickness, d: maxZ - minZ, h: h)
-            wall(x: maxX, z: (minZ + maxZ) / 2, w: thickness, d: maxZ - minZ, h: h)
-        } else {
-            wall(x: (minX + maxX) / 2, z: minZ, w: maxX - minX, d: thickness, h: h)
-            wall(x: (minX + maxX) / 2, z: maxZ, w: maxX - minX, d: thickness, h: h)
-        }
-    }
-
     func water(minX: Float, maxX: Float, minZ: Float, maxZ: Float) {
         let w = maxX - minX
         let d = maxZ - minZ
@@ -193,20 +151,6 @@ final class MapKit {
         }
     }
 
-    private func doorway(_ opening: WallOpening, minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float) {
-        let lintel = max(0.5, h - doorHeight)
-        switch opening {
-        case .north(let center, let width):
-            wall(x: center, z: maxZ, w: width, d: thickness, h: lintel, y: doorHeight, collide: false)
-        case .south(let center, let width):
-            wall(x: center, z: minZ, w: width, d: thickness, h: lintel, y: doorHeight, collide: false)
-        case .east(let center, let width):
-            wall(x: maxX, z: center, w: thickness, d: width, h: lintel, y: doorHeight, collide: false)
-        case .west(let center, let width):
-            wall(x: minX, z: center, w: thickness, d: width, h: lintel, y: doorHeight, collide: false)
-        }
-    }
-
     func layout(
         site: SIMD3<Float>,
         player: SIMD3<Float>,
@@ -227,36 +171,6 @@ final class MapKit {
             attackPaths: attackPaths,
             defendPosts: defendPosts
         )
-    }
-
-    private func spanX(z: Float, minX: Float, maxX: Float, gaps: [(Float, Float)], h: Float) {
-        var cursor = minX
-        for gap in gaps.sorted(by: { $0.0 < $1.0 }) {
-            let g0 = max(minX, gap.0 - gap.1 / 2)
-            let g1 = min(maxX, gap.0 + gap.1 / 2)
-            if g0 - cursor > 0.9 {
-                wall(x: (cursor + g0) / 2, z: z, w: g0 - cursor, d: thickness, h: h)
-            }
-            cursor = max(cursor, g1)
-        }
-        if maxX - cursor > 0.9 {
-            wall(x: (cursor + maxX) / 2, z: z, w: maxX - cursor, d: thickness, h: h)
-        }
-    }
-
-    private func spanZ(x: Float, minZ: Float, maxZ: Float, gaps: [(Float, Float)], h: Float) {
-        var cursor = minZ
-        for gap in gaps.sorted(by: { $0.0 < $1.0 }) {
-            let g0 = max(minZ, gap.0 - gap.1 / 2)
-            let g1 = min(maxZ, gap.0 + gap.1 / 2)
-            if g0 - cursor > 0.9 {
-                wall(x: x, z: (cursor + g0) / 2, w: thickness, d: g0 - cursor, h: h)
-            }
-            cursor = max(cursor, g1)
-        }
-        if maxZ - cursor > 0.9 {
-            wall(x: x, z: (cursor + maxZ) / 2, w: thickness, d: maxZ - cursor, h: h)
-        }
     }
 
     private func addLights() {

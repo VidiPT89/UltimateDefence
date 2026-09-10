@@ -77,8 +77,6 @@ enum MapBuilder {
         kit.pillar(x: 24, z: 8)
         kit.pipe(from: SIMD3(25, 3.4, -30), to: SIMD3(25, 3.4, 20))
         kit.pipe(from: SIMD3(-22, 3.4, -30), to: SIMD3(-22, 3.4, 6))
-        kit.decal(x: 0, y: 1.4, z: -33.3, w: 2.2, h: 1.4, yaw: 0)
-        kit.decal(x: 25, y: 1.6, z: -8, w: 1.8, h: 1.2, yaw: .pi / 2)
         kit.lamps([
             SIMD3(25, 4.6, 28), SIMD3(8, 4.8, 30), SIMD3(0, 4.4, -8),
             SIMD3(25, 4.2, -28), SIMD3(-22, 4.2, -20), SIMD3(10, 5.2, 16)

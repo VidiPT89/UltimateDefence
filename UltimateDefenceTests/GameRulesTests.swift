@@ -149,7 +149,7 @@ final class GameRulesTests: XCTestCase {
         XCTAssertEqual(MatchSize.six.allyCount, 5)
     }
 
-    func testPlayerDeathDoesNotEndRoundIfAlliesRemain() {
+    func testPlayerDeathShowsTheResultImmediately() {
         let result = GameRules.outcome(
             playerAlive: false,
             defendersAlive: 3,
@@ -159,7 +159,7 @@ final class GameRulesTests: XCTestCase {
             bombTimeLeft: 40,
             defused: false
         )
-        XCTAssertEqual(result, .inProgress)
+        XCTAssertEqual(result, .attackersWinElimination)
     }
 
     func testLastDefenderDeathEndsTheRound() {

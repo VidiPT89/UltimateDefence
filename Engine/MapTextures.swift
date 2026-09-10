@@ -21,8 +21,8 @@ enum MapTextures {
         let n = noise(x + row * 3, y)
         let chip = (gx == 6 && gy == 4) || (gx == 22 && gy == 9) ? -0.12 : 0
         let dirt = ((x / 9) + (y / 11)) % 5 == 0 ? -0.07 : 0
-        if inMortar { return (0.28, 0.20, 0.12) }
-        return (0.68 + n * 0.10 + chip + dirt, 0.48 + n * 0.07 + dirt, 0.28 + n * 0.05)
+        if inMortar { return (0.42, 0.32, 0.22) }
+        return (0.74 + n * 0.05 + chip + dirt * 0.5, 0.58 + n * 0.04, 0.38 + n * 0.03)
     }
 
     static let crate = make(size: 256) { x, y, size in
@@ -66,7 +66,7 @@ enum MapTextures {
     }
 
     static func sky(top: NSColor, bottom: NSColor) -> NSImage {
-        let size = 64
+        let size = 256
         let image = NSImage(size: NSSize(width: size, height: size))
         image.lockFocus()
         var tr: CGFloat = 0, tg: CGFloat = 0, tb: CGFloat = 0, ta: CGFloat = 0
@@ -74,7 +74,7 @@ enum MapTextures {
         top.getRed(&tr, green: &tg, blue: &tb, alpha: &ta)
         bottom.getRed(&br, green: &bg, blue: &bb, alpha: &ba)
         for y in 0..<size {
-            let t = CGFloat(y) / CGFloat(size - 1)
+            let t = pow(CGFloat(y) / CGFloat(size - 1), 0.85)
             NSColor(
                 calibratedRed: br + (tr - br) * t,
                 green: bg + (tg - bg) * t,
@@ -83,34 +83,24 @@ enum MapTextures {
             ).setFill()
             NSRect(x: 0, y: y, width: size, height: 1).fill()
         }
-        NSColor(calibratedRed: 1, green: 0.95, blue: 0.75, alpha: 1).setFill()
-        NSBezierPath(ovalIn: NSRect(x: 44, y: 48, width: 8, height: 8)).fill()
+        NSColor(calibratedRed: 1, green: 0.93, blue: 0.72, alpha: 1).setFill()
+        NSBezierPath(ovalIn: NSRect(x: 168, y: 188, width: 28, height: 28)).fill()
         image.unlockFocus()
         return image
     }
 
-    static let bump = make(size: 128) { x, y, _ in
-        let n = noise(x, y)
-        return (n, n, n)
-    }
-
     static func goldSrc(_ contents: Any) -> SCNMaterial {
         let mat = SCNMaterial()
-        mat.lightingModel = .phong
+        mat.lightingModel = .blinn
         mat.diffuse.contents = contents
         mat.diffuse.wrapS = .repeat
         mat.diffuse.wrapT = .repeat
         mat.diffuse.magnificationFilter = .linear
         mat.diffuse.minificationFilter = .linear
         mat.diffuse.mipFilter = .linear
-        mat.normal.contents = bump
-        mat.normal.intensity = 0.55
-        mat.normal.wrapS = .repeat
-        mat.normal.wrapT = .repeat
-        mat.specular.contents = NSColor(calibratedWhite: 0.22, alpha: 1)
-        mat.shininess = 18
-        mat.locksAmbientWithDiffuse = false
-        mat.ambient.contents = NSColor(calibratedWhite: 0.22, alpha: 1)
+        mat.specular.contents = NSColor(calibratedWhite: 0.06, alpha: 1)
+        mat.shininess = 4
+        mat.locksAmbientWithDiffuse = true
         mat.isDoubleSided = true
         mat.writesToDepthBuffer = true
         mat.readsFromDepthBuffer = true

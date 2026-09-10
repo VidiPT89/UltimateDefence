@@ -313,7 +313,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let reloading = CACurrentMediaTime() < player.reloadingUntil
         let moving = player.moving
         let aiming = player.aiming
-        let alive = player.isAlive
         onMain {
             if self.session.health != health { self.session.health = health }
             if self.session.mag != mag { self.session.mag = mag }
@@ -327,7 +326,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             if self.session.reloading != reloading { self.session.reloading = reloading }
             if self.session.moving != moving { self.session.moving = moving }
             if self.session.aiming != aiming { self.session.aiming = aiming }
-            if self.session.playerAlive != alive { self.session.playerAlive = alive }
         }
     }
 

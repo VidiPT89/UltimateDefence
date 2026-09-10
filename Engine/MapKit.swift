@@ -215,17 +215,6 @@ final class MapKit {
         }
     }
 
-    func decal(x: Float, y: Float, z: Float, w: Float, h: Float, yaw: Float) {
-        let plane = SCNPlane(width: CGFloat(w), height: CGFloat(h))
-        plane.firstMaterial = MapTextures.goldSrc(MapTextures.concrete)
-        plane.firstMaterial?.transparency = 0.35
-        let node = SCNNode(geometry: plane)
-        node.name = NodeName.trim
-        node.position = SCNVector3(x, y, z)
-        node.eulerAngles.y = CGFloat(yaw)
-        scene.rootNode.addChildNode(node)
-    }
-
     func water(minX: Float, maxX: Float, minZ: Float, maxZ: Float) {
         let w = maxX - minX
         let d = maxZ - minZ

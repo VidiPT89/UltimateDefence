@@ -76,7 +76,7 @@ final class PlayerController {
         SIMD3(cos(yaw), 0, -sin(yaw))
     }
 
-    func move(dt: Float, walls: [AABB], floors: [Platform] = []) {
+    func move(dt: Float, walls: [AABB]) {
         guard isAlive else { return }
         var dir = SIMD3<Float>(repeating: 0)
         if keys.contains(13) || keys.contains(126) { dir += forward() } // W / up
@@ -101,9 +101,7 @@ final class PlayerController {
         vertical -= GameRules.gravity * dt
         var y = Float(node.position.y) + vertical * dt
         punch = max(0, punch - dt * 2.4)
-        let sampleX = Float(node.position.x)
-        let sampleZ = Float(node.position.z)
-        let eye = Collision.floorHeight(x: sampleX, z: sampleZ, floors: floors) + (crouching ? crouchEye : standEye)
+        let eye = crouching ? crouchEye : standEye
         if y <= eye + 0.06 {
             if eye - y < 0.58 || grounded {
                 y = eye
@@ -140,7 +138,7 @@ final class PlayerController {
         if hypot(resolved.x - proposed.x, resolved.z - proposed.z) > 0.01 {
             velocity = SIMD3(resolved.x - Float(node.position.x), 0, resolved.z - Float(node.position.z)) / max(dt, 0.001)
         }
-        let landed = Collision.floorHeight(x: resolved.x, z: resolved.z, floors: floors) + (crouching ? crouchEye : standEye)
+        let landed = eye
         if y <= landed + 0.06, landed - y < 0.58 || grounded {
             y = landed
             vertical = 0

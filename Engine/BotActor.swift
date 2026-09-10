@@ -81,17 +81,18 @@ final class BotActor {
             node.eulerAngles.y = CGFloat(atan2(-dir.x, -dir.z))
         }
 
+        let onSite = Collision.distanceXZ(pos, site) < GameRules.siteRadius
+        if GameRules.canPlant(isTerrorist: isTerrorist, botId: id, planterId: planterId, planted: bombPlanted, onSite: onSite) {
+            plantProgress += TimeInterval(dt) * (canShoot ? 0.55 : 1)
+            if plantProgress >= GameRules.plantTime { return .plant }
+        } else {
+            plantProgress = max(0, plantProgress - TimeInterval(dt) * 0.6)
+        }
+
         if canShoot, now - lastShot > 0.45 + TimeInterval(id) * 0.04 {
             lastShot = now
             if shootPlayer { return .fireAtPlayer }
             if let shootBot { return .fireAtBot(shootBot.id) }
-        }
-
-        if isTerrorist, !bombPlanted, Collision.distanceXZ(pos, site) < GameRules.siteRadius {
-            plantProgress += TimeInterval(dt)
-            if plantProgress >= GameRules.plantTime { return .plant }
-        } else {
-            plantProgress = max(0, plantProgress - TimeInterval(dt) * 0.6)
         }
         return .idle
     }
@@ -112,7 +113,10 @@ final class BotActor {
     }
 
     private func destination(from pos: SIMD3<Float>, site: SIMD3<Float>, bombPlanted: Bool, planterId: Int) -> SIMD3<Float> {
-        if isTerrorist, id == planterId, !bombPlanted, waypoint >= path.count - 1 {
+        if bombPlanted {
+            return site
+        }
+        if isTerrorist, id == planterId, waypoint >= path.count - 1 {
             return site
         }
         while waypoint < path.count, Collision.distanceXZ(pos, path[waypoint]) < 1.4 {

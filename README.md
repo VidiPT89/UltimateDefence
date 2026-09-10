@@ -11,10 +11,11 @@
 - ✅ Round-based defence: eliminate attackers, run down the clock, or defuse the artefact
 - ✅ Maps built on a 2 m grid so rooms, halls and doors share the same edges
 - ✅ Match sizes from 1v1 to 6v6 with allied defender bots versus terrorist bots
-- ✅ Any attacker can plant on Site A; dying ends the round immediately
-- ✅ Humanoid CT and T models, crates, barrels, pillars and indoor/outdoor compounds
+- ✅ Dying ends the round immediately
+- ✅ Humanoid CT and T models, crates, barrels and indoor/outdoor compounds
 - ✅ Walk (Shift), crouch (Ctrl), jump, aim-down-sights, recoil punch and distance-based bot accuracy
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
+- ✅ One designated attacker plants on Site A; the others take mid, long or tunnel
 - ✅ HUD: health, ammo, round timer and defuse progress
 - ✅ Bilingual PT-PT / English language switch
 - ✅ Dark, Light and System appearance, with iVidi.dev orange, burnt yellow and black
@@ -56,7 +57,7 @@ Select the `UltimateDefence` scheme and run on My Mac (`⌘R`).
 ## 📖 Usage
 
 1. Pick a map (Dust II, Aztec, Office, Mill) and a match size (1v1 to 6v6), then click **INICIAR RONDA**
-2. You are on the defence. Allied CT bots hold with you. Terrorists rush Site A to plant
+2. You are on the defence. Allied CT bots hold with you. One terrorist plants on Site A while the others push the routes
 3. Use **WASD** to move (default run), **Shift** to walk, **Ctrl** to crouch, **Space** to jump, the mouse to look, left click to fire and right click to aim
 4. **1** / **2** or the scroll wheel switch weapons, **R** reloads, **E** defuses while standing on the site
 5. Toggle sound, language and theme from the main menu. **Esc** returns to the menu and releases the pointer

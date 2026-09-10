@@ -17,18 +17,6 @@ struct AABB {
     }
 }
 
-struct Platform {
-    var minX: Float
-    var maxX: Float
-    var minZ: Float
-    var maxZ: Float
-    var height: Float
-
-    func contains(x: Float, z: Float) -> Bool {
-        x >= minX && x <= maxX && z >= minZ && z <= maxZ
-    }
-}
-
 enum Collision {
     static func resolve(position: SIMD3<Float>, proposed: SIMD3<Float>, radius: Float, walls: [AABB]) -> SIMD3<Float> {
         var x = proposed.x
@@ -92,12 +80,6 @@ enum Collision {
             if !moved { break }
         }
         return SIMD3(x, position.y, z)
-    }
-
-    static func floorHeight(x: Float, z: Float, floors: [Platform]) -> Float {
-        floors.reduce(0) { best, pad in
-            pad.contains(x: x, z: z) ? max(best, pad.height) : best
-        }
     }
 
     static func losClear(_ from: SIMD3<Float>, _ to: SIMD3<Float>, walls: [AABB]) -> Bool {

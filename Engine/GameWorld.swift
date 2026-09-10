@@ -112,7 +112,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             sounds.playReload()
         }
         wasReloading = reloading
-        player.move(dt: dt, walls: layout.walls, floors: layout.floors)
+        player.move(dt: dt, walls: layout.walls)
         if player.moving, player.grounded, now - lastStep > (player.sprinting ? 0.28 : 0.38) {
             lastStep = now
             sounds.playStep()
@@ -189,7 +189,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 site: layout.siteCenter,
                 walls: layout.walls,
                 bombPlanted: bombPlanted,
-                planterId: terrorists.first(where: \.isAlive)?.id ?? 0,
+                planterId: terrorists.filter(\.isAlive).map(\.id).min() ?? 0,
                 others: bots
             )
             switch action {

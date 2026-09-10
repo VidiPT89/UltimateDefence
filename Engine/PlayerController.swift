@@ -45,9 +45,8 @@ final class PlayerController {
         cameraNode.camera?.wantsHDR = false
         cameraNode.camera?.bloomIntensity = 0
         cameraNode.camera?.motionBlurIntensity = 0
-        cameraNode.camera?.vignettingIntensity = 0.08
-        cameraNode.camera?.screenSpaceAmbientOcclusionIntensity = 0.18
-        cameraNode.camera?.screenSpaceAmbientOcclusionRadius = 0.8
+        cameraNode.camera?.vignettingIntensity = 0
+        cameraNode.camera?.screenSpaceAmbientOcclusionIntensity = 0
         cameraNode.position = SCNVector3Zero
         if cameraNode.parent !== node {
             node.addChildNode(cameraNode)

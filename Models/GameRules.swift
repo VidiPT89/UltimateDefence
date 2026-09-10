@@ -76,6 +76,7 @@ struct GameRules {
     }
 
     static func outcome(
+        playerAlive: Bool,
         defendersAlive: Int,
         attackersAlive: Int,
         timeLeft: TimeInterval,
@@ -85,6 +86,7 @@ struct GameRules {
     ) -> RoundOutcome {
         if defused { return .defendersWinDefuse }
         if bombPlanted && bombTimeLeft <= 0 { return .attackersWinPlant }
+        if !playerAlive { return .attackersWinElimination }
         if attackersAlive <= 0 && !bombPlanted { return .defendersWinElimination }
         if defendersAlive <= 0 { return .attackersWinElimination }
         if !bombPlanted && timeLeft <= 0 { return .defendersWinTime }

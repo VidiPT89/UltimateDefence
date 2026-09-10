@@ -4,20 +4,23 @@ import SceneKit
 enum MapTextures {
     static let sand = make(size: 128) { x, y, _ in
         let n = noise(x, y)
-        let pebble = ((x * 13 + y * 7) % 17 == 0) ? 0.08 : 0
-        return (0.70 + n * 0.10 + pebble, 0.56 + n * 0.07, 0.30 + n * 0.05)
+        let grit = CGFloat((x * 17 + y * 11) % 9) * 0.012
+        let stain = ((x / 18) + (y / 22)) % 3 == 0 ? -0.06 : 0
+        return (0.66 + n * 0.08 + grit + stain, 0.52 + n * 0.06 + grit * 0.6, 0.28 + n * 0.04)
     }
 
     static let sandstone = make(size: 128) { x, y, _ in
-        let brickW = 32
-        let brickH = 14
+        let brickW = 20
+        let brickH = 10
+        let gx = x % brickW
         let gy = y % brickH
         let row = y / brickH
         let shift = (row % 2) * (brickW / 2)
         let inMortar = ((x + shift) % brickW) <= 1 || gy <= 1
-        let n = noise(x, y)
-        if inMortar { return (0.42, 0.32, 0.20) }
-        return (0.78 + n * 0.06, 0.62 + n * 0.05, 0.38 + n * 0.04)
+        let n = noise(x + row * 3, y)
+        let chip = gx == 4 && gy == 3 ? -0.08 : 0
+        if inMortar { return (0.36, 0.26, 0.16) }
+        return (0.72 + n * 0.08 + chip, 0.54 + n * 0.06, 0.32 + n * 0.04)
     }
 
     static let crate = make(size: 128) { x, y, size in
@@ -77,6 +80,8 @@ enum MapTextures {
             ).setFill()
             NSRect(x: 0, y: y, width: size, height: 1).fill()
         }
+        NSColor(calibratedRed: 1, green: 0.95, blue: 0.75, alpha: 1).setFill()
+        NSBezierPath(ovalIn: NSRect(x: 44, y: 48, width: 8, height: 8)).fill()
         image.unlockFocus()
         return image
     }
@@ -89,6 +94,8 @@ enum MapTextures {
         mat.diffuse.wrapT = .repeat
         mat.diffuse.magnificationFilter = .nearest
         mat.diffuse.minificationFilter = .nearest
+        mat.diffuse.mipFilter = .nearest
+        mat.ambient.contents = NSColor(calibratedWhite: 0.35, alpha: 1)
         mat.locksAmbientWithDiffuse = true
         mat.isDoubleSided = false
         mat.writesToDepthBuffer = true

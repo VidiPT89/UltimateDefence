@@ -25,8 +25,15 @@ struct RootView: View {
         .frame(minWidth: 1100, minHeight: 700)
         .preferredColorScheme(theme.colorScheme)
         .animation(.easeOut(duration: 0.35), value: session.screen)
+        .onChange(of: session.screen) { screen in
+            if screen != .playing {
+                session.capturedMouse = false
+                PointerLock.release()
+            }
+        }
         .onDisappear {
             session.capturedMouse = false
+            PointerLock.release()
         }
     }
 

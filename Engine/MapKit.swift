@@ -37,8 +37,8 @@ final class MapKit {
     init(sky: NSImage, fog: NSColor, wall: NSImage, ground: NSImage, groundSize: CGFloat) {
         wallTexture = wall
         scene.background.contents = sky
-        scene.fogStartDistance = 70
-        scene.fogEndDistance = 140
+        scene.fogStartDistance = 36
+        scene.fogEndDistance = 95
         scene.fogColor = fog
         addLights()
         let box = SCNBox(width: groundSize, height: 0.4, length: groundSize, chamferRadius: 0)
@@ -190,13 +190,13 @@ final class MapKit {
         let ambient = SCNNode()
         ambient.light = SCNLight()
         ambient.light?.type = .ambient
-        ambient.light?.intensity = 460
-        ambient.light?.color = NSColor(calibratedRed: 0.86, green: 0.82, blue: 0.72, alpha: 1)
+        ambient.light?.intensity = 240
+        ambient.light?.color = NSColor(calibratedRed: 0.72, green: 0.66, blue: 0.52, alpha: 1)
         scene.rootNode.addChildNode(ambient)
         let sun = SCNNode()
         sun.light = SCNLight()
         sun.light?.type = .directional
-        sun.light?.intensity = 1100
+        sun.light?.intensity = 1500
         sun.light?.color = NSColor(calibratedRed: 1, green: 0.96, blue: 0.84, alpha: 1)
         sun.light?.castsShadow = false
         sun.eulerAngles = SCNVector3(-0.9, 0.65, 0)
@@ -204,9 +204,9 @@ final class MapKit {
     }
 
     private static func tiledBox(_ tex: NSImage, w: Float, h: Float, d: Float) -> [SCNMaterial] {
-        let ru = max(1, CGFloat(w / 2))
-        let rv = max(1, CGFloat(h / 2))
-        let rt = max(1, CGFloat(d / 2))
+        let ru = max(1, CGFloat(w / 0.7))
+        let rv = max(1, CGFloat(h / 0.7))
+        let rt = max(1, CGFloat(d / 0.7))
         return [
             MapTextures.tiled(tex, repeatU: ru, repeatV: rv),
             MapTextures.tiled(tex, repeatU: rt, repeatV: rv),

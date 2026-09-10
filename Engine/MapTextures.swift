@@ -8,10 +8,16 @@ enum MapTextures {
     }
 
     static let sandstone = make(size: 64) { x, y, _ in
+        let brickW = 16
+        let brickH = 8
+        let gx = x % brickW
+        let gy = y % brickH
+        let row = y / brickH
+        let shift = (row % 2) * (brickW / 2)
+        let inMortar = ((x + shift) % brickW) == 0 || gy == 0
         let n = noise(x, y)
-        let mortar = x % 16 == 0 || y % 8 == 0
-        if mortar { return (0.42, 0.34, 0.22) }
-        return (0.78 + n * 0.06, 0.62 + n * 0.05, 0.38)
+        if inMortar { return (0.38, 0.30, 0.18) }
+        return (0.76 + n * 0.05, 0.60 + n * 0.04, 0.36 + n * 0.03)
     }
 
     static let crate = make(size: 64) { x, y, size in
@@ -54,6 +60,15 @@ enum MapTextures {
         mat.diffuse.magnificationFilter = .nearest
         mat.diffuse.minificationFilter = .nearest
         mat.locksAmbientWithDiffuse = true
+        mat.isDoubleSided = false
+        mat.writesToDepthBuffer = true
+        mat.readsFromDepthBuffer = true
+        return mat
+    }
+
+    static func tiled(_ contents: Any, repeatU: CGFloat, repeatV: CGFloat) -> SCNMaterial {
+        let mat = goldSrc(contents)
+        mat.diffuse.contentsTransform = SCNMatrix4MakeScale(max(1, repeatU), max(1, repeatV), 1)
         return mat
     }
 

@@ -97,7 +97,7 @@ struct GameSceneView: NSViewRepresentable {
         view.allowsCameraControl = false
         view.autoenablesDefaultLighting = false
         view.antialiasingMode = .multisampling4X
-        view.backgroundColor = NSColor.black
+        view.backgroundColor = NSColor(calibratedRed: 0.58, green: 0.73, blue: 0.88, alpha: 1)
         view.onKey = { code, down in world.handleKey(code, down: down) }
         view.onLook = { dx, dy in world.player.look(dx: dx, dy: dy) }
         view.onFire = { down in world.player.shooting = down }

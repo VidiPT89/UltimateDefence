@@ -42,8 +42,8 @@ final class MapKit {
     init(sky: NSImage, fog: NSColor, wall: NSImage, ground: NSImage, groundSize: CGFloat) {
         wallTexture = wall
         scene.background.contents = sky
-        scene.fogStartDistance = 24
-        scene.fogEndDistance = 78
+        scene.fogStartDistance = 42
+        scene.fogEndDistance = 110
         scene.fogColor = fog
         addLights()
         let box = SCNBox(width: groundSize, height: 0.4, length: groundSize, chamferRadius: 0)
@@ -261,8 +261,8 @@ final class MapKit {
             bulb.light = SCNLight()
             bulb.light?.type = .omni
             bulb.light?.color = NSColor(calibratedRed: 1, green: 0.92, blue: 0.74, alpha: 1)
-            bulb.light?.intensity = 780
-            bulb.light?.attenuationEndDistance = 26
+            bulb.light?.intensity = 340
+            bulb.light?.attenuationEndDistance = 18
             bulb.position = SCNVector3(p.x, p.y - 0.25, p.z)
             scene.rootNode.addChildNode(bulb)
         }
@@ -364,23 +364,23 @@ final class MapKit {
         let ambient = SCNNode()
         ambient.light = SCNLight()
         ambient.light?.type = .ambient
-        ambient.light?.intensity = 220
-        ambient.light?.color = NSColor(calibratedRed: 0.48, green: 0.46, blue: 0.42, alpha: 1)
+        ambient.light?.intensity = 380
+        ambient.light?.color = NSColor(calibratedRed: 0.72, green: 0.70, blue: 0.64, alpha: 1)
         scene.rootNode.addChildNode(ambient)
         let sun = SCNNode()
         sun.light = SCNLight()
         sun.light?.type = .directional
-        sun.light?.intensity = 2400
-        sun.light?.color = NSColor(calibratedRed: 1, green: 0.94, blue: 0.82, alpha: 1)
+        sun.light?.intensity = 1100
+        sun.light?.color = NSColor(calibratedRed: 1, green: 0.97, blue: 0.90, alpha: 1)
         sun.light?.castsShadow = false
         sun.eulerAngles = SCNVector3(-0.9, 0.65, 0)
         scene.rootNode.addChildNode(sun)
     }
 
     private static func tiledBox(_ tex: NSImage, w: Float, h: Float, d: Float) -> [SCNMaterial] {
-        let ru = max(1, CGFloat(w / 0.42))
-        let rv = max(1, CGFloat(h / 0.42))
-        let rt = max(1, CGFloat(d / 0.42))
+        let ru = max(1, CGFloat(w / 1.15))
+        let rv = max(1, CGFloat(h / 1.15))
+        let rt = max(1, CGFloat(d / 1.15))
         return [
             MapTextures.tiled(tex, repeatU: ru, repeatV: rv),
             MapTextures.tiled(tex, repeatU: rt, repeatV: rv),

@@ -59,12 +59,6 @@ final class BotActor {
         rifle.eulerAngles.x = -0.12
         node.addChildNode(rifle)
         node.addChildNode(Self.box(0.05, 0.18, 0.12, at: SCNVector3(0.28, 1.04, -0.12), color: NSColor(calibratedRed: 0.42, green: 0.26, blue: 0.12, alpha: 1)))
-
-        let bodyShape = SCNBox(width: 0.55, height: 1.75, length: 0.4, chamferRadius: 0)
-        node.physicsBody = SCNPhysicsBody(type: .kinematic, shape: SCNPhysicsShape(geometry: bodyShape, options: nil))
-        node.physicsBody?.categoryBitMask = PhysicsCategory.bot
-        head.physicsBody = SCNPhysicsBody(type: .kinematic, shape: SCNPhysicsShape(geometry: headGeom, options: nil))
-        head.physicsBody?.categoryBitMask = PhysicsCategory.bot
     }
 
     func update(
@@ -134,8 +128,6 @@ final class BotActor {
     func takeDamage(_ amount: Int) {
         health = GameRules.remainingHealth(current: health, damage: amount)
         if !isAlive {
-            node.physicsBody = nil
-            head.physicsBody = nil
             let drop = SCNAction.rotateBy(x: 1.2, y: 0.2, z: 0.4, duration: 0.4)
             node.runAction(.sequence([
                 .group([drop, .moveBy(x: 0, y: 0.1, z: 0, duration: 0.12)]),

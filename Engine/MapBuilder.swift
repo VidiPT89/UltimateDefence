@@ -1,14 +1,10 @@
 import SceneKit
 import AppKit
 
-enum PhysicsCategory {
-    static let world: Int = 1 << 0
-    static let bot: Int = 1 << 1
-}
-
 enum NodeName {
     static let player = "player"
     static let camera = "fpsCamera"
+    static let ground = "ground"
     static let site = "siteA"
     static let botPrefix = "bot-"
     static let headSuffix = "-head"
@@ -32,11 +28,12 @@ enum MapBuilder {
         addLights(to: scene)
         scene.rootNode.addParticleSystem(FX.dustField())
 
-        let ground = SCNBox(width: 64, height: 0.4, length: 64, chamferRadius: 0)
+        let ground = SCNBox(width: 66, height: 0.4, length: 66, chamferRadius: 0)
         let groundTile: CGFloat = 32
         ground.materials = Array(repeating: MapTextures.tiled(MapTextures.sand, repeatU: groundTile, repeatV: groundTile), count: 6)
         let floor = SCNNode(geometry: ground)
         floor.position = SCNVector3(0, -0.2, 0)
+        floor.name = NodeName.ground
         scene.rootNode.addChildNode(floor)
 
         var walls: [AABB] = []

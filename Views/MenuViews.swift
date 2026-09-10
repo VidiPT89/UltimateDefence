@@ -178,6 +178,9 @@ struct ResultView: View {
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundStyle(UDTheme.primaryText(for: scheme))
                     .multilineTextAlignment(.center)
+                Text("\(session.kills) \(language.t(.kills))")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(UDTheme.muted(for: scheme))
                 HStack(spacing: 12) {
                     capsuleButton(language.t(.newRound), action: onAgain)
                     capsuleButton(language.t(.menu), action: onMenu)

@@ -5,6 +5,7 @@ struct RootView: View {
     @EnvironmentObject private var sounds: SoundManager
     @StateObject private var session = GameSession()
     @State private var world: GameWorld?
+    @State private var roundToken = 0
     @State private var showSplash = true
 
     var body: some View {
@@ -33,6 +34,7 @@ struct RootView: View {
         ZStack {
             if let world, session.screen != .menu {
                 GameSceneView(world: world, session: session)
+                    .id(roundToken)
                     .ignoresSafeArea()
                 HUDView(session: session)
             }
@@ -51,6 +53,8 @@ struct RootView: View {
     }
 
     private func startRound() {
+        session.capturedMouse = false
+        roundToken += 1
         world = GameWorld(session: session, sounds: sounds)
         session.screen = .playing
         session.outcome = .inProgress

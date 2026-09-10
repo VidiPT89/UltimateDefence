@@ -22,7 +22,7 @@ enum L10nKey: String, CaseIterable {
     case kills
     case map
     case match
-    case sandlot, dust2, mill
+    case dust2, aztec, office, mill
     case teammates
 }
 
@@ -73,8 +73,9 @@ enum L10n {
         .kills: "abates",
         .map: "Mapa",
         .match: "Partida",
-        .sandlot: "Sandlot",
         .dust2: "Dust II",
+        .aztec: "Aztec",
+        .office: "Office",
         .mill: "Mill",
         .teammates: "defesa"
     ]
@@ -120,8 +121,9 @@ enum L10n {
         .kills: "kills",
         .map: "Map",
         .match: "Match",
-        .sandlot: "Sandlot",
         .dust2: "Dust II",
+        .aztec: "Aztec",
+        .office: "Office",
         .mill: "Mill",
         .teammates: "defence"
     ]

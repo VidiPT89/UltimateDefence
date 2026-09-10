@@ -112,6 +112,14 @@ struct GameSceneView: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: FPSSceneView, context: Context) {
+        nsView.scene = world.scene
+        nsView.delegate = world
+        nsView.pointOfView = world.player.cameraNode
+        nsView.onKey = { code, down in world.handleKey(code, down: down) }
+        nsView.onLook = { dx, dy in world.player.look(dx: dx, dy: dy) }
+        nsView.onFire = { down in world.player.shooting = down }
+        nsView.onAim = { down in world.player.aiming = down }
+        nsView.onCycle = { dir in world.cycleWeapon(dir) }
         nsView.window?.acceptsMouseMovedEvents = true
         if session.screen == .playing {
             nsView.window?.makeFirstResponder(nsView)

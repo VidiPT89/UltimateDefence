@@ -1,21 +1,60 @@
 import AppKit
+import SceneKit
 
 enum MapTextures {
-    static let concrete = make(size: 128) { x, y, _ in
+    static let sand = make(size: 64) { x, y, _ in
         let n = noise(x, y)
-        let v = 0.18 + n * 0.08
+        return (0.72 + n * 0.08, 0.58 + n * 0.06, 0.32 + n * 0.04)
+    }
+
+    static let sandstone = make(size: 64) { x, y, _ in
+        let n = noise(x, y)
+        let mortar = x % 16 == 0 || y % 8 == 0
+        if mortar { return (0.42, 0.34, 0.22) }
+        return (0.78 + n * 0.06, 0.62 + n * 0.05, 0.38)
+    }
+
+    static let crate = make(size: 64) { x, y, size in
+        let border = x < 3 || y < 3 || x > size - 4 || y > size - 4
+        let plank = (y / 8) % 2 == 0
+        if border { return (0.22, 0.14, 0.08) }
+        if plank { return (0.55, 0.35, 0.16) }
+        return (0.48, 0.30, 0.12)
+    }
+
+    static let metal = make(size: 32) { x, y, _ in
+        let n = noise(x, y)
+        let v = 0.28 + n * 0.08
+        return (v, v * 1.02, v * 1.05)
+    }
+
+    static let concrete = make(size: 64) { x, y, _ in
+        let n = noise(x, y)
+        let v = 0.42 + n * 0.08
         return (v, v * 0.96, v * 0.88)
     }
 
-    static let rust = make(size: 128) { x, y, _ in
+    static let rust = make(size: 64) { x, y, _ in
         let n = noise(x, y)
-        return (0.42 + n * 0.12, 0.20 + n * 0.06, 0.10)
+        return (0.48 + n * 0.1, 0.28 + n * 0.05, 0.12)
     }
 
-    static let hazard = make(size: 64) { x, y, size in
-        let stripe = ((x + y) / max(1, size / 8)) % 2 == 0
-        if stripe { return (0.98, 0.61, 0.0) }
-        return (0.04, 0.04, 0.06)
+    static let hazard = make(size: 32) { x, y, size in
+        let stripe = ((x + y) / max(1, size / 4)) % 2 == 0
+        if stripe { return (0.85, 0.62, 0.12) }
+        return (0.12, 0.10, 0.08)
+    }
+
+    static func goldSrc(_ contents: Any) -> SCNMaterial {
+        let mat = SCNMaterial()
+        mat.lightingModel = .lambert
+        mat.diffuse.contents = contents
+        mat.diffuse.wrapS = .repeat
+        mat.diffuse.wrapT = .repeat
+        mat.diffuse.magnificationFilter = .nearest
+        mat.diffuse.minificationFilter = .nearest
+        mat.locksAmbientWithDiffuse = true
+        return mat
     }
 
     private static func make(size: Int, paint: (Int, Int, Int) -> (CGFloat, CGFloat, CGFloat)) -> NSImage {

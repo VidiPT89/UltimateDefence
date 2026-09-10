@@ -21,9 +21,9 @@ struct WeaponStats: Equatable {
 
     static let rifle = WeaponStats(
         name: "UD-4 Carbine",
-        damage: 28,
-        headshotMultiplier: 2.4,
-        fireInterval: 0.095,
+        damage: 27,
+        headshotMultiplier: 4.0,
+        fireInterval: 0.1,
         magazine: 30,
         reserve: 90,
         reloadTime: 2.1,
@@ -63,9 +63,11 @@ struct GameRules {
     static let botMaxHealth = 100
     static let attackerCount = 4
     static let siteRadius: Float = 4.5
-    static let playerSpeed: Float = 8.5
-    static let sprintMultiplier: Float = 1.32
-    static let botSpeed: Float = 5.4
+    static let playerSpeed: Float = 6.6
+    static let walkMultiplier: Float = 0.52
+    static let crouchMultiplier: Float = 0.34
+    static let sprintMultiplier: Float = 1.0
+    static let botSpeed: Float = 4.6
     static let jumpVelocity: Float = 7.4
     static let gravity: Float = 22
 
@@ -99,11 +101,21 @@ struct GameRules {
         return 0.14 + closeness * 0.36
     }
 
-    static func aimSpread(moving: Bool, sprinting: Bool, aiming: Bool = false) -> Float {
-        var spread: Float = 0.008
-        if moving { spread += 0.018 }
-        if sprinting { spread += 0.012 }
-        if aiming { spread *= 0.38 }
+    static func aimSpread(
+        moving: Bool,
+        sprinting: Bool,
+        aiming: Bool = false,
+        walking: Bool = false,
+        crouching: Bool = false,
+        airborne: Bool = false
+    ) -> Float {
+        var spread: Float = 0.006
+        if moving { spread += 0.022 }
+        if sprinting { spread += 0.01 }
+        if walking { spread *= 0.45 }
+        if crouching { spread *= 0.4 }
+        if aiming { spread *= 0.42 }
+        if airborne { spread += 0.05 }
         return spread
     }
 }

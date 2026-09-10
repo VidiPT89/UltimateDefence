@@ -53,6 +53,8 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         player.vertical = 0
         player.grounded = true
         player.aiming = false
+        player.punch = 0
+        player.roundStart = CACurrentMediaTime()
         wasReloading = false
         player.node.removeFromParentNode()
         player.setup(at: layout.playerSpawn)
@@ -65,12 +67,10 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             return bot
         }
         muzzle?.removeFromParentNode()
-        onMain {
-            self.session.kills = 0
-            self.session.aiming = false
-            self.session.moving = false
-            self.session.outcome = .inProgress
-        }
+        session.kills = 0
+        session.aiming = false
+        session.moving = false
+        session.outcome = .inProgress
         publishHUD()
     }
 
@@ -113,8 +113,8 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         guard player.canShoot(now: now) else { return }
         player.consumeShot(now: now)
         sounds.playShoot()
-        player.pitch += 0.016
-        player.yaw += Float.random(in: -0.01...0.01)
+        player.punch += player.slot == .rifle ? 0.024 : 0.04
+        player.yaw += Float.random(in: -0.012...0.012)
         player.applyLook()
         flashMuzzle()
         WeaponRig.kick(player.cameraNode)
@@ -181,7 +181,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 sounds.playShoot()
                 let muzzlePos = SCNVector3(
                     bot.node.worldPosition.x,
-                    bot.node.worldPosition.y + 0.35,
+                    bot.node.worldPosition.y + 1.2,
                     bot.node.worldPosition.z
                 )
                 FX.spark(at: muzzlePos, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
@@ -298,8 +298,15 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     }
 
     private func lookDirection() -> SIMD3<Float> {
-        let spread = GameRules.aimSpread(moving: player.moving, sprinting: player.sprinting, aiming: player.aiming)
-        let pitch = player.pitch + Float.random(in: -spread...spread)
+        let spread = GameRules.aimSpread(
+            moving: player.moving,
+            sprinting: player.sprinting,
+            aiming: player.aiming,
+            walking: player.walking,
+            crouching: player.crouching,
+            airborne: !player.grounded
+        )
+        let pitch = player.pitch + player.punch + Float.random(in: -spread...spread)
         let yaw = player.yaw + Float.random(in: -spread...spread)
         let cy = cos(pitch)
         return SIMD3(-sin(yaw) * cy, sin(pitch), -cos(yaw) * cy)

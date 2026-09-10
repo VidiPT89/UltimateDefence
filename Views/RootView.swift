@@ -57,6 +57,7 @@ struct RootView: View {
             world?.resetRound()
         }
         session.screen = .playing
+        session.outcome = .inProgress
         session.capturedMouse = true
     }
 }

@@ -77,10 +77,12 @@ final class GameRulesTests: XCTestCase {
     }
 
     func testAimSpreadGrowsWhenMoving() {
-        let still = GameRules.aimSpread(moving: false, sprinting: false, aiming: false)
-        let run = GameRules.aimSpread(moving: true, sprinting: true, aiming: false)
+        let still = GameRules.aimSpread(moving: false, sprinting: false)
+        let run = GameRules.aimSpread(moving: true, sprinting: true)
+        let walk = GameRules.aimSpread(moving: true, sprinting: false, walking: true)
         let ads = GameRules.aimSpread(moving: true, sprinting: false, aiming: true)
         XCTAssertGreaterThan(run, still)
+        XCTAssertLessThan(walk, run)
         XCTAssertLessThan(ads, run)
     }
 }

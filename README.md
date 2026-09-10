@@ -9,15 +9,15 @@
 
 - ✅ First-person combat with mouse look, WASD movement and hitscan weapons
 - ✅ Round-based defence: eliminate attackers, run down the clock, or defuse the artefact
-- ✅ Four attacker bots that push Site A, shoot on sight and plant if left unchecked
+- ✅ Four attacker bots with humanoid models that push Site A, shoot on sight and plant if left unchecked
+- ✅ GoldSrc-style compound: sandy ground, sandstone walls, wooden crates and a bright outdoor sky
+- ✅ Walk (Shift), crouch (Ctrl), jump, aim-down-sights, recoil punch and distance-based bot accuracy
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
-- ✅ Industrial 3D compound with cover, lighting, particle dust and an animated bomb site
-- ✅ Cinematic HUD: health, ammo, round timer and defuse progress
+- ✅ HUD: health, ammo, round timer and defuse progress
 - ✅ Bilingual PT-PT / English language switch
 - ✅ Dark, Light and System appearance, with iVidi.dev orange, burnt yellow and black
 - ✅ Animated splash with developer credits, then the main menu
 - ✅ Sound effects for gunfire, footsteps, reloads, hits, plant beeps and round results
-- ✅ Sprint, jump, aim-down-sights, recoil and distance-based bot accuracy
 - ✅ Native macOS window with pointer lock while you play
 
 ## 🛠️ Tech Stack
@@ -55,7 +55,7 @@ Select the `UltimateDefence` scheme and run on My Mac (`⌘R`).
 
 1. Click **INICIAR RONDA** and click the game view to capture the mouse
 2. Hold Site A (the glowing ring). Attackers spawn on the far side of the compound
-3. Use **WASD** to move, **Shift** to sprint, **Space** to jump, the mouse to look, left click to fire and right click to aim
+3. Use **WASD** to move (default run), **Shift** to walk, **Ctrl** to crouch, **Space** to jump, the mouse to look, left click to fire and right click to aim
 4. **1** / **2** or the scroll wheel switch weapons, **R** reloads, **E** defuses while standing on the site
 5. Toggle sound, language and theme from the main menu. **Esc** returns to the menu and releases the pointer
 

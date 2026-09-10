@@ -42,7 +42,7 @@ enum FX {
         dust.birthRate = 18
         dust.particleLifeSpan = 7
         dust.particleSize = 0.07
-        dust.particleColor = NSColor(calibratedWhite: 0.55, alpha: 0.18)
+        dust.particleColor = NSColor(calibratedRed: 0.72, green: 0.62, blue: 0.4, alpha: 0.16)
         dust.spreadingAngle = 180
         dust.particleVelocity = 0.15
         dust.emitterShape = SCNBox(width: 50, height: 6, length: 50, chamferRadius: 0)
@@ -88,16 +88,15 @@ enum WeaponRig {
         root.name = "weaponRig"
         switch slot {
         case .rifle:
-            root.addChildNode(box(0.08, 0.08, 0.68, x: 0.22, y: -0.18, z: -0.46, color: steel))
-            root.addChildNode(box(0.09, 0.11, 0.28, x: 0.22, y: -0.16, z: -0.22, color: dark))
-            root.addChildNode(box(0.07, 0.16, 0.18, x: 0.22, y: -0.28, z: -0.2, color: dark))
-            root.addChildNode(box(0.05, 0.18, 0.07, x: 0.22, y: -0.34, z: -0.32, color: steel))
-            root.addChildNode(box(0.035, 0.035, 0.18, x: 0.22, y: -0.11, z: -0.68, color: ember))
-            root.addChildNode(box(0.02, 0.05, 0.05, x: 0.22, y: -0.08, z: -0.38, color: ember))
+            root.addChildNode(box(0.07, 0.07, 0.72, x: 0.22, y: -0.16, z: -0.48, color: wood))
+            root.addChildNode(box(0.08, 0.1, 0.22, x: 0.22, y: -0.14, z: -0.22, color: dark))
+            root.addChildNode(box(0.06, 0.22, 0.1, x: 0.22, y: -0.28, z: -0.18, color: wood))
+            root.addChildNode(box(0.05, 0.2, 0.12, x: 0.22, y: -0.3, z: -0.34, color: dark))
+            root.addChildNode(box(0.04, 0.04, 0.16, x: 0.22, y: -0.12, z: -0.78, color: steel))
         case .pistol:
-            root.addChildNode(box(0.06, 0.08, 0.24, x: 0.18, y: -0.16, z: -0.34, color: steel))
-            root.addChildNode(box(0.05, 0.16, 0.08, x: 0.18, y: -0.28, z: -0.24, color: dark))
-            root.addChildNode(box(0.03, 0.03, 0.08, x: 0.18, y: -0.12, z: -0.46, color: ember))
+            root.addChildNode(box(0.05, 0.07, 0.22, x: 0.18, y: -0.14, z: -0.36, color: steel))
+            root.addChildNode(box(0.045, 0.16, 0.07, x: 0.18, y: -0.26, z: -0.24, color: dark))
+            root.addChildNode(box(0.03, 0.03, 0.08, x: 0.18, y: -0.11, z: -0.46, color: dark))
         }
         camera.addChildNode(root)
     }
@@ -112,18 +111,13 @@ enum WeaponRig {
         rig.runAction(.sequence([back, rest]))
     }
 
-    private static let steel = NSColor(calibratedRed: 0.42, green: 0.45, blue: 0.48, alpha: 1)
-    private static let dark = NSColor(calibratedRed: 0.12, green: 0.13, blue: 0.14, alpha: 1)
-    private static let ember = NSColor(calibratedRed: 0.976, green: 0.612, blue: 0, alpha: 1)
+    private static let steel = NSColor(calibratedRed: 0.32, green: 0.33, blue: 0.34, alpha: 1)
+    private static let dark = NSColor(calibratedRed: 0.14, green: 0.13, blue: 0.12, alpha: 1)
+    private static let wood = NSColor(calibratedRed: 0.45, green: 0.28, blue: 0.12, alpha: 1)
 
     private static func box(_ w: CGFloat, _ h: CGFloat, _ l: CGFloat, x: CGFloat, y: CGFloat, z: CGFloat, color: NSColor) -> SCNNode {
-        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0.008)
-        let m = SCNMaterial()
-        m.diffuse.contents = color
-        m.metalness.contents = 0.65
-        m.roughness.contents = 0.28
-        m.lightingModel = .physicallyBased
-        g.firstMaterial = m
+        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0)
+        g.firstMaterial = MapTextures.goldSrc(color)
         let n = SCNNode(geometry: g)
         n.position = SCNVector3(x, y, z)
         return n

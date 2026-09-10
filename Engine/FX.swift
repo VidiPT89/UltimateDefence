@@ -62,17 +62,18 @@ enum WeaponRig {
         root.name = "weaponRig"
         switch slot {
         case .rifle:
-            root.addChildNode(box(0.08, 0.08, 0.18, x: 0.08, y: -0.22, z: -0.28, color: skin))
-            root.addChildNode(box(0.1, 0.08, 0.22, x: 0.2, y: -0.2, z: -0.18, color: skin))
-            root.addChildNode(box(0.07, 0.07, 0.55, x: 0.2, y: -0.16, z: -0.52, color: steel))
-            root.addChildNode(box(0.05, 0.12, 0.16, x: 0.2, y: -0.24, z: -0.28, color: dark))
-            root.addChildNode(box(0.04, 0.05, 0.12, x: 0.2, y: -0.12, z: -0.72, color: dark))
-            root.addChildNode(box(0.08, 0.06, 0.1, x: 0.08, y: -0.18, z: -0.42, color: glove))
+            root.addChildNode(box(0.09, 0.08, 0.16, x: 0.1, y: -0.2, z: -0.26, color: skin))
+            root.addChildNode(box(0.1, 0.07, 0.14, x: 0.22, y: -0.18, z: -0.2, color: glove))
+            root.addChildNode(box(0.055, 0.07, 0.62, x: 0.2, y: -0.15, z: -0.52, color: steel))
+            root.addChildNode(box(0.07, 0.09, 0.18, x: 0.2, y: -0.14, z: -0.28, color: dark))
+            root.addChildNode(box(0.04, 0.14, 0.08, x: 0.2, y: -0.24, z: -0.26, color: dark))
+            root.addChildNode(box(0.03, 0.04, 0.1, x: 0.2, y: -0.1, z: -0.78, color: dark))
+            root.addChildNode(box(0.08, 0.05, 0.08, x: 0.08, y: -0.16, z: -0.4, color: glove))
         case .pistol:
-            root.addChildNode(box(0.08, 0.08, 0.16, x: 0.16, y: -0.2, z: -0.28, color: skin))
-            root.addChildNode(box(0.05, 0.07, 0.22, x: 0.18, y: -0.16, z: -0.4, color: steel))
-            root.addChildNode(box(0.045, 0.14, 0.07, x: 0.18, y: -0.26, z: -0.28, color: dark))
-            root.addChildNode(box(0.07, 0.05, 0.08, x: 0.12, y: -0.18, z: -0.34, color: glove))
+            root.addChildNode(box(0.08, 0.07, 0.14, x: 0.16, y: -0.18, z: -0.26, color: skin))
+            root.addChildNode(box(0.045, 0.06, 0.2, x: 0.18, y: -0.14, z: -0.4, color: steel))
+            root.addChildNode(box(0.04, 0.13, 0.06, x: 0.18, y: -0.24, z: -0.28, color: dark))
+            root.addChildNode(box(0.07, 0.05, 0.07, x: 0.12, y: -0.16, z: -0.32, color: glove))
         }
         camera.addChildNode(root)
     }

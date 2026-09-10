@@ -264,6 +264,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let aliveBots = bots.filter { $0.isTerrorist && $0.isAlive }.count
         let defendersAlive = bots.filter { !$0.isTerrorist && $0.isAlive }.count + (player.isAlive ? 1 : 0)
         let result = GameRules.outcome(
+            playerAlive: player.isAlive,
             defendersAlive: defendersAlive,
             attackersAlive: aliveBots,
             timeLeft: timeLeft,

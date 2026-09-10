@@ -17,17 +17,22 @@ final class FPSSceneView: SCNView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         window?.acceptsMouseMovedEvents = true
-        becomeFirstResponder()
+        if window == nil {
+            setPointerLocked(false)
+        } else {
+            becomeFirstResponder()
+        }
     }
 
     func setPointerLocked(_ locked: Bool) {
-        tracking = locked
         if locked {
+            guard !tracking else { return }
+            tracking = true
             NSCursor.hide()
             CGAssociateMouseAndMouseCursorPosition(boolean_t(0))
         } else {
-            NSCursor.unhide()
-            CGAssociateMouseAndMouseCursorPosition(boolean_t(1))
+            tracking = false
+            PointerLock.release()
         }
     }
 
@@ -96,7 +101,7 @@ struct GameSceneView: NSViewRepresentable {
         view.pointOfView = world.player.cameraNode
         view.allowsCameraControl = false
         view.autoenablesDefaultLighting = false
-        view.antialiasingMode = .multisampling4X
+        view.antialiasingMode = .none
         view.backgroundColor = NSColor(calibratedRed: 0.58, green: 0.73, blue: 0.88, alpha: 1)
         view.onKey = { code, down in world.handleKey(code, down: down) }
         view.onLook = { dx, dy in world.player.look(dx: dx, dy: dy) }
@@ -104,7 +109,9 @@ struct GameSceneView: NSViewRepresentable {
         view.onAim = { down in world.player.aiming = down }
         view.onCycle = { dir in world.cycleWeapon(dir) }
         view.onFocus = { focused in
-            session.capturedMouse = focused
+            if session.screen == .playing {
+                session.capturedMouse = focused
+            }
         }
         view.isPlaying = true
         view.loops = true
@@ -133,5 +140,13 @@ struct GameSceneView: NSViewRepresentable {
 
     static func dismantleNSView(_ nsView: FPSSceneView, coordinator: ()) {
         nsView.setPointerLocked(false)
+    }
+}
+
+enum PointerLock {
+    static func release() {
+        NSCursor.unhide()
+        CGAssociateMouseAndMouseCursorPosition(boolean_t(1))
+        CGDisplayShowCursor(CGMainDisplayID())
     }
 }

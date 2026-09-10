@@ -16,6 +16,7 @@ final class GameRulesTests: XCTestCase {
 
     func testDefendersWinOnTimeIfBombNotPlanted() {
         let result = GameRules.outcome(
+            playerAlive: true,
             defendersAlive: 1,
             attackersAlive: 2,
             timeLeft: 0,
@@ -28,6 +29,7 @@ final class GameRulesTests: XCTestCase {
 
     func testAttackersWinIfBombExplodes() {
         let result = GameRules.outcome(
+            playerAlive: true,
             defendersAlive: 1,
             attackersAlive: 0,
             timeLeft: 20,
@@ -40,6 +42,7 @@ final class GameRulesTests: XCTestCase {
 
     func testDefuseBeatsExplosion() {
         let result = GameRules.outcome(
+            playerAlive: true,
             defendersAlive: 1,
             attackersAlive: 1,
             timeLeft: 10,
@@ -119,22 +122,11 @@ final class GameRulesTests: XCTestCase {
         XCTAssertEqual(MatchSize.six.allyCount, 5)
     }
 
-    func testPlayerDeathDoesNotEndRoundIfAlliesRemain() {
+    func testPlayerDeathEndsTheRoundImmediately() {
         let result = GameRules.outcome(
-            defendersAlive: 2,
+            playerAlive: false,
+            defendersAlive: 3,
             attackersAlive: 3,
-            timeLeft: 40,
-            bombPlanted: false,
-            bombTimeLeft: 40,
-            defused: false
-        )
-        XCTAssertEqual(result, .inProgress)
-    }
-
-    func testLastDefenderDownLosesTheRound() {
-        let result = GameRules.outcome(
-            defendersAlive: 0,
-            attackersAlive: 2,
             timeLeft: 40,
             bombPlanted: false,
             bombTimeLeft: 40,

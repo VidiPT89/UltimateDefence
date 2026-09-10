@@ -29,6 +29,9 @@ enum CharacterMesh {
         root.addChildNode(head)
         root.addChildNode(box(0.12, 0.1, 0.12, at: SCNVector3(0, 1.54, 0.02), color: look.skin))
         addHeadgear(head, look: look)
+        let eye = NSColor(calibratedRed: 0.12, green: 0.12, blue: 0.1, alpha: 1)
+        head.addChildNode(box(0.035, 0.03, 0.02, at: SCNVector3(-0.045, 0.02, 0.11), color: eye))
+        head.addChildNode(box(0.035, 0.03, 0.02, at: SCNVector3(0.045, 0.02, 0.11), color: eye))
 
         arm(root, side: -1, look: look)
         arm(root, side: 1, look: look)

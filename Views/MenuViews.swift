@@ -196,6 +196,7 @@ struct ResultView: View {
     var body: some View {
         ZStack {
             Color("Black").opacity(scheme == .dark ? 0.62 : 0.28).ignoresSafeArea()
+                .onAppear { PointerLock.release() }
             VStack(spacing: 18) {
                 Text(language.t(victory ? .objectiveComplete : .lineBroken).uppercased())
                     .font(.system(size: 13, weight: .semibold, design: .rounded))

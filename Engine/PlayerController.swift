@@ -77,7 +77,7 @@ final class PlayerController {
         SIMD3(cos(yaw), 0, -sin(yaw))
     }
 
-    func move(dt: Float, walls: [AABB]) {
+    func move(dt: Float, walls: [AABB], floors: [Platform] = []) {
         guard isAlive else { return }
         var dir = SIMD3<Float>(repeating: 0)
         if keys.contains(13) || keys.contains(126) { dir += forward() } // W / up
@@ -91,7 +91,6 @@ final class PlayerController {
         sprinting = moving && !walking && !crouching && !aiming
         let standEye: Float = 1.64
         let crouchEye: Float = 1.18
-        let layoutEye = crouching ? crouchEye : standEye
         let targetFOV: CGFloat = aiming ? 62 : 88
         if let cam = cameraNode.camera {
             cam.fieldOfView += (targetFOV - cam.fieldOfView) * CGFloat(min(1, dt * 10))
@@ -103,10 +102,17 @@ final class PlayerController {
         vertical -= GameRules.gravity * dt
         var y = Float(node.position.y) + vertical * dt
         punch = max(0, punch - dt * 2.4)
-        if y <= layoutEye {
-            y = layoutEye
-            vertical = 0
-            grounded = true
+        let sampleX = Float(node.position.x)
+        let sampleZ = Float(node.position.z)
+        let eye = Collision.floorHeight(x: sampleX, z: sampleZ, floors: floors) + (crouching ? crouchEye : standEye)
+        if y <= eye + 0.06 {
+            if eye - y < 0.58 || grounded {
+                y = eye
+                vertical = 0
+                grounded = true
+            }
+        } else {
+            grounded = false
         }
 
         if !moving {
@@ -134,6 +140,12 @@ final class PlayerController {
         )
         if hypot(resolved.x - proposed.x, resolved.z - proposed.z) > 0.01 {
             velocity = SIMD3(resolved.x - Float(node.position.x), 0, resolved.z - Float(node.position.z)) / max(dt, 0.001)
+        }
+        let landed = Collision.floorHeight(x: resolved.x, z: resolved.z, floors: floors) + (crouching ? crouchEye : standEye)
+        if y <= landed + 0.06, landed - y < 0.58 || grounded {
+            y = landed
+            vertical = 0
+            grounded = true
         }
         node.position = SCNVector3(resolved.x, y, resolved.z)
     }

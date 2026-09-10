@@ -23,6 +23,7 @@ enum WallOpening {
 
 struct MapLayout {
     let walls: [AABB]
+    let floors: [Platform]
     let siteCenter: SIMD3<Float>
     let playerSpawn: SIMD3<Float>
     let playerYaw: Float
@@ -33,6 +34,7 @@ struct MapLayout {
 final class MapKit {
     let scene = SCNScene()
     var walls: [AABB] = []
+    var floors: [Platform] = []
     private let wallTexture: NSImage
     private let thickness: Float = 1.1
     private let doorHeight: Float = 2.52
@@ -40,8 +42,8 @@ final class MapKit {
     init(sky: NSImage, fog: NSColor, wall: NSImage, ground: NSImage, groundSize: CGFloat) {
         wallTexture = wall
         scene.background.contents = sky
-        scene.fogStartDistance = 36
-        scene.fogEndDistance = 95
+        scene.fogStartDistance = 24
+        scene.fogEndDistance = 78
         scene.fogColor = fog
         addLights()
         let box = SCNBox(width: groundSize, height: 0.4, length: groundSize, chamferRadius: 0)
@@ -175,6 +177,55 @@ final class MapKit {
         scene.rootNode.addChildNode(node)
     }
 
+    func hall(minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float = 3.7) {
+        let alongZ = (maxZ - minZ) >= (maxX - minX)
+        if alongZ {
+            wall(x: minX, z: (minZ + maxZ) / 2, w: thickness, d: maxZ - minZ, h: h)
+            wall(x: maxX, z: (minZ + maxZ) / 2, w: thickness, d: maxZ - minZ, h: h)
+        } else {
+            wall(x: (minX + maxX) / 2, z: minZ, w: maxX - minX, d: thickness, h: h)
+            wall(x: (minX + maxX) / 2, z: maxZ, w: maxX - minX, d: thickness, h: h)
+        }
+        slab(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, y: 0.02, h: 0.05, texture: MapTextures.concrete, name: NodeName.trim)
+        slab(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, y: h - 0.12, h: 0.2, texture: MapTextures.concrete, name: NodeName.solid)
+    }
+
+    func platform(minX: Float, maxX: Float, minZ: Float, maxZ: Float, height: Float) {
+        guard height > 0.08 else { return }
+        let w = maxX - minX
+        let d = maxZ - minZ
+        let box = SCNBox(width: CGFloat(w), height: CGFloat(height), length: CGFloat(d), chamferRadius: 0.02)
+        box.materials = Self.tiledBox(MapTextures.concrete, w: w, h: height, d: d)
+        let node = SCNNode(geometry: box)
+        node.name = NodeName.trim
+        node.position = SCNVector3((minX + maxX) / 2, height / 2, (minZ + maxZ) / 2)
+        scene.rootNode.addChildNode(node)
+        floors.append(Platform(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, height: height))
+    }
+
+    func steps(x: Float, z: Float, dx: Float, dz: Float, count: Int, width: Float, rise: Float, run: Float) {
+        for index in 0..<count {
+            let t = Float(index)
+            let cx = x + dx * t * run
+            let cz = z + dz * t * run
+            let h = rise * Float(index + 1)
+            let hx = abs(dx) > 0.5 ? run * 0.55 : width / 2
+            let hz = abs(dz) > 0.5 ? run * 0.55 : width / 2
+            platform(minX: cx - hx, maxX: cx + hx, minZ: cz - hz, maxZ: cz + hz, height: h)
+        }
+    }
+
+    func decal(x: Float, y: Float, z: Float, w: Float, h: Float, yaw: Float) {
+        let plane = SCNPlane(width: CGFloat(w), height: CGFloat(h))
+        plane.firstMaterial = MapTextures.goldSrc(MapTextures.concrete)
+        plane.firstMaterial?.transparency = 0.35
+        let node = SCNNode(geometry: plane)
+        node.name = NodeName.trim
+        node.position = SCNVector3(x, y, z)
+        node.eulerAngles.y = CGFloat(yaw)
+        scene.rootNode.addChildNode(node)
+    }
+
     func water(minX: Float, maxX: Float, minZ: Float, maxZ: Float) {
         let w = maxX - minX
         let d = maxZ - minZ
@@ -270,6 +321,7 @@ final class MapKit {
     ) -> MapLayout {
         MapLayout(
             walls: walls,
+            floors: floors,
             siteCenter: site,
             playerSpawn: player,
             playerYaw: yaw,

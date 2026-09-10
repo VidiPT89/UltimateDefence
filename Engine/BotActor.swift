@@ -129,7 +129,7 @@ final class BotActor {
         let origin = SCNVector3(from.x, from.y + 1.5, from.z)
         let dest = SCNVector3(to.x, to.y + 1.4, to.z)
         let hits = world.hitTestWithSegment(from: origin, to: dest, options: [
-            SCNHitTestOption.searchMode.rawValue: SCNHitTestSearchMode.closest.rawValue
+            SCNHitTestOption.searchMode.rawValue: NSNumber(value: SCNHitTestSearchMode.closest.rawValue)
         ])
         guard let first = hits.first else { return true }
         var current: SCNNode? = first.node

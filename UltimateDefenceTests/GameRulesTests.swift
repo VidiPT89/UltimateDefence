@@ -172,10 +172,28 @@ final class GameRulesTests: XCTestCase {
         XCTAssertEqual(Collision.floorHeight(x: 8, z: 8, floors: [low, high]), 0)
     }
 
-    func testDust2CatwalkIsRaised() {
-        let layout = MapBuilder.make(.dust2).1
-        XCTAssertGreaterThan(Collision.floorHeight(x: 10, z: 16, floors: layout.floors), 1.2)
-        XCTAssertEqual(Collision.floorHeight(x: 0, z: -40, floors: layout.floors), 0)
+    func testMapsStayFlat() {
+        for arena in ArenaMap.allCases {
+            let layout = MapBuilder.make(arena).1
+            XCTAssertTrue(layout.floors.isEmpty, "\(arena.rawValue) should be flat")
+            XCTAssertFalse(layout.attackPaths.isEmpty)
+            XCTAssertFalse(layout.defendPosts.isEmpty)
+        }
+    }
+
+    func testAttackPathsMoveTowardTheSite() {
+        for arena in ArenaMap.allCases {
+            let layout = MapBuilder.make(arena).1
+            for path in layout.attackPaths {
+                let start = path.first!
+                let end = path.last!
+                XCTAssertLessThan(
+                    Collision.distanceXZ(end, layout.siteCenter),
+                    Collision.distanceXZ(start, layout.siteCenter) + 2,
+                    "Path on \(arena.rawValue) should finish nearer the site"
+                )
+            }
+        }
     }
 
     func testCrateDoesNotBlockSight() {

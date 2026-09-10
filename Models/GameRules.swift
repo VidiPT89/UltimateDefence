@@ -62,7 +62,7 @@ struct GameRules {
     static let playerSpeed: Float = 6.6
     static let walkMultiplier: Float = 0.52
     static let crouchMultiplier: Float = 0.34
-    static let botSpeed: Float = 4.6
+    static let botSpeed: Float = 4.1
     static let jumpVelocity: Float = 7.4
     static let gravity: Float = 22
 

@@ -3,6 +3,8 @@ import AppKit
 import simd
 
 enum MapBuilder {
+    private static let door: Float = 4
+
     static func make(_ arena: ArenaMap) -> (SCNScene, MapLayout) {
         switch arena {
         case .dust2: return dust2()
@@ -15,215 +17,197 @@ enum MapBuilder {
     private static func dust2() -> (SCNScene, MapLayout) {
         let kit = MapKit(
             sky: MapTextures.sky(
-                top: NSColor(calibratedRed: 0.38, green: 0.58, blue: 0.82, alpha: 1),
-                bottom: NSColor(calibratedRed: 0.78, green: 0.74, blue: 0.62, alpha: 1)
+                top: NSColor(calibratedRed: 0.42, green: 0.62, blue: 0.84, alpha: 1),
+                bottom: NSColor(calibratedRed: 0.80, green: 0.78, blue: 0.68, alpha: 1)
             ),
-            fog: NSColor(calibratedRed: 0.68, green: 0.66, blue: 0.58, alpha: 1),
+            fog: NSColor(calibratedRed: 0.70, green: 0.72, blue: 0.70, alpha: 1),
             wall: MapTextures.sandstone,
             ground: MapTextures.sand,
-            groundSize: 108
+            groundSize: 96
         )
-        kit.room(minX: -9, maxX: 9, minZ: -48, maxZ: -34, openings: [
-            .north(center: 0, width: 4.8),
-            .east(center: -41, width: 4.4),
-            .west(center: -41, width: 4.2)
+        kit.room(minX: -8, maxX: 8, minZ: -38, maxZ: -26, openings: [
+            .north(center: 0, width: door),
+            .east(center: -32, width: door),
+            .west(center: -32, width: door)
         ])
-        kit.room(minX: 9, maxX: 28, minZ: -48, maxZ: -34, openings: [
-            .west(center: -41, width: 4.4),
-            .north(center: 25, width: 4.6)
+        kit.room(minX: 8, maxX: 22, minZ: -38, maxZ: -26, openings: [
+            .west(center: -32, width: door),
+            .north(center: 15, width: door)
         ])
-        kit.hall(minX: -3.4, maxX: 3.4, minZ: -34, maxZ: -22)
-        kit.hall(minX: 22, maxX: 28, minZ: -34, maxZ: 18)
-        kit.room(minX: -10, maxX: 12, minZ: -22, maxZ: 10, openings: [
-            .south(center: 0, width: 4.8),
-            .west(center: 0, width: 4.2),
-            .east(center: 4, width: 4.2),
-            .north(center: 6, width: 4.6)
+        kit.room(minX: -22, maxX: -8, minZ: -38, maxZ: -26, openings: [
+            .east(center: -32, width: door),
+            .north(center: -16, width: door)
         ])
-        kit.room(minX: -26, maxX: -9, minZ: -44, maxZ: -34, openings: [
-            .east(center: -41, width: 4.2),
-            .north(center: -22, width: 4.2)
+        kit.hall(minX: -2, maxX: 2, minZ: -26, maxZ: -14)
+        kit.hall(minX: 13, maxX: 17, minZ: -26, maxZ: 10)
+        kit.hall(minX: -18, maxX: -14, minZ: -26, maxZ: -6)
+        kit.room(minX: -12, maxX: 12, minZ: -14, maxZ: 4, openings: [
+            .south(center: 0, width: door),
+            .north(center: 0, width: door),
+            .west(center: -6, width: door)
         ])
-        kit.hall(minX: -26, maxX: -18, minZ: -34, maxZ: 8)
-        kit.room(minX: -26, maxX: -10, minZ: -4, maxZ: 10, openings: [
-            .east(center: 0, width: 4.2),
-            .south(center: -22, width: 4.2)
+        kit.room(minX: -20, maxX: -12, minZ: -10, maxZ: 2, openings: [
+            .east(center: -6, width: door),
+            .south(center: -16, width: door)
         ])
-        kit.room(minX: 4, maxX: 16, minZ: 10, maxZ: 24, openings: [
-            .south(center: 6, width: 4.6),
-            .east(center: 18, width: 4.4)
+        kit.hall(minX: -2, maxX: 2, minZ: 4, maxZ: 10)
+        kit.room(minX: -6, maxX: 24, minZ: 10, maxZ: 28, openings: [
+            .south(center: 0, width: door),
+            .south(center: 15, width: door)
         ])
-        kit.room(minX: 16, maxX: 36, minZ: 18, maxZ: 40, openings: [
-            .south(center: 25, width: 4.6),
-            .west(center: 18, width: 4.4),
-            .west(center: 32, width: 4.4)
-        ])
-        kit.room(minX: -2, maxX: 16, minZ: 24, maxZ: 38, openings: [
-            .east(center: 32, width: 4.4),
-            .south(center: 8, width: 4.4)
-        ])
-        kit.platform(minX: 5, maxX: 15, minZ: 11.2, maxZ: 23, height: 1.55)
-        kit.steps(x: 6, z: 9.2, dx: 0, dz: 1, count: 4, width: 3.2, rise: 0.38, run: 0.7)
-        kit.platform(minX: 29, maxX: 35.2, minZ: 32, maxZ: 38.4, height: 1.15)
-        kit.steps(x: 28.2, z: 34, dx: 1, dz: 0, count: 3, width: 2.6, rise: 0.38, run: 0.65)
-        kit.compound(minX: -28, maxX: 38, minZ: -50, maxZ: 42)
-        kit.crate(x: 33, z: 36)
-        kit.crate(x: 31.4, z: 36)
-        kit.crate(x: 32.2, z: 36, y: 1.5)
-        kit.crate(x: 24, z: 36)
-        kit.barrel(x: 25, z: -28)
-        kit.barrel(x: -22, z: 2)
-        kit.pillar(x: 2, z: -6)
-        kit.pillar(x: 24, z: 8)
-        kit.pipe(from: SIMD3(25, 3.4, -30), to: SIMD3(25, 3.4, 20))
-        kit.pipe(from: SIMD3(-22, 3.4, -30), to: SIMD3(-22, 3.4, 6))
-        kit.lamps([
-            SIMD3(25, 4.6, 28), SIMD3(8, 4.8, 30), SIMD3(0, 4.4, -8),
-            SIMD3(25, 4.2, -28), SIMD3(-22, 4.2, -20), SIMD3(10, 5.2, 16)
-        ])
-        let site = SIMD3<Float>(26, 0, 30)
-        let player = SIMD3<Float>(6, 1.64, 30)
+        kit.crate(x: 20, z: 24)
+        kit.crate(x: 18.4, z: 24)
+        kit.barrel(x: 15, z: -30)
+        kit.lamps([SIMD3(0, 4.2, -32), SIMD3(0, 4.2, -5), SIMD3(15, 4.2, -8), SIMD3(8, 4.2, 18)])
+        let site = p(8, 20)
         kit.site(at: site)
         return (kit.scene, kit.layout(
             site: site,
-            player: player,
+            player: SIMD3(4, 1.64, 22),
             yaw: .pi,
-            terrorists: Self.cluster(SIMD3(0, 0, -40), count: 6, alongX: true),
-            defenders: Self.cluster(SIMD3(8, 0, 30), count: 6, alongX: true)
+            terrorists: Self.cluster(p(0, -32), count: 6, alongX: true),
+            defenders: Self.cluster(p(6, 22), count: 6, alongX: true),
+            attackPaths: [
+                [p(0, -32), p(0, -20), p(0, -5), p(0, 7), p(6, 18)],
+                [p(14, -32), p(15, -12), p(15, 12), p(12, 18)],
+                [p(-14, -32), p(-16, -16), p(-16, -4), p(-8, -5), p(0, -4), p(6, 18)]
+            ],
+            defendPosts: [p(6, 20), p(14, 16), p(0, 14), p(10, 22), p(-2, 18), p(16, 20)]
         ))
     }
 
     private static func aztec() -> (SCNScene, MapLayout) {
         let kit = MapKit(
             sky: MapTextures.sky(
-                top: NSColor(calibratedRed: 0.34, green: 0.56, blue: 0.80, alpha: 1),
-                bottom: NSColor(calibratedRed: 0.72, green: 0.78, blue: 0.70, alpha: 1)
+                top: NSColor(calibratedRed: 0.36, green: 0.58, blue: 0.80, alpha: 1),
+                bottom: NSColor(calibratedRed: 0.74, green: 0.80, blue: 0.72, alpha: 1)
             ),
-            fog: NSColor(calibratedRed: 0.58, green: 0.68, blue: 0.70, alpha: 1),
+            fog: NSColor(calibratedRed: 0.62, green: 0.70, blue: 0.72, alpha: 1),
             wall: MapTextures.sandstone,
             ground: MapTextures.sand,
-            groundSize: 92
+            groundSize: 88
         )
-        kit.room(minX: -10, maxX: 10, minZ: -40, maxZ: -24, openings: [.north(center: 0, width: 4.6)])
-        kit.hall(minX: -3.2, maxX: 3.2, minZ: -24, maxZ: -10)
-        kit.room(minX: -8, maxX: 8, minZ: -10, maxZ: 8, openings: [
-            .south(center: 0, width: 4.6),
-            .north(center: 0, width: 4.6)
+        kit.room(minX: -8, maxX: 8, minZ: -36, maxZ: -24, openings: [.north(center: 0, width: door)])
+        kit.hall(minX: -2, maxX: 2, minZ: -24, maxZ: -12)
+        kit.room(minX: -8, maxX: 8, minZ: -12, maxZ: 4, openings: [
+            .south(center: 0, width: door),
+            .north(center: 0, width: door)
         ])
-        kit.water(minX: -6, maxX: 6, minZ: -6, maxZ: 4)
-        kit.hall(minX: -3.2, maxX: 3.2, minZ: 8, maxZ: 16)
-        kit.room(minX: -26, maxX: 6, minZ: 16, maxZ: 36, openings: [
-            .south(center: 0, width: 4.6),
-            .east(center: 24, width: 4.4)
+        kit.water(minX: -5, maxX: 5, minZ: -8, maxZ: 0)
+        kit.hall(minX: -2, maxX: 2, minZ: 4, maxZ: 12)
+        kit.room(minX: -20, maxX: 8, minZ: 12, maxZ: 28, openings: [
+            .south(center: 0, width: door),
+            .east(center: 20, width: door)
         ])
-        kit.room(minX: 6, maxX: 26, minZ: 12, maxZ: 30, openings: [.west(center: 24, width: 4.4)])
-        kit.platform(minX: -24, maxX: -10, minZ: 22, maxZ: 34, height: 1.4)
-        kit.steps(x: -9, z: 26, dx: -1, dz: 0, count: 4, width: 2.8, rise: 0.35, run: 0.7)
-        kit.compound(minX: -28, maxX: 28, minZ: -42, maxZ: 38)
-        kit.crate(x: -20, z: 30)
-        kit.crate(x: 22, z: 22)
-        kit.barrel(x: 0, z: -28)
-        kit.pillar(x: 0, z: 18)
-        kit.pipe(from: SIMD3(0, 3.5, -22), to: SIMD3(0, 3.5, 14))
-        kit.lamps([SIMD3(0, 4.8, -32), SIMD3(0, 4.6, -2), SIMD3(-16, 5.4, 26), SIMD3(16, 4.8, 18)])
-        let site = SIMD3<Float>(-18, 0, 28)
-        let player = SIMD3<Float>(16, 1.64, 18)
+        kit.room(minX: 8, maxX: 22, minZ: 12, maxZ: 26, openings: [.west(center: 20, width: door)])
+        kit.crate(x: -16, z: 24)
+        kit.crate(x: 16, z: 20)
+        kit.lamps([SIMD3(0, 4.2, -30), SIMD3(0, 4.2, -4), SIMD3(-10, 4.2, 20), SIMD3(14, 4.2, 18)])
+        let site = p(-12, 20)
         kit.site(at: site)
         return (kit.scene, kit.layout(
             site: site,
-            player: player,
-            yaw: .pi * 0.7,
-            terrorists: Self.cluster(SIMD3(0, 0, -32), count: 6, alongX: true),
-            defenders: Self.cluster(SIMD3(14, 0, 16), count: 6, alongX: true)
+            player: SIMD3(14, 1.64, 18),
+            yaw: .pi * 0.75,
+            terrorists: Self.cluster(p(0, -30), count: 6, alongX: true),
+            defenders: Self.cluster(p(14, 18), count: 6, alongX: true),
+            attackPaths: [
+                [p(0, -30), p(0, -18), p(0, -4), p(0, 8), p(-8, 18)],
+                [p(0, -30), p(0, -4), p(0, 16), p(10, 18)]
+            ],
+            defendPosts: [p(-10, 20), p(12, 18), p(0, 16), p(-16, 22), p(6, 20), p(16, 16)]
         ))
     }
 
     private static func office() -> (SCNScene, MapLayout) {
         let kit = MapKit(
             sky: MapTextures.sky(
-                top: NSColor(calibratedRed: 0.32, green: 0.38, blue: 0.46, alpha: 1),
-                bottom: NSColor(calibratedRed: 0.52, green: 0.54, blue: 0.56, alpha: 1)
+                top: NSColor(calibratedRed: 0.34, green: 0.40, blue: 0.48, alpha: 1),
+                bottom: NSColor(calibratedRed: 0.54, green: 0.56, blue: 0.58, alpha: 1)
             ),
-            fog: NSColor(calibratedRed: 0.42, green: 0.44, blue: 0.46, alpha: 1),
+            fog: NSColor(calibratedRed: 0.46, green: 0.48, blue: 0.50, alpha: 1),
             wall: MapTextures.concrete,
             ground: MapTextures.metal,
             groundSize: 80
         )
-        kit.room(minX: -10, maxX: 10, minZ: -36, maxZ: -20, openings: [.north(center: 0, width: 4.2)])
-        kit.hall(minX: -2.8, maxX: 2.8, minZ: -20, maxZ: -6)
-        kit.room(minX: -8, maxX: 8, minZ: -6, maxZ: 8, openings: [
-            .south(center: 0, width: 4.2),
-            .north(center: 0, width: 4.2),
-            .east(center: 0, width: 4.0)
+        kit.room(minX: -8, maxX: 8, minZ: -32, maxZ: -20, openings: [.north(center: 0, width: door)])
+        kit.hall(minX: -2, maxX: 2, minZ: -20, maxZ: -8)
+        kit.room(minX: -8, maxX: 8, minZ: -8, maxZ: 6, openings: [
+            .south(center: 0, width: door),
+            .north(center: 0, width: door),
+            .east(center: -1, width: door)
         ])
-        kit.hall(minX: 8, maxX: 22, minZ: -2.6, maxZ: 2.6)
-        kit.room(minX: 22, maxX: 32, minZ: -12, maxZ: 8, openings: [.west(center: 0, width: 4.0)])
-        kit.hall(minX: -2.8, maxX: 2.8, minZ: 8, maxZ: 16)
-        kit.room(minX: -22, maxX: 8, minZ: 16, maxZ: 34, openings: [.south(center: 0, width: 4.2)])
-        kit.platform(minX: 24, maxX: 31, minZ: -4, maxZ: 6, height: 1.2)
-        kit.compound(minX: -24, maxX: 34, minZ: -38, maxZ: 36)
-        kit.crate(x: 26, z: 0, w: 1.6, h: 1.1, d: 2.0)
-        kit.crate(x: -16, z: 28)
-        kit.barrel(x: 28, z: -8)
-        kit.pillar(x: 0, z: 16)
-        kit.pipe(from: SIMD3(0, 3.3, -18), to: SIMD3(0, 3.3, 20))
-        kit.lamps([SIMD3(0, 4.2, -28), SIMD3(0, 4.2, 0), SIMD3(26, 4.2, -2), SIMD3(-10, 4.4, 24)])
-        let site = SIMD3<Float>(-12, 0, 26)
-        let player = SIMD3<Float>(2, 1.64, 26)
+        kit.hall(minX: 8, maxX: 18, minZ: -3, maxZ: 1)
+        kit.room(minX: 18, maxX: 28, minZ: -10, maxZ: 6, openings: [.west(center: -1, width: door)])
+        kit.hall(minX: -2, maxX: 2, minZ: 6, maxZ: 14)
+        kit.room(minX: -18, maxX: 8, minZ: 14, maxZ: 28, openings: [.south(center: 0, width: door)])
+        kit.crate(x: 22, z: 0)
+        kit.crate(x: -12, z: 24)
+        kit.lamps([SIMD3(0, 4.0, -26), SIMD3(0, 4.0, -1), SIMD3(22, 4.0, -2), SIMD3(-8, 4.0, 20)])
+        let site = p(-10, 22)
         kit.site(at: site)
         return (kit.scene, kit.layout(
             site: site,
-            player: player,
+            player: SIMD3(2, 1.64, 22),
             yaw: .pi,
-            terrorists: Self.cluster(SIMD3(0, 0, -28), count: 6, alongX: true),
-            defenders: Self.cluster(SIMD3(2, 0, 24), count: 6, alongX: true)
+            terrorists: Self.cluster(p(0, -26), count: 6, alongX: true),
+            defenders: Self.cluster(p(2, 22), count: 6, alongX: true),
+            attackPaths: [
+                [p(0, -26), p(0, -14), p(0, -1), p(0, 10), p(-6, 20)],
+                [p(0, -26), p(0, -1), p(12, -1), p(22, -1)]
+            ],
+            defendPosts: [p(-8, 22), p(2, 20), p(0, 16), p(-14, 24), p(4, 24), p(20, 2)]
         ))
     }
 
     private static func mill() -> (SCNScene, MapLayout) {
         let kit = MapKit(
             sky: MapTextures.sky(
-                top: NSColor(calibratedRed: 0.36, green: 0.42, blue: 0.48, alpha: 1),
-                bottom: NSColor(calibratedRed: 0.56, green: 0.56, blue: 0.54, alpha: 1)
+                top: NSColor(calibratedRed: 0.38, green: 0.44, blue: 0.50, alpha: 1),
+                bottom: NSColor(calibratedRed: 0.58, green: 0.58, blue: 0.56, alpha: 1)
             ),
-            fog: NSColor(calibratedRed: 0.46, green: 0.46, blue: 0.46, alpha: 1),
+            fog: NSColor(calibratedRed: 0.50, green: 0.50, blue: 0.50, alpha: 1),
             wall: MapTextures.concrete,
             ground: MapTextures.metal,
             groundSize: 76
         )
-        kit.room(minX: -10, maxX: 10, minZ: -32, maxZ: -16, openings: [.north(center: 0, width: 4.4)])
-        kit.hall(minX: -3, maxX: 3, minZ: -16, maxZ: -4)
-        kit.room(minX: -14, maxX: 8, minZ: -4, maxZ: 12, openings: [
-            .south(center: 0, width: 4.4),
-            .north(center: -6, width: 4.4),
-            .east(center: 4, width: 4.2)
+        kit.room(minX: -8, maxX: 8, minZ: -30, maxZ: -18, openings: [.north(center: 0, width: door)])
+        kit.hall(minX: -2, maxX: 2, minZ: -18, maxZ: -6)
+        kit.room(minX: -12, maxX: 8, minZ: -6, maxZ: 8, openings: [
+            .south(center: 0, width: door),
+            .north(center: -4, width: door),
+            .east(center: 1, width: door)
         ])
-        kit.hall(minX: 8, maxX: 20, minZ: 0.8, maxZ: 6.8)
-        kit.room(minX: 20, maxX: 30, minZ: -4, maxZ: 16, openings: [.west(center: 4, width: 4.2)])
-        kit.room(minX: -22, maxX: 4, minZ: 12, maxZ: 30, openings: [.south(center: -6, width: 4.4)])
-        kit.platform(minX: -20, maxX: -8, minZ: 16, maxZ: 28, height: 1.5)
-        kit.steps(x: -7, z: 20, dx: -1, dz: 0, count: 4, width: 2.8, rise: 0.37, run: 0.7)
-        kit.compound(minX: -24, maxX: 32, minZ: -34, maxZ: 32)
-        kit.crate(x: -16, z: 24)
-        kit.barrel(x: 24, z: 8)
-        kit.pillar(x: -4, z: 4)
-        kit.pipe(from: SIMD3(-6, 3.4, -12), to: SIMD3(-6, 3.4, 18))
-        kit.lamps([SIMD3(0, 4.4, -24), SIMD3(-6, 4.4, 2), SIMD3(24, 4.4, 6), SIMD3(-14, 5.2, 22)])
-        let site = SIMD3<Float>(-14, 0, 22)
-        let player = SIMD3<Float>(22, 1.64, 6)
+        kit.hall(minX: 8, maxX: 18, minZ: -1, maxZ: 3)
+        kit.room(minX: 18, maxX: 28, minZ: -6, maxZ: 12, openings: [.west(center: 1, width: door)])
+        kit.hall(minX: -6, maxX: -2, minZ: 8, maxZ: 14)
+        kit.room(minX: -18, maxX: 4, minZ: 14, maxZ: 28, openings: [.south(center: -4, width: door)])
+        kit.crate(x: -12, z: 22)
+        kit.barrel(x: 25, z: 8)
+        kit.lamps([SIMD3(0, 4.0, -24), SIMD3(-4, 4.0, 1), SIMD3(22, 4.0, 2), SIMD3(-10, 4.0, 20)])
+        let site = p(-10, 20)
         kit.site(at: site)
         return (kit.scene, kit.layout(
             site: site,
-            player: player,
-            yaw: .pi * 0.75,
-            terrorists: Self.cluster(SIMD3(0, 0, -24), count: 6, alongX: true),
-            defenders: Self.cluster(SIMD3(22, 0, 4), count: 6, alongX: true)
+            player: SIMD3(22, 1.64, 4),
+            yaw: .pi * 0.8,
+            terrorists: Self.cluster(p(0, -24), count: 6, alongX: true),
+            defenders: Self.cluster(p(22, 2), count: 6, alongX: true),
+            attackPaths: [
+                [p(0, -24), p(0, -12), p(0, 1), p(-4, 11), p(-8, 18)],
+                [p(0, -24), p(0, 1), p(12, 1), p(22, 2)]
+            ],
+            defendPosts: [p(-8, 20), p(22, 4), p(-4, 16), p(-14, 22), p(2, 18), p(20, 8)]
         ))
+    }
+
+    private static func p(_ x: Float, _ z: Float) -> SIMD3<Float> {
+        SIMD3(x, 0, z)
     }
 
     private static func cluster(_ origin: SIMD3<Float>, count: Int, alongX: Bool) -> [SIMD3<Float>] {
         (0..<count).map { index in
-            let offset = (Float(index) - Float(count - 1) / 2) * 1.7
+            let offset = (Float(index) - Float(count - 1) / 2) * 1.6
             if alongX {
                 return SIMD3(origin.x + offset, 0, origin.z)
             }

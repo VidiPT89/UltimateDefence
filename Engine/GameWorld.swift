@@ -71,13 +71,17 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let ctSpawns = Array(layout.defenderSpawns.prefix(ctCount))
         bots = tSpawns.enumerated().map { index, spawn in
             let clear = Collision.unstick(spawn, radius: 0.45, walls: layout.walls)
-            let bot = BotActor(id: index, team: .terrorist, at: clear)
+            let routes = layout.attackPaths
+            let path = routes.isEmpty ? [layout.siteCenter] : routes[index % routes.count]
+            let bot = BotActor(id: index, team: .terrorist, at: clear, path: path)
             scene.rootNode.addChildNode(bot.node)
             return bot
         }
         bots += ctSpawns.enumerated().map { index, spawn in
             let clear = Collision.unstick(spawn, radius: 0.45, walls: layout.walls)
-            let bot = BotActor(id: index, team: .counter, at: clear)
+            let posts = layout.defendPosts
+            let post = posts.isEmpty ? layout.siteCenter : posts[index % posts.count]
+            let bot = BotActor(id: index, team: .counter, at: clear, path: [post])
             scene.rootNode.addChildNode(bot.node)
             return bot
         }
@@ -184,7 +188,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 enemies: enemies,
                 site: layout.siteCenter,
                 walls: layout.walls,
-                floors: layout.floors,
                 bombPlanted: bombPlanted,
                 planterId: terrorists.first(where: \.isAlive)?.id ?? 0,
                 others: bots

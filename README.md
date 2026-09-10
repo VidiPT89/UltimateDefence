@@ -9,7 +9,7 @@
 
 - ✅ First-person combat with mouse look, WASD movement and hitscan weapons
 - ✅ Round-based defence: eliminate attackers, run down the clock, or defuse the artefact
-- ✅ Maps: Dust II, Aztec, Office and Mill with corridors, mid routes, doors and walkable ramps
+- ✅ Maps: Dust II, Aztec, Office and Mill with aligned flat corridors (mid, long and tunnel routes)
 - ✅ Match sizes from 1v1 to 6v6 with allied defender bots versus terrorist bots
 - ✅ Any attacker can plant on Site A; dying ends the round immediately
 - ✅ Humanoid CT and T models, crates, barrels, pillars and indoor/outdoor compounds

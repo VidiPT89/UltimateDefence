@@ -32,20 +32,19 @@ final class MapKit {
     var floors: [Platform] = []
     private let wallTexture: NSImage
 
-    init(sky: NSImage, fog: NSColor, wall: NSImage, ground: NSImage, groundSize: CGFloat) {
+    init(sky: NSImage, fog: NSColor, wall: NSImage, indoor: Bool) {
         wallTexture = wall
         scene.background.contents = sky
-        scene.fogStartDistance = 42
-        scene.fogEndDistance = 110
+        scene.fogStartDistance = indoor ? 28 : 55
+        scene.fogEndDistance = indoor ? 70 : 140
         scene.fogColor = fog
-        addLights()
-        let box = SCNBox(width: groundSize, height: 0.4, length: groundSize, chamferRadius: 0)
-        let tiles = max(10, groundSize / 1.6)
-        box.materials = Array(repeating: MapTextures.tiled(ground, repeatU: tiles, repeatV: tiles), count: 6)
-        let floor = SCNNode(geometry: box)
-        floor.position = SCNVector3(0, -0.2, 0)
-        floor.name = NodeName.ground
-        scene.rootNode.addChildNode(floor)
+        addLights(indoor: indoor)
+        let void = SCNBox(width: 180, height: 1, length: 180, chamferRadius: 0)
+        void.firstMaterial = MapTextures.goldSrc(NSColor(calibratedRed: 0.05, green: 0.05, blue: 0.045, alpha: 1))
+        let bed = SCNNode(geometry: void)
+        bed.position = SCNVector3(0, -0.55, 0)
+        bed.name = NodeName.ground
+        scene.rootNode.addChildNode(bed)
     }
 
     func wall(
@@ -59,7 +58,7 @@ final class MapKit {
         collide: Bool = true
     ) {
         let tex = texture ?? wallTexture
-        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0.02)
+        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
         box.materials = Self.tiledBox(tex, w: w, h: h, d: d)
         let node = SCNNode(geometry: box)
         node.name = collide ? NodeName.solid : NodeName.trim
@@ -109,6 +108,15 @@ final class MapKit {
         walls.append(AABB(minX: x - 0.4, maxX: x + 0.4, minZ: z - 0.4, maxZ: z + 0.4, blocksSight: false))
     }
 
+    func slab(x: Float, z: Float, w: Float, d: Float, y: Float, h: Float, texture: NSImage) {
+        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
+        box.materials = Self.tiledBox(texture, w: w, h: h, d: d)
+        let node = SCNNode(geometry: box)
+        node.name = NodeName.trim
+        node.position = SCNVector3(x, y, z)
+        scene.rootNode.addChildNode(node)
+    }
+
     func water(minX: Float, maxX: Float, minZ: Float, maxZ: Float) {
         let w = maxX - minX
         let d = maxZ - minZ
@@ -120,14 +128,14 @@ final class MapKit {
     }
 
     func site(at center: SIMD3<Float>) {
-        let pad = SCNCylinder(radius: 4.2, height: 0.05)
-        pad.firstMaterial = MapTextures.goldSrc(NSColor(calibratedRed: 0.52, green: 0.16, blue: 0.1, alpha: 1))
+        let pad = SCNBox(width: 3.4, height: 0.05, length: 3.4, chamferRadius: 0)
+        pad.firstMaterial = MapTextures.tiled(MapTextures.site, repeatU: 1, repeatV: 1)
         let siteNode = SCNNode(geometry: pad)
         siteNode.name = NodeName.site
-        siteNode.position = SCNVector3(center.x, 0.03, center.z)
+        siteNode.position = SCNVector3(center.x, 0.08, center.z)
         scene.rootNode.addChildNode(siteNode)
         let c4 = SCNBox(width: 0.42, height: 0.14, length: 0.28, chamferRadius: 0.02)
-        c4.firstMaterial = MapTextures.goldSrc(NSColor(calibratedRed: 0.1, green: 0.12, blue: 0.1, alpha: 1))
+        c4.firstMaterial = MapTextures.goldSrc(NSColor(calibratedRed: 0.08, green: 0.10, blue: 0.08, alpha: 1))
         let c4Node = SCNNode(geometry: c4)
         c4Node.position = SCNVector3(center.x, 0.12, center.z)
         scene.rootNode.addChildNode(c4Node)
@@ -144,8 +152,8 @@ final class MapKit {
             bulb.light = SCNLight()
             bulb.light?.type = .omni
             bulb.light?.color = NSColor(calibratedRed: 1, green: 0.92, blue: 0.74, alpha: 1)
-            bulb.light?.intensity = 340
-            bulb.light?.attenuationEndDistance = 18
+            bulb.light?.intensity = 520
+            bulb.light?.attenuationEndDistance = 22
             bulb.position = SCNVector3(p.x, p.y - 0.25, p.z)
             scene.rootNode.addChildNode(bulb)
         }
@@ -173,20 +181,24 @@ final class MapKit {
         )
     }
 
-    private func addLights() {
+    private func addLights(indoor: Bool) {
         let ambient = SCNNode()
         ambient.light = SCNLight()
         ambient.light?.type = .ambient
-        ambient.light?.intensity = 380
-        ambient.light?.color = NSColor(calibratedRed: 0.72, green: 0.70, blue: 0.64, alpha: 1)
+        ambient.light?.intensity = indoor ? 280 : 420
+        ambient.light?.color = indoor
+            ? NSColor(calibratedRed: 0.62, green: 0.64, blue: 0.60, alpha: 1)
+            : NSColor(calibratedRed: 0.78, green: 0.74, blue: 0.64, alpha: 1)
         scene.rootNode.addChildNode(ambient)
         let sun = SCNNode()
         sun.light = SCNLight()
         sun.light?.type = .directional
-        sun.light?.intensity = 1100
-        sun.light?.color = NSColor(calibratedRed: 1, green: 0.97, blue: 0.90, alpha: 1)
+        sun.light?.intensity = indoor ? 700 : 980
+        sun.light?.color = indoor
+            ? NSColor(calibratedRed: 0.92, green: 0.94, blue: 0.90, alpha: 1)
+            : NSColor(calibratedRed: 1, green: 0.96, blue: 0.82, alpha: 1)
         sun.light?.castsShadow = false
-        sun.eulerAngles = SCNVector3(-0.9, 0.65, 0)
+        sun.eulerAngles = SCNVector3(-0.95, 0.55, 0)
         scene.rootNode.addChildNode(sun)
     }
 

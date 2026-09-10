@@ -15,13 +15,12 @@ enum MapBuilder {
     private static func dust2() -> (SCNScene, MapLayout) {
         let kit = MapKit(
             sky: MapTextures.sky(
-                top: NSColor(calibratedRed: 0.42, green: 0.62, blue: 0.84, alpha: 1),
-                bottom: NSColor(calibratedRed: 0.80, green: 0.78, blue: 0.68, alpha: 1)
+                top: NSColor(calibratedRed: 0.38, green: 0.60, blue: 0.86, alpha: 1),
+                bottom: NSColor(calibratedRed: 0.86, green: 0.80, blue: 0.62, alpha: 1)
             ),
-            fog: NSColor(calibratedRed: 0.70, green: 0.72, blue: 0.70, alpha: 1),
+            fog: NSColor(calibratedRed: 0.78, green: 0.76, blue: 0.66, alpha: 1),
             wall: MapTextures.sandstone,
-            ground: MapTextures.sand,
-            groundSize: 96
+            indoor: false
         )
         let grid = GridMap()
         grid.fill(x0: -4, x1: 3, z0: -19, z1: -14)
@@ -34,7 +33,7 @@ enum MapBuilder {
         grid.fill(x0: -10, x1: -7, z0: -5, z1: 0)
         grid.fill(x0: -1, x1: 0, z0: 2, z1: 4)
         grid.fill(x0: -3, x1: 11, z0: 5, z1: 13)
-        grid.emit(into: kit)
+        grid.emit(into: kit, walkTexture: MapTextures.sand, ceiling: nil)
         kit.crate(x: GridMap.world(10, 6).x, z: GridMap.world(10, 6).z)
         kit.crate(x: GridMap.world(9, 6).x, z: GridMap.world(9, 6).z)
         kit.barrel(x: GridMap.world(9, -17).x, z: GridMap.world(9, -17).z)
@@ -63,13 +62,12 @@ enum MapBuilder {
     private static func aztec() -> (SCNScene, MapLayout) {
         let kit = MapKit(
             sky: MapTextures.sky(
-                top: NSColor(calibratedRed: 0.36, green: 0.58, blue: 0.80, alpha: 1),
-                bottom: NSColor(calibratedRed: 0.74, green: 0.80, blue: 0.72, alpha: 1)
+                top: NSColor(calibratedRed: 0.32, green: 0.56, blue: 0.82, alpha: 1),
+                bottom: NSColor(calibratedRed: 0.80, green: 0.78, blue: 0.58, alpha: 1)
             ),
-            fog: NSColor(calibratedRed: 0.62, green: 0.70, blue: 0.72, alpha: 1),
-            wall: MapTextures.sandstone,
-            ground: MapTextures.sand,
-            groundSize: 88
+            fog: NSColor(calibratedRed: 0.70, green: 0.74, blue: 0.68, alpha: 1),
+            wall: MapTextures.aztecStone,
+            indoor: false
         )
         let grid = GridMap()
         grid.fill(x0: -4, x1: 3, z0: -18, z1: -13)
@@ -78,7 +76,7 @@ enum MapBuilder {
         grid.fill(x0: -1, x1: 0, z0: 2, z1: 5)
         grid.fill(x0: -10, x1: 3, z0: 6, z1: 13)
         grid.fill(x0: 4, x1: 10, z0: 6, z1: 12)
-        grid.emit(into: kit)
+        grid.emit(into: kit, walkTexture: MapTextures.sand, ceiling: nil)
         kit.water(minX: -5, maxX: 5, minZ: -8, maxZ: 0)
         kit.crate(x: GridMap.world(-3, -17).x, z: GridMap.world(-3, -17).z)
         kit.crate(x: GridMap.world(10, 11).x, z: GridMap.world(10, 11).z)
@@ -106,13 +104,13 @@ enum MapBuilder {
     private static func office() -> (SCNScene, MapLayout) {
         let kit = MapKit(
             sky: MapTextures.sky(
-                top: NSColor(calibratedRed: 0.34, green: 0.40, blue: 0.48, alpha: 1),
-                bottom: NSColor(calibratedRed: 0.54, green: 0.56, blue: 0.58, alpha: 1)
+                top: NSColor(calibratedRed: 0.22, green: 0.26, blue: 0.30, alpha: 1),
+                bottom: NSColor(calibratedRed: 0.36, green: 0.38, blue: 0.40, alpha: 1),
+                clouds: false
             ),
-            fog: NSColor(calibratedRed: 0.46, green: 0.48, blue: 0.50, alpha: 1),
-            wall: MapTextures.concrete,
-            ground: MapTextures.metal,
-            groundSize: 80
+            fog: NSColor(calibratedRed: 0.28, green: 0.30, blue: 0.32, alpha: 1),
+            wall: MapTextures.plaster,
+            indoor: true
         )
         let grid = GridMap()
         grid.fill(x0: -4, x1: 3, z0: -16, z1: -11)
@@ -122,7 +120,7 @@ enum MapBuilder {
         grid.fill(x0: 9, x1: 13, z0: -5, z1: 2)
         grid.fill(x0: -1, x1: 0, z0: 3, z1: 6)
         grid.fill(x0: -9, x1: 3, z0: 7, z1: 13)
-        grid.emit(into: kit)
+        grid.emit(into: kit, walkTexture: MapTextures.carpet, ceiling: MapTextures.tiles)
         kit.crate(x: GridMap.world(12, -4).x, z: GridMap.world(12, -4).z)
         kit.crate(x: GridMap.world(-8, 8).x, z: GridMap.world(-8, 8).z)
         kit.lamps([SIMD3(0, 4.0, -26), SIMD3(0, 4.0, -1), SIMD3(22, 4.0, -2), SIMD3(-8, 4.0, 20)])
@@ -149,13 +147,13 @@ enum MapBuilder {
     private static func mill() -> (SCNScene, MapLayout) {
         let kit = MapKit(
             sky: MapTextures.sky(
-                top: NSColor(calibratedRed: 0.38, green: 0.44, blue: 0.50, alpha: 1),
-                bottom: NSColor(calibratedRed: 0.58, green: 0.58, blue: 0.56, alpha: 1)
+                top: NSColor(calibratedRed: 0.26, green: 0.28, blue: 0.30, alpha: 1),
+                bottom: NSColor(calibratedRed: 0.40, green: 0.38, blue: 0.34, alpha: 1),
+                clouds: false
             ),
-            fog: NSColor(calibratedRed: 0.50, green: 0.50, blue: 0.50, alpha: 1),
-            wall: MapTextures.concrete,
-            ground: MapTextures.metal,
-            groundSize: 76
+            fog: NSColor(calibratedRed: 0.32, green: 0.32, blue: 0.30, alpha: 1),
+            wall: MapTextures.rust,
+            indoor: true
         )
         let grid = GridMap()
         grid.fill(x0: -4, x1: 3, z0: -15, z1: -10)
@@ -165,7 +163,7 @@ enum MapBuilder {
         grid.fill(x0: 9, x1: 13, z0: -3, z1: 5)
         grid.fill(x0: -3, x1: -2, z0: 4, z1: 6)
         grid.fill(x0: -9, x1: 1, z0: 7, z1: 13)
-        grid.emit(into: kit)
+        grid.emit(into: kit, walkTexture: MapTextures.concrete, ceiling: MapTextures.metal)
         kit.crate(x: GridMap.world(-8, 8).x, z: GridMap.world(-8, 8).z)
         kit.barrel(x: GridMap.world(12, 4).x, z: GridMap.world(12, 4).z)
         kit.lamps([SIMD3(0, 4.0, -24), SIMD3(-4, 4.0, 1), SIMD3(22, 4.0, 2), SIMD3(-10, 4.0, 20)])

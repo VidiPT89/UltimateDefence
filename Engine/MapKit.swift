@@ -16,6 +16,7 @@ struct MapLayout {
     let walls: [AABB]
     let siteCenter: SIMD3<Float>
     let playerSpawn: SIMD3<Float>
+    let playerYaw: Float
     let attackerSpawns: [SIMD3<Float>]
     let defenderSpawns: [SIMD3<Float>]
 }
@@ -102,11 +103,18 @@ final class MapKit {
         }
     }
 
-    func layout(site: SIMD3<Float>, player: SIMD3<Float>, terrorists: [SIMD3<Float>], defenders: [SIMD3<Float>]) -> MapLayout {
+    func layout(
+        site: SIMD3<Float>,
+        player: SIMD3<Float>,
+        yaw: Float,
+        terrorists: [SIMD3<Float>],
+        defenders: [SIMD3<Float>]
+    ) -> MapLayout {
         MapLayout(
             walls: walls,
             siteCenter: site,
             playerSpawn: player,
+            playerYaw: yaw,
             attackerSpawns: terrorists,
             defenderSpawns: defenders
         )

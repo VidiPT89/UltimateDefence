@@ -36,7 +36,6 @@ final class BotActor {
         dt: Float,
         now: TimeInterval,
         player: PlayerController,
-        allies: [BotActor],
         enemies: [BotActor],
         site: SIMD3<Float>,
         walls: [AABB],
@@ -101,13 +100,12 @@ final class BotActor {
             if let shootBot { return .fireAtBot(shootBot.id) }
         }
 
-        if isTerrorist, id == 0, !bombPlanted, Collision.distanceXZ(pos, site) < GameRules.siteRadius {
+        if isTerrorist, !bombPlanted, Collision.distanceXZ(pos, site) < GameRules.siteRadius {
             plantProgress += TimeInterval(dt)
             if plantProgress >= GameRules.plantTime { return .plant }
         } else {
             plantProgress = max(0, plantProgress - TimeInterval(dt) * 0.6)
         }
-        _ = allies
         return .idle
     }
 

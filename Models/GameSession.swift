@@ -22,6 +22,8 @@ final class GameSession: ObservableObject {
     @Published var kills = 0
     @Published var aiming = false
     @Published var moving = false
+    @Published var freezeLeft: TimeInterval = 0
+    @Published var playerAlive = true
 
     enum Screen {
         case menu

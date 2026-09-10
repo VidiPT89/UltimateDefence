@@ -24,6 +24,7 @@ enum L10nKey: String, CaseIterable {
     case match
     case dust2, aztec, office, mill
     case teammates
+    case freeze, spectating
 }
 
 enum L10n {
@@ -56,7 +57,7 @@ enum L10n {
         .victoryTime: "Vitória: o tempo esgotou",
         .victoryDefuse: "Vitória: artefacto desarmado",
         .defeatPlant: "Derrota: o artefacto explodiu",
-        .defeatEliminated: "Derrota: foste abatido",
+        .defeatEliminated: "Derrota: a defesa caiu",
         .objectiveComplete: "Objectivo cumprido",
         .lineBroken: "Linha quebrada",
         .newRound: "Nova ronda",
@@ -77,7 +78,9 @@ enum L10n {
         .aztec: "Aztec",
         .office: "Office",
         .mill: "Mill",
-        .teammates: "defesa"
+        .teammates: "defesa",
+        .freeze: "Preparar",
+        .spectating: "A ronda continua com a tua equipa"
     ]
 
     private static let en: [L10nKey: String] = [
@@ -104,7 +107,7 @@ enum L10n {
         .victoryTime: "Victory: time ran out",
         .victoryDefuse: "Victory: artefact defused",
         .defeatPlant: "Defeat: the artefact detonated",
-        .defeatEliminated: "Defeat: you were downed",
+        .defeatEliminated: "Defeat: the defence fell",
         .objectiveComplete: "Objective complete",
         .lineBroken: "Line broken",
         .newRound: "New round",
@@ -125,6 +128,8 @@ enum L10n {
         .aztec: "Aztec",
         .office: "Office",
         .mill: "Mill",
-        .teammates: "defence"
+        .teammates: "defence",
+        .freeze: "Freeze",
+        .spectating: "The round continues with your team"
     ]
 }

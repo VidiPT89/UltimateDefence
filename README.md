@@ -9,12 +9,13 @@
 
 - ✅ First-person combat with mouse look, WASD movement and hitscan weapons
 - ✅ Round-based defence: eliminate attackers, run down the clock, or defuse the artefact
-- ✅ Maps: Dust II, Sandlot and Mill
-- ✅ 2v2, 3v3 and 5v5 with allied defender bots versus terrorist bots
+- ✅ Maps: Dust II, Aztec, Office and Mill
+- ✅ Match sizes from 1v1 to 6v6 with allied defender bots versus terrorist bots
+- ✅ Freeze at round start, then any attacker can plant on Site A
 - ✅ Humanoid CT and T models, GoldSrc lighting, crates and outdoor/indoor compounds
 - ✅ Walk (Shift), crouch (Ctrl), jump, aim-down-sights, recoil punch and distance-based bot accuracy
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
-- ✅ HUD: health, ammo, round timer and defuse progress
+- ✅ HUD: health, ammo, round timer, freeze countdown and defuse progress
 - ✅ Bilingual PT-PT / English language switch
 - ✅ Dark, Light and System appearance, with iVidi.dev orange, burnt yellow and black
 - ✅ Animated splash with developer credits, then the main menu
@@ -54,13 +55,13 @@ Select the `UltimateDefence` scheme and run on My Mac (`⌘R`).
 
 ## 📖 Usage
 
-1. Pick a map (Dust II, Sandlot, Mill) and a match size (2v2, 3v3, 5v5), then click **INICIAR RONDA**
+1. Pick a map (Dust II, Aztec, Office, Mill) and a match size (1v1 to 6v6), then click **INICIAR RONDA**
 2. You are on the defence. Allied CT bots hold with you. Terrorists rush Site A to plant
 3. Use **WASD** to move (default run), **Shift** to walk, **Ctrl** to crouch, **Space** to jump, the mouse to look, left click to fire and right click to aim
 4. **1** / **2** or the scroll wheel switch weapons, **R** reloads, **E** defuses while standing on the site
 5. Toggle sound, language and theme from the main menu. **Esc** returns to the menu and releases the pointer
 
-Win by eliminating every attacker before they plant, by surviving until the round timer ends, or by defusing after a plant. You lose if you are downed or if the artefact detonates.
+Win by eliminating every attacker before they plant, by surviving until the round timer ends, or by defusing after a plant. You lose if the whole defence is downed or if the artefact detonates. If you go down and teammates remain, the round keeps going.
 
 ## 🧪 Testing
 

@@ -99,12 +99,25 @@ struct MainMenuView: View {
                 Text(language.t(.mill)).tag(ArenaMap.mill)
             }
             .pickerStyle(.segmented)
-            Picker(language.t(.match), selection: $session.matchSize) {
+            Text(language.t(.match))
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(UDTheme.muted(for: scheme))
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                 ForEach(MatchSize.allCases) { size in
-                    Text(size.label).tag(size)
+                    Button {
+                        session.matchSize = size
+                    } label: {
+                        Text(size.label)
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .foregroundStyle(session.matchSize == size ? Color("Black") : UDTheme.primaryText(for: scheme))
+                            .background(session.matchSize == size ? UDTheme.orange : UDTheme.cardFill(for: scheme))
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .pickerStyle(.segmented)
         }
         .padding(18)
         .frame(maxWidth: 520)

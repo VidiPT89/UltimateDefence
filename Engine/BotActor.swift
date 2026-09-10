@@ -10,15 +10,16 @@ final class BotActor {
     var health = GameRules.botMaxHealth
     var lastShot: TimeInterval = 0
     var plantProgress: TimeInterval = 0
-    private var wander: Float
+    private let path: [SIMD3<Float>]
+    private var waypoint = 0
 
     var isAlive: Bool { health > 0 }
     var isTerrorist: Bool { team == .terrorist }
 
-    init(id: Int, team: BotTeam, at spawn: SIMD3<Float>) {
+    init(id: Int, team: BotTeam, at spawn: SIMD3<Float>, path: [SIMD3<Float>]) {
         self.id = id
         self.team = team
-        wander = Float(id) * 0.55 + (team == .terrorist ? 0 : 1.7)
+        self.path = path.isEmpty ? [spawn] : path
         let prefix = team == .terrorist ? NodeName.terroristPrefix : NodeName.counterPrefix
         node = SCNNode()
         node.name = "\(prefix)\(id)"
@@ -39,7 +40,6 @@ final class BotActor {
         enemies: [BotActor],
         site: SIMD3<Float>,
         walls: [AABB],
-        floors: [Platform],
         bombPlanted: Bool,
         planterId: Int,
         others: [BotActor]
@@ -47,65 +47,41 @@ final class BotActor {
         guard isAlive else { return .idle }
         let pos = SIMD3(Float(node.position.x), 0, Float(node.position.z))
         let playerPos = player.worldPosition
-        let hold = holdPoint(site: site)
-        var aim = hold
+        var look = destination(from: pos, site: site, bombPlanted: bombPlanted, planterId: planterId)
         var canShoot = false
         var shootPlayer = false
         var shootBot: BotActor?
 
-        if isTerrorist {
-            let seesPlayer = player.isAlive && visible(from: pos, to: playerPos, walls: walls)
-            let visibleEnemy = enemies.first { $0.isAlive && visible(from: pos, to: $0.xz, walls: walls) }
-            if seesPlayer {
-                aim = playerPos
-                canShoot = true
-                shootPlayer = true
-            } else if let visibleEnemy {
-                aim = visibleEnemy.xz
-                canShoot = true
-                shootBot = visibleEnemy
-            } else if id == planterId && !bombPlanted {
-                aim = site
-            } else {
-                aim = hold
-            }
-        } else {
-            let visibleEnemy = enemies.first { $0.isAlive && visible(from: pos, to: $0.xz, walls: walls) }
-            if let visibleEnemy {
-                aim = visibleEnemy.xz
-                canShoot = true
-                shootBot = visibleEnemy
-            } else {
-                aim = hold
-            }
+        if isTerrorist, player.isAlive, visible(from: pos, to: playerPos, walls: walls) {
+            look = playerPos
+            canShoot = true
+            shootPlayer = true
+        } else if let enemy = enemies.first(where: { $0.isAlive && visible(from: pos, to: $0.xz, walls: walls) }) {
+            look = enemy.xz
+            canShoot = true
+            shootBot = enemy
         }
 
-        var dir = SIMD3(aim.x - pos.x, 0, aim.z - pos.z)
+        var dir = SIMD3(look.x - pos.x, 0, look.z - pos.z)
         let len = simd_length(dir)
-        let holdFire = canShoot && len < 12
-        if len > 0.7, !holdFire || len > 8 {
+        let hold = canShoot && len < 11
+        if len > 0.55, !hold {
             dir /= len
-            wander += dt * (canShoot ? 2.1 : 1)
-            let side = SIMD3(-dir.z, 0, dir.x) * sin(wander) * 0.45
-            let speed = GameRules.botSpeed * (plantProgress > 0 ? 0.28 : 1)
-            var next = pos + (dir + side) * speed * dt
+            var next = pos + dir * GameRules.botSpeed * (plantProgress > 0 ? 0.25 : 1) * dt
             for other in others where other.id != id && other.isAlive && other.team == team {
-                let o = other.xz
-                let gap = Collision.distanceXZ(next, o)
-                if gap < 0.95, gap > 0.01 {
-                    next += (next - o) / gap * (0.95 - gap)
+                let gap = Collision.distanceXZ(next, other.xz)
+                if gap < 0.9, gap > 0.01 {
+                    next += (next - other.xz) / gap * (0.9 - gap)
                 }
             }
-            let resolved = Collision.resolve(position: pos, proposed: next, radius: 0.45, walls: walls)
-            let ground = Collision.floorHeight(x: resolved.x, z: resolved.z, floors: floors)
-            node.position = SCNVector3(resolved.x, ground, resolved.z)
+            let resolved = Collision.resolve(position: pos, proposed: next, radius: 0.42, walls: walls)
+            node.position = SCNVector3(resolved.x, 0, resolved.z)
             node.eulerAngles.y = CGFloat(atan2(-dir.x, -dir.z))
-            node.eulerAngles.x = CGFloat(sin(wander * 8) * 0.03)
-        } else if len > 0.2 {
+        } else if len > 0.15 {
             node.eulerAngles.y = CGFloat(atan2(-dir.x, -dir.z))
         }
 
-        if canShoot, now - lastShot > 0.4 + TimeInterval(id) * 0.05 {
+        if canShoot, now - lastShot > 0.45 + TimeInterval(id) * 0.04 {
             lastShot = now
             if shootPlayer { return .fireAtPlayer }
             if let shootBot { return .fireAtBot(shootBot.id) }
@@ -135,14 +111,21 @@ final class BotActor {
         }
     }
 
-    private func holdPoint(site: SIMD3<Float>) -> SIMD3<Float> {
-        let angle = Float(id) * 1.1 + (isTerrorist ? 0.4 : 2.2)
-        let radius: Float = isTerrorist ? 7.5 : 5.5
-        return SIMD3(site.x + cos(angle) * radius, 0, site.z + sin(angle) * radius)
+    private func destination(from pos: SIMD3<Float>, site: SIMD3<Float>, bombPlanted: Bool, planterId: Int) -> SIMD3<Float> {
+        if isTerrorist, id == planterId, !bombPlanted, waypoint >= path.count - 1 {
+            return site
+        }
+        while waypoint < path.count, Collision.distanceXZ(pos, path[waypoint]) < 1.4 {
+            waypoint += 1
+        }
+        if waypoint >= path.count {
+            return path.last ?? site
+        }
+        return path[waypoint]
     }
 
     private func visible(from: SIMD3<Float>, to: SIMD3<Float>, walls: [AABB]) -> Bool {
-        guard Collision.distanceXZ(from, to) < 34 else { return false }
+        guard Collision.distanceXZ(from, to) < 32 else { return false }
         return Collision.losClear(from, to, walls: walls)
     }
 }

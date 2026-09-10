@@ -29,6 +29,8 @@ struct MapLayout {
     let playerYaw: Float
     let attackerSpawns: [SIMD3<Float>]
     let defenderSpawns: [SIMD3<Float>]
+    let attackPaths: [[SIMD3<Float>]]
+    let defendPosts: [SIMD3<Float>]
 }
 
 final class MapKit {
@@ -36,8 +38,8 @@ final class MapKit {
     var walls: [AABB] = []
     var floors: [Platform] = []
     private let wallTexture: NSImage
-    private let thickness: Float = 1.1
-    private let doorHeight: Float = 2.52
+    private let thickness: Float = 0.8
+    private let doorHeight: Float = 2.6
 
     init(sky: NSImage, fog: NSColor, wall: NSImage, ground: NSImage, groundSize: CGFloat) {
         wallTexture = wall
@@ -55,7 +57,7 @@ final class MapKit {
         scene.rootNode.addChildNode(floor)
     }
 
-    func room(minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float = 4.4, openings: [WallOpening] = []) {
+    func room(minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float = 4.0, openings: [WallOpening] = []) {
         var north: [(Float, Float)] = []
         var south: [(Float, Float)] = []
         var east: [(Float, Float)] = []
@@ -72,8 +74,6 @@ final class MapKit {
         spanX(z: minZ, minX: minX, maxX: maxX, gaps: south, h: h)
         spanZ(x: maxX, minZ: minZ, maxZ: maxZ, gaps: east, h: h)
         spanZ(x: minX, minZ: minZ, maxZ: maxZ, gaps: west, h: h)
-        slab(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, y: 0.02, h: 0.05, texture: MapTextures.concrete, name: NodeName.trim)
-        slab(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, y: h - 0.12, h: 0.22, texture: MapTextures.concrete, name: NodeName.solid)
         for opening in openings {
             doorway(opening, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, h: h)
         }
@@ -84,7 +84,7 @@ final class MapKit {
         z: Float,
         w: Float,
         d: Float,
-        h: Float = 4.4,
+        h: Float = 4.0,
         y: Float = 0,
         texture: NSImage? = nil,
         collide: Bool = true
@@ -96,25 +96,9 @@ final class MapKit {
         node.name = collide ? NodeName.solid : NodeName.trim
         node.position = SCNVector3(x, y + h / 2, z)
         scene.rootNode.addChildNode(node)
-        if y < 0.05, collide {
-            let cap = SCNBox(width: CGFloat(w + 0.08), height: 0.14, length: CGFloat(d + 0.08), chamferRadius: 0)
-            cap.materials = Self.tiledBox(MapTextures.concrete, w: w, h: 0.14, d: d)
-            let lid = SCNNode(geometry: cap)
-            lid.name = NodeName.trim
-            lid.position = SCNVector3(x, y + h + 0.05, z)
-            scene.rootNode.addChildNode(lid)
-        }
         if collide {
             walls.append(AABB(minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2, blocksSight: true))
         }
-    }
-
-    func compound(minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float = 5.2) {
-        let t = thickness
-        wall(x: (minX + maxX) / 2, z: minZ, w: maxX - minX + t, d: t, h: h)
-        wall(x: (minX + maxX) / 2, z: maxZ, w: maxX - minX + t, d: t, h: h)
-        wall(x: minX, z: (minZ + maxZ) / 2, w: t, d: maxZ - minZ, h: h)
-        wall(x: maxX, z: (minZ + maxZ) / 2, w: t, d: maxZ - minZ, h: h)
     }
 
     func crate(x: Float, z: Float, w: Float = 1.5, h: Float = 1.5, d: Float = 1.5, y: Float = 0) {
@@ -156,28 +140,7 @@ final class MapKit {
         walls.append(AABB(minX: x - 0.4, maxX: x + 0.4, minZ: z - 0.4, maxZ: z + 0.4, blocksSight: false))
     }
 
-    func pillar(x: Float, z: Float, h: Float = 4.2) {
-        wall(x: x, z: z, w: 0.72, d: 0.72, h: h, texture: MapTextures.concrete)
-        wall(x: x, z: z, w: 0.92, d: 0.92, h: 0.22, y: 0, texture: MapTextures.concrete, collide: false)
-        wall(x: x, z: z, w: 0.88, d: 0.88, h: 0.18, y: h - 0.18, texture: MapTextures.concrete, collide: false)
-    }
-
-    func pipe(from: SIMD3<Float>, to: SIMD3<Float>) {
-        let dx = to.x - from.x
-        let dy = to.y - from.y
-        let dz = to.z - from.z
-        let length = hypot(hypot(dx, dy), dz)
-        guard length > 0.3 else { return }
-        let cyl = SCNCylinder(radius: 0.09, height: CGFloat(length))
-        cyl.firstMaterial = MapTextures.goldSrc(MapTextures.metal)
-        let node = SCNNode(geometry: cyl)
-        node.position = SCNVector3((from.x + to.x) / 2, (from.y + to.y) / 2, (from.z + to.z) / 2)
-        node.look(at: SCNVector3(to.x, to.y, to.z))
-        node.eulerAngles.x += .pi / 2
-        scene.rootNode.addChildNode(node)
-    }
-
-    func hall(minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float = 3.7) {
+    func hall(minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float = 4.0) {
         let alongZ = (maxZ - minZ) >= (maxX - minX)
         if alongZ {
             wall(x: minX, z: (minZ + maxZ) / 2, w: thickness, d: maxZ - minZ, h: h)
@@ -185,33 +148,6 @@ final class MapKit {
         } else {
             wall(x: (minX + maxX) / 2, z: minZ, w: maxX - minX, d: thickness, h: h)
             wall(x: (minX + maxX) / 2, z: maxZ, w: maxX - minX, d: thickness, h: h)
-        }
-        slab(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, y: 0.02, h: 0.05, texture: MapTextures.concrete, name: NodeName.trim)
-        slab(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, y: h - 0.12, h: 0.2, texture: MapTextures.concrete, name: NodeName.solid)
-    }
-
-    func platform(minX: Float, maxX: Float, minZ: Float, maxZ: Float, height: Float) {
-        guard height > 0.08 else { return }
-        let w = maxX - minX
-        let d = maxZ - minZ
-        let box = SCNBox(width: CGFloat(w), height: CGFloat(height), length: CGFloat(d), chamferRadius: 0.02)
-        box.materials = Self.tiledBox(MapTextures.concrete, w: w, h: height, d: d)
-        let node = SCNNode(geometry: box)
-        node.name = NodeName.trim
-        node.position = SCNVector3((minX + maxX) / 2, height / 2, (minZ + maxZ) / 2)
-        scene.rootNode.addChildNode(node)
-        floors.append(Platform(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, height: height))
-    }
-
-    func steps(x: Float, z: Float, dx: Float, dz: Float, count: Int, width: Float, rise: Float, run: Float) {
-        for index in 0..<count {
-            let t = Float(index)
-            let cx = x + dx * t * run
-            let cz = z + dz * t * run
-            let h = rise * Float(index + 1)
-            let hx = abs(dx) > 0.5 ? run * 0.55 : width / 2
-            let hz = abs(dz) > 0.5 ? run * 0.55 : width / 2
-            platform(minX: cx - hx, maxX: cx + hx, minZ: cz - hz, maxZ: cz + hz, height: h)
         }
     }
 
@@ -257,48 +193,18 @@ final class MapKit {
         }
     }
 
-    private func slab(minX: Float, maxX: Float, minZ: Float, maxZ: Float, y: Float, h: Float, texture: NSImage, name: String) {
-        let w = maxX - minX
-        let d = maxZ - minZ
-        guard w > 1, d > 1 else { return }
-        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
-        box.materials = Self.tiledBox(texture, w: w, h: h, d: d)
-        let node = SCNNode(geometry: box)
-        node.name = name
-        node.position = SCNVector3((minX + maxX) / 2, y + h / 2, (minZ + maxZ) / 2)
-        scene.rootNode.addChildNode(node)
-    }
-
     private func doorway(_ opening: WallOpening, minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float) {
-        let lintel = max(0.6, h - doorHeight)
+        let lintel = max(0.5, h - doorHeight)
         switch opening {
         case .north(let center, let width):
             wall(x: center, z: maxZ, w: width, d: thickness, h: lintel, y: doorHeight, collide: false)
-            frameX(center: center, z: maxZ, width: width)
         case .south(let center, let width):
             wall(x: center, z: minZ, w: width, d: thickness, h: lintel, y: doorHeight, collide: false)
-            frameX(center: center, z: minZ, width: width)
         case .east(let center, let width):
             wall(x: maxX, z: center, w: thickness, d: width, h: lintel, y: doorHeight, collide: false)
-            frameZ(center: center, x: maxX, width: width)
         case .west(let center, let width):
             wall(x: minX, z: center, w: thickness, d: width, h: lintel, y: doorHeight, collide: false)
-            frameZ(center: center, x: minX, width: width)
         }
-    }
-
-    private func frameX(center: Float, z: Float, width: Float) {
-        let wood = MapTextures.wood
-        wall(x: center - width / 2, z: z, w: 0.18, d: thickness + 0.16, h: doorHeight, y: 0, texture: wood, collide: false)
-        wall(x: center + width / 2, z: z, w: 0.18, d: thickness + 0.16, h: doorHeight, y: 0, texture: wood, collide: false)
-        wall(x: center, z: z, w: width + 0.2, d: thickness + 0.16, h: 0.16, y: doorHeight - 0.08, texture: wood, collide: false)
-    }
-
-    private func frameZ(center: Float, x: Float, width: Float) {
-        let wood = MapTextures.wood
-        wall(x: x, z: center - width / 2, w: thickness + 0.16, d: 0.18, h: doorHeight, y: 0, texture: wood, collide: false)
-        wall(x: x, z: center + width / 2, w: thickness + 0.16, d: 0.18, h: doorHeight, y: 0, texture: wood, collide: false)
-        wall(x: x, z: center, w: thickness + 0.16, d: width + 0.2, h: 0.16, y: doorHeight - 0.08, texture: wood, collide: false)
     }
 
     func layout(
@@ -306,7 +212,9 @@ final class MapKit {
         player: SIMD3<Float>,
         yaw: Float,
         terrorists: [SIMD3<Float>],
-        defenders: [SIMD3<Float>]
+        defenders: [SIMD3<Float>],
+        attackPaths: [[SIMD3<Float>]],
+        defendPosts: [SIMD3<Float>]
     ) -> MapLayout {
         MapLayout(
             walls: walls,
@@ -315,7 +223,9 @@ final class MapKit {
             playerSpawn: player,
             playerYaw: yaw,
             attackerSpawns: terrorists,
-            defenderSpawns: defenders
+            defenderSpawns: defenders,
+            attackPaths: attackPaths,
+            defendPosts: defendPosts
         )
     }
 

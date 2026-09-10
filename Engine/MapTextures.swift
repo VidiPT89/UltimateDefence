@@ -48,12 +48,6 @@ enum MapTextures {
         return (v, v * 0.96, v * 0.88)
     }
 
-    static let wood = make(size: 128) { x, y, _ in
-        let n = noise(x, y)
-        let grain = sin(CGFloat(y) * 0.4) * 0.04
-        return (0.46 + n * 0.05 + grain, 0.30 + n * 0.04, 0.14)
-    }
-
     static let water = make(size: 64) { x, y, _ in
         let n = noise(x, y)
         return (0.18 + n * 0.05, 0.32 + n * 0.06, 0.38 + n * 0.08)

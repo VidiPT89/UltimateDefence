@@ -80,7 +80,7 @@ enum WeaponRig {
 
     private static let steel = NSColor(calibratedRed: 0.42, green: 0.45, blue: 0.48, alpha: 1)
     private static let dark = NSColor(calibratedRed: 0.12, green: 0.13, blue: 0.14, alpha: 1)
-    private static let ember = NSColor(calibratedRed: 0.95, green: 0.42, blue: 0.16, alpha: 1)
+    private static let ember = NSColor(calibratedRed: 0.976, green: 0.612, blue: 0, alpha: 1)
 
     private static func box(_ w: CGFloat, _ h: CGFloat, _ l: CGFloat, x: CGFloat, y: CGFloat, z: CGFloat, color: NSColor) -> SCNNode {
         let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0.008)

@@ -12,6 +12,8 @@ enum L10nKey: String, CaseIterable {
     case objectiveComplete, lineBroken
     case newRound, menu
     case carbine, pistol
+    case clickToCapture
+    case mouseLook
 }
 
 enum L10n {
@@ -50,7 +52,9 @@ enum L10n {
         .newRound: "Nova ronda",
         .menu: "Menu",
         .carbine: "Carabina UD-4",
-        .pistol: "Pistola UD-9"
+        .pistol: "Pistola UD-9",
+        .clickToCapture: "Clica para capturar o rato",
+        .mouseLook: "Rato + clique"
     ]
 
     private static let en: [L10nKey: String] = [
@@ -83,6 +87,8 @@ enum L10n {
         .newRound: "New round",
         .menu: "Menu",
         .carbine: "UD-4 Carbine",
-        .pistol: "UD-9 Sidearm"
+        .pistol: "UD-9 Sidearm",
+        .clickToCapture: "Click to capture the mouse",
+        .mouseLook: "Mouse + click"
     ]
 }

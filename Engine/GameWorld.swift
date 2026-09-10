@@ -40,6 +40,10 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         player.lastShot = -10
         player.reloadingUntil = 0
         player.defuseProgress = 0
+        player.yaw = .pi * 0.85
+        player.pitch = 0
+        player.bob = 0
+        player.interacting = false
         player.node.removeFromParentNode()
         player.setup(at: layout.playerSpawn)
         scene.rootNode.addChildNode(player.node)
@@ -84,24 +88,29 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         WeaponRig.kick(player.cameraNode)
         let origin = player.cameraNode.worldPosition
         let dir = lookDirection()
+        let start = SCNVector3(
+            origin.x + CGFloat(dir.x * 0.85),
+            origin.y + CGFloat(dir.y * 0.85),
+            origin.z + CGFloat(dir.z * 0.85)
+        )
         let dest = SCNVector3(
             origin.x + CGFloat(dir.x * player.currentStats.range),
             origin.y + CGFloat(dir.y * player.currentStats.range),
             origin.z + CGFloat(dir.z * player.currentStats.range)
         )
-        let hits = scene.rootNode.hitTestWithSegment(from: origin, to: dest, options: [
+        let hits = scene.rootNode.hitTestWithSegment(from: start, to: dest, options: [
             SCNHitTestOption.searchMode.rawValue: SCNHitTestSearchMode.closest.rawValue
-        ])
+        ]).filter { !Self.isPlayerGeometry($0.node) }
         guard let hit = hits.first else {
             let miss = SCNVector3(
                 origin.x + CGFloat(dir.x * 18),
                 origin.y + CGFloat(dir.y * 18),
                 origin.z + CGFloat(dir.z * 18)
             )
-            FX.tracer(from: origin, to: miss, in: scene.rootNode)
+            FX.tracer(from: start, to: miss, in: scene.rootNode)
             return
         }
-        FX.tracer(from: origin, to: hit.worldCoordinates, in: scene.rootNode)
+        FX.tracer(from: start, to: hit.worldCoordinates, in: scene.rootNode)
         FX.spark(at: hit.worldCoordinates, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
         let name = hit.node.name ?? hit.node.parent?.name ?? ""
         guard name.hasPrefix(NodeName.botPrefix) else { return }
@@ -187,15 +196,12 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         session.health = player.health
         session.mag = player.currentMag
         session.reserve = player.reserve[player.slot] ?? 0
-        session.weaponName = player.currentStats.name
         session.slot = player.slot
         session.timeLeft = bombPlanted ? max(0, GameRules.bombTime - bombElapsed) : max(0, GameRules.roundTime - roundElapsed)
         session.bombPlanted = bombPlanted
-        session.bombTimeLeft = max(0, GameRules.bombTime - bombElapsed)
         session.defuseProgress = min(1, player.defuseProgress / GameRules.defuseTime)
         session.attackersAlive = bots.filter(\.isAlive).count
         session.reloading = CACurrentMediaTime() < player.reloadingUntil
-        session.moving = player.moving
     }
 
     private func lookDirection() -> SIMD3<Float> {
@@ -235,5 +241,17 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             player.keys.remove(code)
             if code == 14 { player.interacting = false }
         }
+    }
+
+    private static func isPlayerGeometry(_ node: SCNNode) -> Bool {
+        var current: SCNNode? = node
+        while let node = current {
+            let name = node.name ?? ""
+            if name == NodeName.player || name == NodeName.camera || name == "weaponRig" {
+                return true
+            }
+            current = node.parent
+        }
+        return false
     }
 }

@@ -116,7 +116,7 @@ final class BotActor {
         ])
         guard let first = hits.first else { return true }
         let name = first.node.name ?? first.node.parent?.name ?? ""
-        return name == NodeName.player || name == NodeName.camera
+        return name == NodeName.player || name == NodeName.camera || name == "weaponRig"
     }
 
     private static func pbr(_ color: NSColor, metal: CGFloat, rough: CGFloat) -> SCNMaterial {

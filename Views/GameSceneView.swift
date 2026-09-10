@@ -51,8 +51,9 @@ final class FPSSceneView: SCNView {
         onLook?(event.deltaX, event.deltaY)
     }
 
-    override func flagsChanged(with event: NSEvent) {
-        super.flagsChanged(with: event)
+    override func mouseDragged(with event: NSEvent) {
+        guard tracking else { return }
+        onLook?(event.deltaX, event.deltaY)
     }
 }
 

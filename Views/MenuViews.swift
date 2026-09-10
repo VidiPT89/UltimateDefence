@@ -94,7 +94,7 @@ struct MainMenuView: View {
     private var controlsCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             controlRow("WASD", language.t(.move))
-            controlRow("Rato + clique", language.t(.lookShoot))
+            controlRow(language.t(.mouseLook), language.t(.lookShoot))
             controlRow("1 / 2 · R · E", language.t(.weaponsReloadDefuse))
             controlRow("Esc", language.t(.escapeMenu))
         }

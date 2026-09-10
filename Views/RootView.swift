@@ -2,7 +2,6 @@ import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject private var theme: ThemeManager
-    @EnvironmentObject private var language: LanguageManager
     @StateObject private var session = GameSession()
     @State private var world: GameWorld?
     @State private var showSplash = true

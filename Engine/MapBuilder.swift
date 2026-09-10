@@ -2,11 +2,8 @@ import SceneKit
 import AppKit
 
 enum PhysicsCategory {
-    static let none: Int = 0
     static let world: Int = 1 << 0
-    static let player: Int = 1 << 1
-    static let bot: Int = 1 << 2
-    static let projectile: Int = 1 << 3
+    static let bot: Int = 1 << 1
 }
 
 enum NodeName {

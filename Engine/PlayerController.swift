@@ -36,7 +36,9 @@ final class PlayerController {
         cameraNode.camera?.bloomIntensity = 0.35
         cameraNode.camera?.motionBlurIntensity = 0.15
         cameraNode.position = SCNVector3Zero
-        node.addChildNode(cameraNode)
+        if cameraNode.parent !== node {
+            node.addChildNode(cameraNode)
+        }
         WeaponRig.attach(to: cameraNode, slot: slot)
         lastSlot = slot
         applyLook()

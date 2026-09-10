@@ -3,6 +3,7 @@ import SwiftUI
 struct HUDView: View {
     @ObservedObject var session: GameSession
     @EnvironmentObject private var language: LanguageManager
+    @State private var hurtFlash = 0.0
 
     var body: some View {
         ZStack {
@@ -18,7 +19,7 @@ struct HUDView: View {
             .ignoresSafeArea()
             .animation(.easeOut(duration: 0.35), value: session.health)
 
-            Color.red.opacity(session.health < 30 ? 0.08 : 0)
+            Color.red.opacity(max(session.health < 30 ? 0.10 : 0, hurtFlash))
                 .ignoresSafeArea()
                 .allowsHitTesting(false)
 
@@ -27,6 +28,16 @@ struct HUDView: View {
             VStack(spacing: 0) {
                 topBar
                 Spacer()
+                if !session.capturedMouse {
+                    Text(language.t(.clickToCapture))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Color("Black"))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(UDTheme.burnt)
+                        .clipShape(Capsule())
+                        .padding(.bottom, 10)
+                }
                 if session.plantHint {
                     Text(language.t(.holdDefuse))
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -53,6 +64,13 @@ struct HUDView: View {
             .padding(22)
         }
         .allowsHitTesting(false)
+        .onChange(of: session.damageTick) { _ in
+            guard session.damageTick > 0 else { return }
+            hurtFlash = 0.34
+            withAnimation(.easeOut(duration: 0.4)) {
+                hurtFlash = 0
+            }
+        }
     }
 
     private var crosshair: some View {

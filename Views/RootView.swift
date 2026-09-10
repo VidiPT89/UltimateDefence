@@ -45,7 +45,11 @@ struct RootView: View {
                 ResultView(
                     session: session,
                     onAgain: startRound,
-                    onMenu: { session.screen = .menu }
+                    onMenu: {
+                        session.screen = .menu
+                        session.capturedMouse = false
+                        world = nil
+                    }
                 )
             }
         }

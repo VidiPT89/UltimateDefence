@@ -53,6 +53,7 @@ enum WeaponSlot: Int, CaseIterable {
 
 struct GameRules {
     static let roundTime: TimeInterval = 90
+    static let freezeTime: TimeInterval = 2.2
     static let plantTime: TimeInterval = 3.5
     static let bombTime: TimeInterval = 40
     static let defuseTime: TimeInterval = 5
@@ -76,8 +77,7 @@ struct GameRules {
     }
 
     static func outcome(
-        playerAlive: Bool,
-        defendersAlive: Int = 1,
+        defendersAlive: Int,
         attackersAlive: Int,
         timeLeft: TimeInterval,
         bombPlanted: Bool,
@@ -87,7 +87,7 @@ struct GameRules {
         if defused { return .defendersWinDefuse }
         if bombPlanted && bombTimeLeft <= 0 { return .attackersWinPlant }
         if attackersAlive <= 0 && !bombPlanted { return .defendersWinElimination }
-        if !playerAlive && defendersAlive <= 0 { return .attackersWinElimination }
+        if defendersAlive <= 0 { return .attackersWinElimination }
         if !bombPlanted && timeLeft <= 0 { return .defendersWinTime }
         return .inProgress
     }

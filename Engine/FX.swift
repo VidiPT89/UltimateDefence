@@ -39,7 +39,7 @@ enum FX {
 
     static func dustField() -> SCNParticleSystem {
         let dust = SCNParticleSystem()
-        dust.birthRate = 18
+        dust.birthRate = 8
         dust.particleLifeSpan = 7
         dust.particleSize = 0.07
         dust.particleColor = NSColor(calibratedRed: 0.72, green: 0.62, blue: 0.4, alpha: 0.16)

@@ -21,6 +21,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     private var lastBeep: TimeInterval = 0
     private var wasReloading = false
     private var roundClosed = false
+    private var freezeElapsed: TimeInterval = 0
 
     init(session: GameSession, sounds: SoundManager) {
         self.session = session
@@ -39,6 +40,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         bombPlanted = false
         defused = false
         roundClosed = false
+        freezeElapsed = 0
         player.keys.removeAll()
         player.shooting = false
         player.health = GameRules.playerMaxHealth
@@ -48,7 +50,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         player.lastShot = -10
         player.reloadingUntil = 0
         player.defuseProgress = 0
-        player.yaw = .pi * 0.85
+        player.yaw = layout.playerYaw
         player.pitch = 0
         player.bob = 0
         player.interacting = false
@@ -94,6 +96,12 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             dt = 1.0 / 60.0
         }
         lastTime = time
+        if freezeElapsed < GameRules.freezeTime {
+            freezeElapsed += TimeInterval(dt)
+            player.shooting = false
+            publishHUD()
+            return
+        }
         tick(dt: dt, now: time)
     }
 
@@ -179,12 +187,10 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let defenders = bots.filter { !$0.isTerrorist }
         for bot in bots where bot.isAlive {
             let enemies = bot.isTerrorist ? defenders : terrorists
-            let allies = bot.isTerrorist ? terrorists : defenders
             let action = bot.update(
                 dt: dt,
                 now: now,
                 player: player,
-                allies: allies,
                 enemies: enemies,
                 site: layout.siteCenter,
                 walls: layout.walls,
@@ -270,7 +276,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let aliveBots = bots.filter { $0.isTerrorist && $0.isAlive }.count
         let defendersAlive = bots.filter { !$0.isTerrorist && $0.isAlive }.count + (player.isAlive ? 1 : 0)
         let result = GameRules.outcome(
-            playerAlive: player.isAlive,
             defendersAlive: defendersAlive,
             attackersAlive: aliveBots,
             timeLeft: timeLeft,
@@ -311,9 +316,11 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let defuse = min(1, player.defuseProgress / GameRules.defuseTime)
         let attackers = bots.filter { $0.isTerrorist && $0.isAlive }.count
         let defenders = bots.filter { !$0.isTerrorist && $0.isAlive }.count + (player.isAlive ? 1 : 0)
+        let freezeLeft = max(0, GameRules.freezeTime - freezeElapsed)
         let reloading = CACurrentMediaTime() < player.reloadingUntil
         let moving = player.moving
         let aiming = player.aiming
+        let alive = player.isAlive
         onMain {
             if self.session.health != health { self.session.health = health }
             if self.session.mag != mag { self.session.mag = mag }
@@ -327,6 +334,8 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             if self.session.reloading != reloading { self.session.reloading = reloading }
             if self.session.moving != moving { self.session.moving = moving }
             if self.session.aiming != aiming { self.session.aiming = aiming }
+            if abs(self.session.freezeLeft - freezeLeft) > 0.05 { self.session.freezeLeft = freezeLeft }
+            if self.session.playerAlive != alive { self.session.playerAlive = alive }
         }
     }
 

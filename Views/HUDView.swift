@@ -28,6 +28,27 @@ struct HUDView: View {
             VStack(spacing: 0) {
                 topBar
                 Spacer()
+                if session.freezeLeft > 0 {
+                    Text(language.t(.freeze).uppercased() + " \(Int(session.freezeLeft.rounded(.up)))")
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .tracking(1.2)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 10)
+                        .foregroundStyle(Color("Black"))
+                        .background(UDTheme.burnt)
+                        .clipShape(Capsule())
+                        .padding(.bottom, 8)
+                }
+                if !session.playerAlive && session.screen == .playing {
+                    Text(language.t(.spectating))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .foregroundStyle(Color("Black"))
+                        .background(Color.white.opacity(0.85))
+                        .clipShape(Capsule())
+                        .padding(.bottom, 8)
+                }
                 if !session.capturedMouse {
                     Text(language.t(.clickToCapture))
                         .font(.system(size: 14, weight: .semibold, design: .rounded))

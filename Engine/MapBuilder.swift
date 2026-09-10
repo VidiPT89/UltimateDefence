@@ -52,10 +52,12 @@ enum MapBuilder {
             SIMD3(24, 5, -16), SIMD3(-8, 5, -24), SIMD3(8, 5, 32)
         ])
         let site = SIMD3<Float>(26, 0, 32)
+        let player = SIMD3<Float>(6, 1.64, 34)
         kit.site(at: site)
         return (kit.scene, kit.layout(
             site: site,
-            player: SIMD3(6, 1.64, 34),
+            player: player,
+            yaw: Self.facing(from: player, to: site),
             terrorists: Self.cluster(SIMD3(-2, 0, -34), count: 6, alongX: true),
             defenders: Self.cluster(SIMD3(10, 0, 32), count: 6, alongX: true)
         ))
@@ -83,10 +85,12 @@ enum MapBuilder {
         kit.barrel(x: 8, z: -8)
         kit.lamps([SIMD3(-14, 5.4, 12), SIMD3(16, 5.4, -10), SIMD3(0, 5.6, 0), SIMD3(18, 5, 20)])
         let site = SIMD3<Float>(-20, 0, 24)
+        let player = SIMD3<Float>(20, 1.64, -22)
         kit.site(at: site)
         return (kit.scene, kit.layout(
             site: site,
-            player: SIMD3(20, 1.64, -22),
+            player: player,
+            yaw: Self.facing(from: player, to: site),
             terrorists: Self.cluster(SIMD3(-16, 0, -28), count: 6, alongX: true),
             defenders: Self.cluster(SIMD3(16, 0, -18), count: 6, alongX: true)
         ))
@@ -114,10 +118,12 @@ enum MapBuilder {
         kit.barrel(x: 4, z: -16)
         kit.lamps([SIMD3(-10, 4.6, 10), SIMD3(10, 4.6, -6), SIMD3(0, 4.8, 0), SIMD3(18, 4.6, 16)])
         let site = SIMD3<Float>(-20, 0, 22)
+        let player = SIMD3<Float>(22, 1.64, -22)
         kit.site(at: site)
         return (kit.scene, kit.layout(
             site: site,
-            player: SIMD3(22, 1.64, -22),
+            player: player,
+            yaw: Self.facing(from: player, to: site),
             terrorists: Self.cluster(SIMD3(-18, 0, -24), count: 6, alongX: true),
             defenders: Self.cluster(SIMD3(18, 0, -18), count: 6, alongX: true)
         ))
@@ -144,10 +150,12 @@ enum MapBuilder {
         kit.barrel(x: 4, z: 8)
         kit.lamps([SIMD3(-12, 4.8, 12), SIMD3(12, 4.8, -8), SIMD3(0, 5, 0), SIMD3(-18, 4.6, -16)])
         let site = SIMD3<Float>(-18, 0, 22)
+        let player = SIMD3<Float>(18, 1.64, -22)
         kit.site(at: site)
         return (kit.scene, kit.layout(
             site: site,
-            player: SIMD3(18, 1.64, -22),
+            player: player,
+            yaw: Self.facing(from: player, to: site),
             terrorists: Self.cluster(SIMD3(-20, 0, -22), count: 6, alongX: true),
             defenders: Self.cluster(SIMD3(16, 0, -20), count: 6, alongX: true)
         ))
@@ -157,6 +165,10 @@ enum MapBuilder {
         kit.crate(x: x, z: z, w: 1.7, h: 1.7, d: 1.7)
         kit.crate(x: x + 1.8, z: z, w: 1.7, h: 1.7, d: 1.7)
         kit.crate(x: x + 0.9, z: z, y: 1.7)
+    }
+
+    private static func facing(from: SIMD3<Float>, to: SIMD3<Float>) -> Float {
+        atan2(-(to.x - from.x), -(to.z - from.z))
     }
 
     private static func cluster(_ origin: SIMD3<Float>, count: Int, alongX: Bool) -> [SIMD3<Float>] {

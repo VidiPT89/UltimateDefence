@@ -17,6 +17,9 @@ enum L10nKey: String, CaseIterable {
     case sound
     case sprintJump
     case sprintJumpHint
+    case aim
+    case aimHint
+    case kills
 }
 
 enum L10n {
@@ -60,7 +63,10 @@ enum L10n {
         .mouseLook: "Rato + clique",
         .sound: "Som",
         .sprintJump: "Shift · Espaço",
-        .sprintJumpHint: "Correr e saltar"
+        .sprintJumpHint: "Correr e saltar",
+        .aim: "Botão direito · scroll",
+        .aimHint: "Mirar e trocar de arma",
+        .kills: "abates"
     ]
 
     private static let en: [L10nKey: String] = [
@@ -98,6 +104,9 @@ enum L10n {
         .mouseLook: "Mouse + click",
         .sound: "Sound",
         .sprintJump: "Shift · Space",
-        .sprintJumpHint: "Sprint and jump"
+        .sprintJumpHint: "Sprint and jump",
+        .aim: "Right click · scroll",
+        .aimHint: "Aim and switch weapon",
+        .kills: "kills"
     ]
 }

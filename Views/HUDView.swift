@@ -82,8 +82,17 @@ struct HUDView: View {
             Capsule().fill(UDTheme.orange).frame(width: 2, height: 12)
             Circle().fill(Color.white).frame(width: 3, height: 3)
         }
-        .scaleEffect(session.hitTick > 0 ? 1.18 : 1)
+        .scaleEffect(crosshairScale)
         .animation(.spring(response: 0.18, dampingFraction: 0.55), value: session.hitTick)
+        .animation(.easeOut(duration: 0.12), value: session.moving)
+        .animation(.easeOut(duration: 0.12), value: session.aiming)
+    }
+
+    private var crosshairScale: CGFloat {
+        var scale: CGFloat = session.hitTick > 0 ? 1.18 : 1
+        if session.aiming { scale *= 0.72 }
+        if session.moving { scale *= 1.22 }
+        return scale
     }
 
     private var topBar: some View {
@@ -92,6 +101,8 @@ struct HUDView: View {
                 Circle().fill(UDTheme.orange).frame(width: 7, height: 7)
                 Text("\(session.attackersAlive) \(language.t(.attackers).uppercased())")
             }
+            Text("\(session.kills) \(language.t(.kills).uppercased())")
+                .foregroundStyle(UDTheme.burnt)
             Spacer()
             Text(timerText)
                 .font(.system(size: 34, weight: .bold, design: .rounded))

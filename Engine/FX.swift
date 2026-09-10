@@ -49,6 +49,36 @@ enum FX {
         dust.blendMode = .additive
         return dust
     }
+
+    static func siteEmbers() -> SCNParticleSystem {
+        let embers = SCNParticleSystem()
+        embers.birthRate = 10
+        embers.particleLifeSpan = 1.8
+        embers.particleSize = 0.05
+        embers.particleColor = NSColor(calibratedRed: 1, green: 0.45, blue: 0.08, alpha: 0.7)
+        embers.spreadingAngle = 80
+        embers.particleVelocity = 0.55
+        embers.emitterShape = SCNCylinder(radius: 3.8, height: 0.2)
+        embers.blendMode = .additive
+        return embers
+    }
+
+    static func explosion(at position: SCNVector3, in parent: SCNNode) {
+        spark(at: position, in: parent, color: NSColor(calibratedRed: 1, green: 0.5, blue: 0.12, alpha: 1))
+        let wave = SCNSphere(radius: 0.4)
+        let mat = SCNMaterial()
+        mat.diffuse.contents = NSColor(calibratedRed: 1, green: 0.4, blue: 0.1, alpha: 0.4)
+        mat.emission.contents = NSColor(calibratedRed: 1, green: 0.55, blue: 0.15, alpha: 1)
+        mat.lightingModel = .constant
+        wave.firstMaterial = mat
+        let node = SCNNode(geometry: wave)
+        node.position = position
+        parent.addChildNode(node)
+        node.runAction(.sequence([
+            .group([.scale(to: 14, duration: 0.45), .fadeOut(duration: 0.45)]),
+            .removeFromParentNode()
+        ]))
+    }
 }
 
 enum WeaponRig {
@@ -58,12 +88,16 @@ enum WeaponRig {
         root.name = "weaponRig"
         switch slot {
         case .rifle:
-            root.addChildNode(box(0.08, 0.08, 0.62, x: 0.22, y: -0.18, z: -0.42, color: steel))
-            root.addChildNode(box(0.07, 0.14, 0.22, x: 0.22, y: -0.26, z: -0.22, color: dark))
-            root.addChildNode(box(0.04, 0.04, 0.16, x: 0.22, y: -0.12, z: -0.62, color: ember))
+            root.addChildNode(box(0.08, 0.08, 0.68, x: 0.22, y: -0.18, z: -0.46, color: steel))
+            root.addChildNode(box(0.09, 0.11, 0.28, x: 0.22, y: -0.16, z: -0.22, color: dark))
+            root.addChildNode(box(0.07, 0.16, 0.18, x: 0.22, y: -0.28, z: -0.2, color: dark))
+            root.addChildNode(box(0.05, 0.18, 0.07, x: 0.22, y: -0.34, z: -0.32, color: steel))
+            root.addChildNode(box(0.035, 0.035, 0.18, x: 0.22, y: -0.11, z: -0.68, color: ember))
+            root.addChildNode(box(0.02, 0.05, 0.05, x: 0.22, y: -0.08, z: -0.38, color: ember))
         case .pistol:
-            root.addChildNode(box(0.06, 0.08, 0.22, x: 0.18, y: -0.16, z: -0.32, color: steel))
-            root.addChildNode(box(0.05, 0.14, 0.08, x: 0.18, y: -0.26, z: -0.24, color: dark))
+            root.addChildNode(box(0.06, 0.08, 0.24, x: 0.18, y: -0.16, z: -0.34, color: steel))
+            root.addChildNode(box(0.05, 0.16, 0.08, x: 0.18, y: -0.28, z: -0.24, color: dark))
+            root.addChildNode(box(0.03, 0.03, 0.08, x: 0.18, y: -0.12, z: -0.46, color: ember))
         }
         camera.addChildNode(root)
     }

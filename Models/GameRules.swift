@@ -99,10 +99,11 @@ struct GameRules {
         return 0.14 + closeness * 0.36
     }
 
-    static func aimSpread(moving: Bool, sprinting: Bool) -> Float {
+    static func aimSpread(moving: Bool, sprinting: Bool, aiming: Bool = false) -> Float {
         var spread: Float = 0.008
         if moving { spread += 0.018 }
         if sprinting { spread += 0.012 }
+        if aiming { spread *= 0.38 }
         return spread
     }
 }

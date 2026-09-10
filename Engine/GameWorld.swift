@@ -52,6 +52,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         player.interacting = false
         player.vertical = 0
         player.grounded = true
+        player.aiming = false
         wasReloading = false
         player.node.removeFromParentNode()
         player.setup(at: layout.playerSpawn)
@@ -64,8 +65,13 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             return bot
         }
         muzzle?.removeFromParentNode()
+        onMain {
+            self.session.kills = 0
+            self.session.aiming = false
+            self.session.moving = false
+            self.session.outcome = .inProgress
+        }
         publishHUD()
-        session.outcome = .inProgress
     }
 
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
@@ -140,7 +146,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         FX.spark(at: hit.worldCoordinates, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
         let name = hit.node.name ?? hit.node.parent?.name ?? ""
         guard name.hasPrefix(NodeName.botPrefix) else { return }
-        session.hitTick += 1
+        onMain { self.session.hitTick += 1 }
         sounds.playHit()
         let headshot = name.contains(NodeName.headSuffix)
         let dmg = GameRules.applyDamage(
@@ -149,7 +155,11 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             multiplier: player.currentStats.headshotMultiplier
         )
         if let bot = bots.first(where: { name.hasPrefix("\(NodeName.botPrefix)\($0.id)") }) {
+            let wasAlive = bot.isAlive
             bot.takeDamage(dmg)
+            if wasAlive && !bot.isAlive {
+                onMain { self.session.kills += 1 }
+            }
         }
     }
 
@@ -168,6 +178,14 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             case .idle:
                 break
             case .shoot:
+                sounds.playShoot()
+                let muzzlePos = SCNVector3(
+                    bot.node.worldPosition.x,
+                    bot.node.worldPosition.y + 0.35,
+                    bot.node.worldPosition.z
+                )
+                FX.spark(at: muzzlePos, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
+                FX.tracer(from: muzzlePos, to: player.cameraNode.worldPosition, in: scene.rootNode)
                 let distance = Collision.distanceXZ(
                     SIMD3(Float(bot.node.position.x), 0, Float(bot.node.position.z)),
                     player.worldPosition
@@ -176,7 +194,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                     let before = player.health
                     player.takeDamage(Int.random(in: 8...16))
                     if player.health < before {
-                        session.damageTick += 1
+                        onMain { self.session.damageTick += 1 }
                         sounds.playHit()
                     }
                 }
@@ -197,7 +215,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         }
 
         let onSite = Collision.distanceXZ(player.worldPosition, layout.siteCenter) < GameRules.siteRadius
-        session.plantHint = onSite && bombPlanted
+        onMain { self.session.plantHint = onSite && self.bombPlanted }
         if bombPlanted && player.interacting && onSite && player.isAlive {
             player.defuseProgress += TimeInterval(dt)
             if now - lastBeep > 0.45 {
@@ -225,9 +243,16 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             defused: defused
         )
         if result != .inProgress {
-            session.outcome = result
-            session.screen = .result
-            session.capturedMouse = false
+            if result == .attackersWinPlant {
+                let site = layout.siteCenter
+                FX.explosion(at: SCNVector3(site.x, 1.2, site.z), in: scene.rootNode)
+                sounds.playExplosion()
+            }
+            onMain {
+                self.session.outcome = result
+                self.session.screen = .result
+                self.session.capturedMouse = false
+            }
             switch result {
             case .defendersWinElimination, .defendersWinTime, .defendersWinDefuse:
                 sounds.playWin()
@@ -238,19 +263,42 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     }
 
     private func publishHUD() {
-        session.health = player.health
-        session.mag = player.currentMag
-        session.reserve = player.reserve[player.slot] ?? 0
-        session.slot = player.slot
-        session.timeLeft = bombPlanted ? max(0, GameRules.bombTime - bombElapsed) : max(0, GameRules.roundTime - roundElapsed)
-        session.bombPlanted = bombPlanted
-        session.defuseProgress = min(1, player.defuseProgress / GameRules.defuseTime)
-        session.attackersAlive = bots.filter(\.isAlive).count
-        session.reloading = CACurrentMediaTime() < player.reloadingUntil
+        let health = player.health
+        let mag = player.currentMag
+        let reserve = player.reserve[player.slot] ?? 0
+        let slot = player.slot
+        let timeLeft = bombPlanted ? max(0, GameRules.bombTime - bombElapsed) : max(0, GameRules.roundTime - roundElapsed)
+        let planted = bombPlanted
+        let defuse = min(1, player.defuseProgress / GameRules.defuseTime)
+        let attackers = bots.filter(\.isAlive).count
+        let reloading = CACurrentMediaTime() < player.reloadingUntil
+        let moving = player.moving
+        let aiming = player.aiming
+        onMain {
+            if self.session.health != health { self.session.health = health }
+            if self.session.mag != mag { self.session.mag = mag }
+            if self.session.reserve != reserve { self.session.reserve = reserve }
+            if self.session.slot != slot { self.session.slot = slot }
+            if abs(self.session.timeLeft - timeLeft) > 0.05 { self.session.timeLeft = timeLeft }
+            if self.session.bombPlanted != planted { self.session.bombPlanted = planted }
+            if abs(self.session.defuseProgress - defuse) > 0.01 { self.session.defuseProgress = defuse }
+            if self.session.attackersAlive != attackers { self.session.attackersAlive = attackers }
+            if self.session.reloading != reloading { self.session.reloading = reloading }
+            if self.session.moving != moving { self.session.moving = moving }
+            if self.session.aiming != aiming { self.session.aiming = aiming }
+        }
+    }
+
+    private func onMain(_ work: @escaping () -> Void) {
+        if Thread.isMainThread {
+            work()
+        } else {
+            DispatchQueue.main.async(execute: work)
+        }
     }
 
     private func lookDirection() -> SIMD3<Float> {
-        let spread = GameRules.aimSpread(moving: player.moving, sprinting: player.sprinting)
+        let spread = GameRules.aimSpread(moving: player.moving, sprinting: player.sprinting, aiming: player.aiming)
         let pitch = player.pitch + Float.random(in: -spread...spread)
         let yaw = player.yaw + Float.random(in: -spread...spread)
         let cy = cos(pitch)
@@ -271,6 +319,14 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         node.runAction(.sequence([.wait(duration: 0.045), .removeFromParentNode()]))
     }
 
+    func cycleWeapon(_ direction: Int) {
+        let all = WeaponSlot.allCases
+        guard let idx = all.firstIndex(of: player.slot) else { return }
+        let next = all[(idx + direction + all.count) % all.count]
+        player.selectSlot(next)
+        sounds.playUI()
+    }
+
     func handleKey(_ code: UInt16, down: Bool) {
         if down {
             player.keys.insert(code)
@@ -284,8 +340,10 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 sounds.playUI()
             case 14: player.interacting = true // E
             case 53: // Esc
-                session.capturedMouse = false
-                session.screen = .menu
+                onMain {
+                    self.session.capturedMouse = false
+                    self.session.screen = .menu
+                }
             default: break
             }
         } else {

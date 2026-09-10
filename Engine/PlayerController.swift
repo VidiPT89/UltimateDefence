@@ -22,6 +22,7 @@ final class PlayerController {
     var sprinting = false
     var grounded = true
     var vertical: Float = 0
+    var aiming = false
     private var lastSlot: WeaponSlot?
 
     var isAlive: Bool { health > 0 }
@@ -37,7 +38,11 @@ final class PlayerController {
         cameraNode.camera?.zFar = 140
         cameraNode.camera?.wantsHDR = true
         cameraNode.camera?.bloomIntensity = 0.55
-        cameraNode.camera?.motionBlurIntensity = 0.22
+        cameraNode.camera?.motionBlurIntensity = 0.18
+        cameraNode.camera?.vignettingIntensity = 0.35
+        cameraNode.camera?.vignettingPower = 0.65
+        cameraNode.camera?.screenSpaceAmbientOcclusionIntensity = 0.4
+        cameraNode.camera?.screenSpaceAmbientOcclusionRadius = 2.4
         cameraNode.position = SCNVector3Zero
         if cameraNode.parent !== node {
             node.addChildNode(cameraNode)
@@ -77,8 +82,12 @@ final class PlayerController {
         let length = simd_length(dir)
         moving = length > 0.001
         let layoutEye: Float = 1.6
-        let sprintingNow = keys.contains(56)
+        let sprintingNow = keys.contains(56) && !aiming
         sprinting = sprintingNow && moving
+        let targetFOV: CGFloat = aiming ? 48 : 68
+        if let cam = cameraNode.camera {
+            cam.fieldOfView += (targetFOV - cam.fieldOfView) * CGFloat(min(1, dt * 10))
+        }
         if keys.contains(49), grounded {
             vertical = GameRules.jumpVelocity
             grounded = false
@@ -100,7 +109,9 @@ final class PlayerController {
         dir /= length
         bob += dt * (sprintingNow ? 14 : 11)
         cameraNode.position = SCNVector3(sin(bob) * 0.018, sin(bob * 2) * 0.045, 0)
-        let speed = GameRules.playerSpeed * (sprintingNow ? GameRules.sprintMultiplier : 1)
+        let speed = GameRules.playerSpeed
+            * (sprintingNow ? GameRules.sprintMultiplier : 1)
+            * (aiming ? 0.72 : 1)
         let proposed = SIMD3(Float(node.position.x), y, Float(node.position.z)) + dir * speed * dt
         let resolved = Collision.resolve(
             position: SIMD3(Float(node.position.x), y, Float(node.position.z)),

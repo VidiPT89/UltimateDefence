@@ -17,6 +17,9 @@ final class GameSession: ObservableObject {
     @Published var capturedMouse = false
     @Published var hitTick = 0
     @Published var damageTick = 0
+    @Published var kills = 0
+    @Published var aiming = false
+    @Published var moving = false
 
     enum Screen {
         case menu

@@ -58,7 +58,7 @@ final class PlayerController {
     func applyLook() {
         pitch = min(1.25, max(-1.25, pitch))
         node.eulerAngles.y = CGFloat(yaw)
-        cameraNode.eulerAngles.x = CGFloat(pitch)
+        cameraNode.eulerAngles.x = CGFloat(pitch + punch)
     }
 
     func look(dx: CGFloat, dy: CGFloat, sensitivity: Float = 0.0045) {
@@ -124,7 +124,7 @@ final class PlayerController {
         let resolved = Collision.resolve(
             position: SIMD3(Float(node.position.x), y, Float(node.position.z)),
             proposed: proposed,
-            radius: 0.7,
+            radius: 0.42,
             walls: walls
         )
         node.position = SCNVector3(resolved.x, y, resolved.z)

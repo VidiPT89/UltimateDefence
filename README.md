@@ -9,13 +9,13 @@
 
 - ✅ First-person combat with mouse look, WASD movement and hitscan weapons
 - ✅ Round-based defence: eliminate attackers, run down the clock, or defuse the artefact
-- ✅ Maps: Dust II, Aztec, Office and Mill
+- ✅ Maps: Dust II, Aztec, Office and Mill with walkable rooms and doors
 - ✅ Match sizes from 1v1 to 6v6 with allied defender bots versus terrorist bots
-- ✅ Freeze at round start, then any attacker can plant on Site A
+- ✅ Any attacker can plant on Site A
 - ✅ Humanoid CT and T models, GoldSrc lighting, crates and outdoor/indoor compounds
 - ✅ Walk (Shift), crouch (Ctrl), jump, aim-down-sights, recoil punch and distance-based bot accuracy
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
-- ✅ HUD: health, ammo, round timer, freeze countdown and defuse progress
+- ✅ HUD: health, ammo, round timer and defuse progress
 - ✅ Bilingual PT-PT / English language switch
 - ✅ Dark, Light and System appearance, with iVidi.dev orange, burnt yellow and black
 - ✅ Animated splash with developer credits, then the main menu

@@ -24,7 +24,7 @@ enum L10nKey: String, CaseIterable {
     case match
     case dust2, aztec, office, mill
     case teammates
-    case freeze, spectating
+    case spectating
 }
 
 enum L10n {
@@ -79,7 +79,6 @@ enum L10n {
         .office: "Office",
         .mill: "Mill",
         .teammates: "defesa",
-        .freeze: "Preparar",
         .spectating: "A ronda continua com a tua equipa"
     ]
 
@@ -129,7 +128,6 @@ enum L10n {
         .office: "Office",
         .mill: "Mill",
         .teammates: "defence",
-        .freeze: "Freeze",
         .spectating: "The round continues with your team"
     ]
 }

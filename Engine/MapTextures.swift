@@ -2,47 +2,83 @@ import AppKit
 import SceneKit
 
 enum MapTextures {
-    static let sand = make(size: 64) { x, y, _ in
+    static let sand = make(size: 128) { x, y, _ in
         let n = noise(x, y)
-        return (0.72 + n * 0.08, 0.58 + n * 0.06, 0.32 + n * 0.04)
+        let pebble = ((x * 13 + y * 7) % 17 == 0) ? 0.08 : 0
+        return (0.70 + n * 0.10 + pebble, 0.56 + n * 0.07, 0.30 + n * 0.05)
     }
 
-    static let sandstone = make(size: 64) { x, y, _ in
-        let brickW = 16
-        let brickH = 8
+    static let sandstone = make(size: 128) { x, y, _ in
+        let brickW = 32
+        let brickH = 14
         let gy = y % brickH
         let row = y / brickH
         let shift = (row % 2) * (brickW / 2)
-        let inMortar = ((x + shift) % brickW) == 0 || gy == 0
+        let inMortar = ((x + shift) % brickW) <= 1 || gy <= 1
         let n = noise(x, y)
-        if inMortar { return (0.38, 0.30, 0.18) }
-        return (0.76 + n * 0.05, 0.60 + n * 0.04, 0.36 + n * 0.03)
+        if inMortar { return (0.42, 0.32, 0.20) }
+        return (0.78 + n * 0.06, 0.62 + n * 0.05, 0.38 + n * 0.04)
     }
 
-    static let crate = make(size: 64) { x, y, size in
-        let border = x < 3 || y < 3 || x > size - 4 || y > size - 4
-        let plank = (y / 8) % 2 == 0
-        if border { return (0.22, 0.14, 0.08) }
-        if plank { return (0.55, 0.35, 0.16) }
-        return (0.48, 0.30, 0.12)
+    static let crate = make(size: 128) { x, y, size in
+        let border = x < 6 || y < 6 || x > size - 7 || y > size - 7
+        let plank = (y / 16) % 2 == 0
+        let n = noise(x, y) * 0.04
+        if border { return (0.28 + n, 0.16, 0.08) }
+        if plank { return (0.58 + n, 0.38, 0.16) }
+        return (0.50 + n, 0.32, 0.12)
     }
 
-    static let metal = make(size: 32) { x, y, _ in
+    static let metal = make(size: 64) { x, y, _ in
         let n = noise(x, y)
-        let v = 0.28 + n * 0.08
-        return (v, v * 1.02, v * 1.05)
+        let v = 0.32 + n * 0.10
+        return (v, v * 1.02, v * 1.06)
     }
 
-    static let concrete = make(size: 64) { x, y, _ in
+    static let concrete = make(size: 128) { x, y, _ in
         let n = noise(x, y)
-        let v = 0.42 + n * 0.08
-        return (v, v * 0.96, v * 0.88)
+        let crack = (x + y) % 41 == 0 ? -0.08 : 0
+        let v = 0.46 + n * 0.08 + crack
+        return (v, v * 0.97, v * 0.90)
     }
 
-    static let hazard = make(size: 32) { x, y, size in
-        let stripe = ((x + y) / max(1, size / 4)) % 2 == 0
-        if stripe { return (0.85, 0.62, 0.12) }
-        return (0.12, 0.10, 0.08)
+    static let wood = make(size: 128) { x, y, _ in
+        let n = noise(x, y)
+        let grain = sin(CGFloat(y) * 0.4) * 0.04
+        return (0.46 + n * 0.05 + grain, 0.30 + n * 0.04, 0.14)
+    }
+
+    static let water = make(size: 64) { x, y, _ in
+        let n = noise(x, y)
+        return (0.18 + n * 0.05, 0.32 + n * 0.06, 0.38 + n * 0.08)
+    }
+
+    static let hazard = make(size: 64) { x, y, size in
+        let stripe = ((x + y) / max(1, size / 6)) % 2 == 0
+        if stripe { return (0.88, 0.68, 0.14) }
+        return (0.10, 0.09, 0.07)
+    }
+
+    static func sky(top: NSColor, bottom: NSColor) -> NSImage {
+        let size = 64
+        let image = NSImage(size: NSSize(width: size, height: size))
+        image.lockFocus()
+        var tr: CGFloat = 0, tg: CGFloat = 0, tb: CGFloat = 0, ta: CGFloat = 0
+        var br: CGFloat = 0, bg: CGFloat = 0, bb: CGFloat = 0, ba: CGFloat = 0
+        top.getRed(&tr, green: &tg, blue: &tb, alpha: &ta)
+        bottom.getRed(&br, green: &bg, blue: &bb, alpha: &ba)
+        for y in 0..<size {
+            let t = CGFloat(y) / CGFloat(size - 1)
+            NSColor(
+                calibratedRed: br + (tr - br) * t,
+                green: bg + (tg - bg) * t,
+                blue: bb + (tb - bb) * t,
+                alpha: 1
+            ).setFill()
+            NSRect(x: 0, y: y, width: size, height: 1).fill()
+        }
+        image.unlockFocus()
+        return image
     }
 
     static func goldSrc(_ contents: Any) -> SCNMaterial {

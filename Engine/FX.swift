@@ -37,19 +37,6 @@ enum FX {
         node.runAction(.sequence([.fadeOut(duration: 0.08), .removeFromParentNode()]))
     }
 
-    static func dustField() -> SCNParticleSystem {
-        let dust = SCNParticleSystem()
-        dust.birthRate = 8
-        dust.particleLifeSpan = 7
-        dust.particleSize = 0.07
-        dust.particleColor = NSColor(calibratedRed: 0.72, green: 0.62, blue: 0.4, alpha: 0.16)
-        dust.spreadingAngle = 180
-        dust.particleVelocity = 0.15
-        dust.emitterShape = SCNBox(width: 50, height: 6, length: 50, chamferRadius: 0)
-        dust.blendMode = .alpha
-        return dust
-    }
-
     static func explosion(at position: SCNVector3, in parent: SCNNode) {
         spark(at: position, in: parent, color: NSColor(calibratedRed: 1, green: 0.5, blue: 0.12, alpha: 1))
         let wave = SCNSphere(radius: 0.4)

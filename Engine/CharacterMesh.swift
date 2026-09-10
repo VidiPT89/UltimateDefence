@@ -27,6 +27,7 @@ enum CharacterMesh {
         head.name = headName
         head.position = SCNVector3(0, 1.68, 0.02)
         root.addChildNode(head)
+        root.addChildNode(box(0.12, 0.1, 0.12, at: SCNVector3(0, 1.54, 0.02), color: look.skin))
         addHeadgear(head, look: look)
 
         arm(root, side: -1, look: look)
@@ -156,7 +157,7 @@ enum CharacterMesh {
     }
 
     private static func box(_ w: CGFloat, _ h: CGFloat, _ l: CGFloat, at: SCNVector3, color: NSColor) -> SCNNode {
-        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0.012)
+        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0.028)
         g.firstMaterial = MapTextures.goldSrc(color)
         let n = SCNNode(geometry: g)
         n.position = at

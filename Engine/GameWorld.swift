@@ -21,7 +21,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     private var lastBeep: TimeInterval = 0
     private var wasReloading = false
     private var roundClosed = false
-    private weak var view: SCNView?
 
     init(session: GameSession, sounds: SoundManager) {
         self.session = session
@@ -90,7 +89,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     }
 
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        view = renderer as? SCNView
         guard session.screen == .playing, session.outcome == .inProgress, !roundClosed else { return }
         let dt: Float
         if let lastTime {
@@ -129,11 +127,9 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         guard player.canShoot(now: now) else { return }
         player.consumeShot(now: now)
         sounds.playShoot()
-        player.punch += player.slot == .rifle ? 0.018 : 0.03
-        player.applyLook()
         flashMuzzle()
         WeaponRig.kick(player.cameraNode)
-        let hits = screenHits()
+        let hits = aimHits()
         let origin = player.cameraNode.worldPosition
         let dir = cameraForward()
         let start = SCNVector3(
@@ -141,34 +137,37 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             origin.y + CGFloat(dir.y * 0.35),
             origin.z + CGFloat(dir.z * 0.35)
         )
-        guard let hit = hits.first else {
+        if let hit = hits.first {
+            FX.tracer(from: start, to: hit.worldCoordinates, in: scene.rootNode)
+            FX.spark(at: hit.worldCoordinates, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
+            let name = hit.node.name ?? hit.node.parent?.name ?? ""
+            if name.hasPrefix(NodeName.terroristPrefix) {
+                onMain { self.session.hitTick += 1 }
+                sounds.playHit()
+                let headshot = name.contains(NodeName.headSuffix)
+                let dmg = GameRules.applyDamage(
+                    base: player.currentStats.damage,
+                    headshot: headshot,
+                    multiplier: player.currentStats.headshotMultiplier
+                )
+                if let bot = bots.first(where: { $0.isTerrorist && name.hasPrefix("\(NodeName.terroristPrefix)\($0.id)") }) {
+                    let wasAlive = bot.isAlive
+                    bot.takeDamage(dmg)
+                    if wasAlive && !bot.isAlive {
+                        onMain { self.session.kills += 1 }
+                    }
+                }
+            }
+        } else {
             let miss = SCNVector3(
                 origin.x + CGFloat(dir.x * 24),
                 origin.y + CGFloat(dir.y * 24),
                 origin.z + CGFloat(dir.z * 24)
             )
             FX.tracer(from: start, to: miss, in: scene.rootNode)
-            return
         }
-        FX.tracer(from: start, to: hit.worldCoordinates, in: scene.rootNode)
-        FX.spark(at: hit.worldCoordinates, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
-        let name = hit.node.name ?? hit.node.parent?.name ?? ""
-        guard name.hasPrefix(NodeName.terroristPrefix) else { return }
-        onMain { self.session.hitTick += 1 }
-        sounds.playHit()
-        let headshot = name.contains(NodeName.headSuffix)
-        let dmg = GameRules.applyDamage(
-            base: player.currentStats.damage,
-            headshot: headshot,
-            multiplier: player.currentStats.headshotMultiplier
-        )
-        if let bot = bots.first(where: { $0.isTerrorist && name.hasPrefix("\(NodeName.terroristPrefix)\($0.id)") }) {
-            let wasAlive = bot.isAlive
-            bot.takeDamage(dmg)
-            if wasAlive && !bot.isAlive {
-                onMain { self.session.kills += 1 }
-            }
-        }
+        player.punch += player.slot == .rifle ? 0.018 : 0.03
+        player.applyLook()
     }
 
     private func updateBots(dt: Float, now: TimeInterval) {
@@ -334,13 +333,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         }
     }
 
-    private func screenHits() -> [SCNHitTestResult] {
-        if let view {
-            let point = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
-            return view.hitTest(point, options: [
-                .searchMode: SCNHitTestSearchMode.closest
-            ]).filter { !Self.isPlayerGeometry($0.node) }
-        }
+    private func aimHits() -> [SCNHitTestResult] {
         let origin = player.cameraNode.worldPosition
         let dir = cameraForward()
         let start = SCNVector3(
@@ -354,7 +347,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             origin.z + CGFloat(dir.z * player.currentStats.range)
         )
         return scene.rootNode.hitTestWithSegment(from: start, to: dest, options: [
-            SCNHitTestOption.searchMode.rawValue: SCNHitTestSearchMode.closest.rawValue
+            SCNHitTestOption.searchMode.rawValue: NSNumber(value: SCNHitTestSearchMode.closest.rawValue)
         ]).filter { !Self.isPlayerGeometry($0.node) }
     }
 

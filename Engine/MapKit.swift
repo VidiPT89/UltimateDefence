@@ -67,18 +67,6 @@ final class MapKit {
         spanX(z: minZ, minX: minX, maxX: maxX, gaps: south, h: h)
         spanZ(x: maxX, minZ: minZ, maxZ: maxZ, gaps: east, h: h)
         spanZ(x: minX, minZ: minZ, maxZ: maxZ, gaps: west, h: h)
-        for opening in openings {
-            switch opening {
-            case .north(let center, let width):
-                door(x: center, z: maxZ, w: width * 0.9, d: 0.18)
-            case .south(let center, let width):
-                door(x: center, z: minZ, w: width * 0.9, d: 0.18)
-            case .east(let center, let width):
-                door(x: maxX, z: center, w: 0.18, d: width * 0.9)
-            case .west(let center, let width):
-                door(x: minX, z: center, w: 0.18, d: width * 0.9)
-            }
-        }
     }
 
     func wall(x: Float, z: Float, w: Float, d: Float, h: Float = 4.4, texture: NSImage? = nil) {
@@ -166,14 +154,6 @@ final class MapKit {
             attackerSpawns: terrorists,
             defenderSpawns: defenders
         )
-    }
-
-    private func door(x: Float, z: Float, w: Float, d: Float) {
-        let box = SCNBox(width: CGFloat(w), height: 2.6, length: CGFloat(d), chamferRadius: 0)
-        box.materials = Self.tiledBox(MapTextures.wood, w: w, h: 2.6, d: d)
-        let node = SCNNode(geometry: box)
-        node.position = SCNVector3(x, 1.3, z)
-        scene.rootNode.addChildNode(node)
     }
 
     private func spanX(z: Float, minX: Float, maxX: Float, gaps: [(Float, Float)], h: Float) {

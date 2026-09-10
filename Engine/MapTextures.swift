@@ -2,28 +2,30 @@ import AppKit
 import SceneKit
 
 enum MapTextures {
-    static let sand = make(size: 128) { x, y, _ in
+    static let sand = make(size: 256) { x, y, _ in
         let n = noise(x, y)
-        let grit = CGFloat((x * 17 + y * 11) % 9) * 0.012
-        let stain = ((x / 18) + (y / 22)) % 3 == 0 ? -0.06 : 0
-        return (0.66 + n * 0.08 + grit + stain, 0.52 + n * 0.06 + grit * 0.6, 0.28 + n * 0.04)
+        let grit = CGFloat((x * 17 + y * 11) % 9) * 0.018
+        let stain = ((x / 18) + (y / 22)) % 3 == 0 ? -0.08 : 0
+        let pebble = (x * 13 + y * 7) % 29 == 0 ? -0.10 : 0
+        return (0.58 + n * 0.10 + grit + stain + pebble, 0.44 + n * 0.07 + grit * 0.6, 0.22 + n * 0.04)
     }
 
-    static let sandstone = make(size: 128) { x, y, _ in
-        let brickW = 20
-        let brickH = 10
+    static let sandstone = make(size: 256) { x, y, _ in
+        let brickW = 32
+        let brickH = 14
         let gx = x % brickW
         let gy = y % brickH
         let row = y / brickH
         let shift = (row % 2) * (brickW / 2)
-        let inMortar = ((x + shift) % brickW) <= 1 || gy <= 1
+        let inMortar = ((x + shift) % brickW) <= 2 || gy <= 2
         let n = noise(x + row * 3, y)
-        let chip = gx == 4 && gy == 3 ? -0.08 : 0
-        if inMortar { return (0.36, 0.26, 0.16) }
-        return (0.72 + n * 0.08 + chip, 0.54 + n * 0.06, 0.32 + n * 0.04)
+        let chip = (gx == 6 && gy == 4) || (gx == 22 && gy == 9) ? -0.12 : 0
+        let dirt = ((x / 9) + (y / 11)) % 5 == 0 ? -0.07 : 0
+        if inMortar { return (0.28, 0.20, 0.12) }
+        return (0.68 + n * 0.10 + chip + dirt, 0.48 + n * 0.07 + dirt, 0.28 + n * 0.05)
     }
 
-    static let crate = make(size: 128) { x, y, size in
+    static let crate = make(size: 256) { x, y, size in
         let border = x < 6 || y < 6 || x > size - 7 || y > size - 7
         let plank = (y / 16) % 2 == 0
         let n = noise(x, y) * 0.04
@@ -38,11 +40,12 @@ enum MapTextures {
         return (v, v * 1.02, v * 1.06)
     }
 
-    static let concrete = make(size: 128) { x, y, _ in
+    static let concrete = make(size: 256) { x, y, _ in
         let n = noise(x, y)
-        let crack = (x + y) % 41 == 0 ? -0.08 : 0
-        let v = 0.46 + n * 0.08 + crack
-        return (v, v * 0.97, v * 0.90)
+        let crack = (x + y) % 41 == 0 || (x * 2 + y) % 73 == 0 ? -0.12 : 0
+        let blotch = ((x / 20) + (y / 16)) % 4 == 0 ? -0.05 : 0
+        let v = 0.40 + n * 0.10 + crack + blotch
+        return (v, v * 0.96, v * 0.88)
     }
 
     static let wood = make(size: 128) { x, y, _ in
@@ -86,18 +89,29 @@ enum MapTextures {
         return image
     }
 
+    static let bump = make(size: 128) { x, y, _ in
+        let n = noise(x, y)
+        return (n, n, n)
+    }
+
     static func goldSrc(_ contents: Any) -> SCNMaterial {
         let mat = SCNMaterial()
-        mat.lightingModel = .lambert
+        mat.lightingModel = .phong
         mat.diffuse.contents = contents
         mat.diffuse.wrapS = .repeat
         mat.diffuse.wrapT = .repeat
-        mat.diffuse.magnificationFilter = .nearest
-        mat.diffuse.minificationFilter = .nearest
-        mat.diffuse.mipFilter = .nearest
-        mat.ambient.contents = NSColor(calibratedWhite: 0.35, alpha: 1)
-        mat.locksAmbientWithDiffuse = true
-        mat.isDoubleSided = false
+        mat.diffuse.magnificationFilter = .linear
+        mat.diffuse.minificationFilter = .linear
+        mat.diffuse.mipFilter = .linear
+        mat.normal.contents = bump
+        mat.normal.intensity = 0.55
+        mat.normal.wrapS = .repeat
+        mat.normal.wrapT = .repeat
+        mat.specular.contents = NSColor(calibratedWhite: 0.22, alpha: 1)
+        mat.shininess = 18
+        mat.locksAmbientWithDiffuse = false
+        mat.ambient.contents = NSColor(calibratedWhite: 0.22, alpha: 1)
+        mat.isDoubleSided = true
         mat.writesToDepthBuffer = true
         mat.readsFromDepthBuffer = true
         return mat

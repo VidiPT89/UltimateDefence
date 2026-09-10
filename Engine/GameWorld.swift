@@ -56,6 +56,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         player.grounded = true
         player.aiming = false
         player.punch = 0
+        player.velocity = .zero
         player.roundStart = CACurrentMediaTime()
         wasReloading = false
         player.node.removeFromParentNode()
@@ -141,7 +142,10 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             FX.tracer(from: start, to: hit.worldCoordinates, in: scene.rootNode)
             FX.spark(at: hit.worldCoordinates, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
             let name = hit.node.name ?? hit.node.parent?.name ?? ""
-            if name.hasPrefix(NodeName.terroristPrefix) {
+            if !Self.isSolidCover(hit.node),
+               name.hasPrefix(NodeName.terroristPrefix),
+               let bot = bots.first(where: { $0.isTerrorist && name.hasPrefix("\(NodeName.terroristPrefix)\($0.id)") }),
+               Collision.losClear(player.worldPosition, bot.xz, walls: layout.walls) {
                 onMain { self.session.hitTick += 1 }
                 sounds.playHit()
                 let headshot = name.contains(NodeName.headSuffix)
@@ -150,12 +154,10 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                     headshot: headshot,
                     multiplier: player.currentStats.headshotMultiplier
                 )
-                if let bot = bots.first(where: { $0.isTerrorist && name.hasPrefix("\(NodeName.terroristPrefix)\($0.id)") }) {
-                    let wasAlive = bot.isAlive
-                    bot.takeDamage(dmg)
-                    if wasAlive && !bot.isAlive {
-                        onMain { self.session.kills += 1 }
-                    }
+                let wasAlive = bot.isAlive
+                bot.takeDamage(dmg)
+                if wasAlive && !bot.isAlive {
+                    onMain { self.session.kills += 1 }
                 }
             }
         } else {
@@ -183,7 +185,8 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 site: layout.siteCenter,
                 walls: layout.walls,
                 bombPlanted: bombPlanted,
-                world: scene.rootNode
+                planterId: terrorists.first(where: \.isAlive)?.id ?? 0,
+                others: bots
             )
             switch action {
             case .idle:
@@ -213,12 +216,13 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         } else {
             return
         }
-        FX.spark(at: muzzlePos, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.72, blue: 0.25, alpha: 1))
-        FX.tracer(from: muzzlePos, to: dest, in: scene.rootNode)
         let origin = SIMD3(Float(bot.node.position.x), 0, Float(bot.node.position.z))
         let targetPos = toPlayer
             ? player.worldPosition
             : SIMD3(Float(toBot?.node.position.x ?? 0), 0, Float(toBot?.node.position.z ?? 0))
+        guard Collision.losClear(origin, targetPos, walls: layout.walls) else { return }
+        FX.spark(at: muzzlePos, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.72, blue: 0.25, alpha: 1))
+        FX.tracer(from: muzzlePos, to: dest, in: scene.rootNode)
         let distance = Collision.distanceXZ(origin, targetPos)
         guard Float.random(in: 0...1) < GameRules.botHitChance(distance: distance) else { return }
         if toPlayer {
@@ -347,9 +351,15 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             origin.y + CGFloat(dir.y * player.currentStats.range),
             origin.z + CGFloat(dir.z * player.currentStats.range)
         )
-        return scene.rootNode.hitTestWithSegment(from: start, to: dest, options: [
-            SCNHitTestOption.searchMode.rawValue: NSNumber(value: SCNHitTestSearchMode.closest.rawValue)
-        ]).filter { !Self.isPlayerGeometry($0.node) }
+        let hits = scene.rootNode.hitTestWithSegment(from: start, to: dest, options: [
+            SCNHitTestOption.searchMode.rawValue: NSNumber(value: SCNHitTestSearchMode.all.rawValue)
+        ])
+        let origin3 = SIMD3(Float(start.x), Float(start.y), Float(start.z))
+        return hits
+            .filter { !Self.isPlayerGeometry($0.node) && !Self.isTrim($0.node) }
+            .sorted { a, b in
+                Self.hitDistance(a, from: origin3) < Self.hitDistance(b, from: origin3)
+            }
     }
 
     private func cameraForward() -> SIMD3<Float> {
@@ -407,6 +417,29 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             player.keys.remove(code)
             if code == 14 { player.interacting = false }
         }
+    }
+
+    private static func hitDistance(_ hit: SCNHitTestResult, from: SIMD3<Float>) -> Float {
+        let p = hit.worldCoordinates
+        return hypot(hypot(Float(p.x) - from.x, Float(p.y) - from.y), Float(p.z) - from.z)
+    }
+
+    private static func isTrim(_ node: SCNNode) -> Bool {
+        var current: SCNNode? = node
+        while let node = current {
+            if node.name == NodeName.trim { return true }
+            current = node.parent
+        }
+        return false
+    }
+
+    private static func isSolidCover(_ node: SCNNode) -> Bool {
+        var current: SCNNode? = node
+        while let node = current {
+            if node.name == NodeName.solid || node.name == NodeName.ground { return true }
+            current = node.parent
+        }
+        return false
     }
 
     private static func isPlayerGeometry(_ node: SCNNode) -> Bool {

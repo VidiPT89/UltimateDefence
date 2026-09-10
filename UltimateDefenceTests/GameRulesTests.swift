@@ -58,6 +58,30 @@ final class GameRulesTests: XCTestCase {
         XCTAssertLessThan(resolved.z, -1)
     }
 
+    func testUnstickPushesOutOfWall() {
+        let wall = AABB(minX: -1, maxX: 1, minZ: -1, maxZ: 1)
+        let stuck = SIMD3<Float>(0, 0, 0)
+        let free = Collision.unstick(stuck, radius: 0.4, walls: [wall])
+        XCTAssertFalse(Collision.isBlocked(free, radius: 0.4, walls: [wall]))
+    }
+
+    func testMapSpawnsAreWalkable() {
+        for arena in ArenaMap.allCases {
+            let layout = MapBuilder.make(arena).1
+            XCTAssertFalse(
+                Collision.isBlocked(layout.playerSpawn, radius: 0.45, walls: layout.walls),
+                "Player spawn blocked in \(arena.rawValue)"
+            )
+            for spawn in layout.attackerSpawns + layout.defenderSpawns {
+                let clear = Collision.unstick(spawn, radius: 0.45, walls: layout.walls)
+                XCTAssertFalse(
+                    Collision.isBlocked(clear, radius: 0.45, walls: layout.walls),
+                    "Bot spawn blocked in \(arena.rawValue)"
+                )
+            }
+        }
+    }
+
     func testLocalizationCoversEveryKey() {
         for key in L10nKey.allCases {
             let pt = L10n.string(key, language: .portuguese)

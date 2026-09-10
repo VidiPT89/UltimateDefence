@@ -21,7 +21,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     private var lastBeep: TimeInterval = 0
     private var wasReloading = false
     private var roundClosed = false
-    private var freezeElapsed: TimeInterval = 0
+    private weak var view: SCNView?
 
     init(session: GameSession, sounds: SoundManager) {
         self.session = session
@@ -40,7 +40,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         bombPlanted = false
         defused = false
         roundClosed = false
-        freezeElapsed = 0
         player.keys.removeAll()
         player.shooting = false
         player.health = GameRules.playerMaxHealth
@@ -61,7 +60,8 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         player.roundStart = CACurrentMediaTime()
         wasReloading = false
         player.node.removeFromParentNode()
-        player.setup(at: layout.playerSpawn)
+        let spawn = Collision.unstick(layout.playerSpawn, radius: 0.45, walls: layout.walls)
+        player.setup(at: SIMD3(spawn.x, layout.playerSpawn.y, spawn.z))
         scene.rootNode.addChildNode(player.node)
 
         bots.forEach { $0.node.removeFromParentNode() }
@@ -70,12 +70,14 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let tSpawns = Array(layout.attackerSpawns.prefix(tCount))
         let ctSpawns = Array(layout.defenderSpawns.prefix(ctCount))
         bots = tSpawns.enumerated().map { index, spawn in
-            let bot = BotActor(id: index, team: .terrorist, at: spawn)
+            let clear = Collision.unstick(spawn, radius: 0.45, walls: layout.walls)
+            let bot = BotActor(id: index, team: .terrorist, at: clear)
             scene.rootNode.addChildNode(bot.node)
             return bot
         }
         bots += ctSpawns.enumerated().map { index, spawn in
-            let bot = BotActor(id: index, team: .counter, at: spawn)
+            let clear = Collision.unstick(spawn, radius: 0.45, walls: layout.walls)
+            let bot = BotActor(id: index, team: .counter, at: clear)
             scene.rootNode.addChildNode(bot.node)
             return bot
         }
@@ -88,6 +90,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     }
 
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        view = renderer as? SCNView
         guard session.screen == .playing, session.outcome == .inProgress, !roundClosed else { return }
         let dt: Float
         if let lastTime {
@@ -96,12 +99,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             dt = 1.0 / 60.0
         }
         lastTime = time
-        if freezeElapsed < GameRules.freezeTime {
-            freezeElapsed += TimeInterval(dt)
-            player.shooting = false
-            publishHUD()
-            return
-        }
         tick(dt: dt, now: time)
     }
 
@@ -132,31 +129,23 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         guard player.canShoot(now: now) else { return }
         player.consumeShot(now: now)
         sounds.playShoot()
-        player.punch += player.slot == .rifle ? 0.024 : 0.04
-        player.yaw += Float.random(in: -0.012...0.012)
+        player.punch += player.slot == .rifle ? 0.018 : 0.03
         player.applyLook()
         flashMuzzle()
         WeaponRig.kick(player.cameraNode)
+        let hits = screenHits()
         let origin = player.cameraNode.worldPosition
-        let dir = lookDirection()
+        let dir = cameraForward()
         let start = SCNVector3(
-            origin.x + CGFloat(dir.x * 0.85),
-            origin.y + CGFloat(dir.y * 0.85),
-            origin.z + CGFloat(dir.z * 0.85)
+            origin.x + CGFloat(dir.x * 0.35),
+            origin.y + CGFloat(dir.y * 0.35),
+            origin.z + CGFloat(dir.z * 0.35)
         )
-        let dest = SCNVector3(
-            origin.x + CGFloat(dir.x * player.currentStats.range),
-            origin.y + CGFloat(dir.y * player.currentStats.range),
-            origin.z + CGFloat(dir.z * player.currentStats.range)
-        )
-        let hits = scene.rootNode.hitTestWithSegment(from: start, to: dest, options: [
-            SCNHitTestOption.searchMode.rawValue: SCNHitTestSearchMode.closest.rawValue
-        ]).filter { !Self.isPlayerGeometry($0.node) }
         guard let hit = hits.first else {
             let miss = SCNVector3(
-                origin.x + CGFloat(dir.x * 18),
-                origin.y + CGFloat(dir.y * 18),
-                origin.z + CGFloat(dir.z * 18)
+                origin.x + CGFloat(dir.x * 24),
+                origin.y + CGFloat(dir.y * 24),
+                origin.z + CGFloat(dir.z * 24)
             )
             FX.tracer(from: start, to: miss, in: scene.rootNode)
             return
@@ -316,7 +305,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let defuse = min(1, player.defuseProgress / GameRules.defuseTime)
         let attackers = bots.filter { $0.isTerrorist && $0.isAlive }.count
         let defenders = bots.filter { !$0.isTerrorist && $0.isAlive }.count + (player.isAlive ? 1 : 0)
-        let freezeLeft = max(0, GameRules.freezeTime - freezeElapsed)
         let reloading = CACurrentMediaTime() < player.reloadingUntil
         let moving = player.moving
         let aiming = player.aiming
@@ -334,7 +322,6 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             if self.session.reloading != reloading { self.session.reloading = reloading }
             if self.session.moving != moving { self.session.moving = moving }
             if self.session.aiming != aiming { self.session.aiming = aiming }
-            if abs(self.session.freezeLeft - freezeLeft) > 0.05 { self.session.freezeLeft = freezeLeft }
             if self.session.playerAlive != alive { self.session.playerAlive = alive }
         }
     }
@@ -347,17 +334,33 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         }
     }
 
-    private func lookDirection() -> SIMD3<Float> {
-        let spread = GameRules.aimSpread(
-            moving: player.moving,
-            sprinting: player.sprinting,
-            aiming: player.aiming,
-            walking: player.walking,
-            crouching: player.crouching,
-            airborne: !player.grounded
+    private func screenHits() -> [SCNHitTestResult] {
+        if let view {
+            let point = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
+            return view.hitTest(point, options: [
+                .searchMode: SCNHitTestSearchMode.closest
+            ]).filter { !Self.isPlayerGeometry($0.node) }
+        }
+        let origin = player.cameraNode.worldPosition
+        let dir = cameraForward()
+        let start = SCNVector3(
+            origin.x + CGFloat(dir.x * 0.4),
+            origin.y + CGFloat(dir.y * 0.4),
+            origin.z + CGFloat(dir.z * 0.4)
         )
-        let pitch = player.pitch + player.punch + Float.random(in: -spread...spread)
-        let yaw = player.yaw + Float.random(in: -spread...spread)
+        let dest = SCNVector3(
+            origin.x + CGFloat(dir.x * player.currentStats.range),
+            origin.y + CGFloat(dir.y * player.currentStats.range),
+            origin.z + CGFloat(dir.z * player.currentStats.range)
+        )
+        return scene.rootNode.hitTestWithSegment(from: start, to: dest, options: [
+            SCNHitTestOption.searchMode.rawValue: SCNHitTestSearchMode.closest.rawValue
+        ]).filter { !Self.isPlayerGeometry($0.node) }
+    }
+
+    private func cameraForward() -> SIMD3<Float> {
+        let pitch = player.pitch + player.punch
+        let yaw = player.yaw
         let cy = cos(pitch)
         return SIMD3(-sin(yaw) * cy, sin(pitch), -cos(yaw) * cy)
     }

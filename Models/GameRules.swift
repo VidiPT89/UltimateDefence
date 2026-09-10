@@ -53,7 +53,6 @@ enum WeaponSlot: Int, CaseIterable {
 
 struct GameRules {
     static let roundTime: TimeInterval = 90
-    static let freezeTime: TimeInterval = 2.2
     static let plantTime: TimeInterval = 3.5
     static let bombTime: TimeInterval = 40
     static let defuseTime: TimeInterval = 5

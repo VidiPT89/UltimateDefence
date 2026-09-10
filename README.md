@@ -9,10 +9,10 @@
 
 - ✅ First-person combat with mouse look, WASD movement and hitscan weapons
 - ✅ Round-based defence: eliminate attackers, run down the clock, or defuse the artefact
-- ✅ Maps: Dust II, Aztec, Office and Mill with walkable rooms and doors
+- ✅ Maps: Dust II, Aztec, Office and Mill with corridors, mid routes, doors and walkable ramps
 - ✅ Match sizes from 1v1 to 6v6 with allied defender bots versus terrorist bots
-- ✅ Any attacker can plant on Site A
-- ✅ Humanoid CT and T models, GoldSrc lighting, crates and outdoor/indoor compounds
+- ✅ Any attacker can plant on Site A; dying ends the round immediately
+- ✅ Humanoid CT and T models, crates, barrels, pillars and indoor/outdoor compounds
 - ✅ Walk (Shift), crouch (Ctrl), jump, aim-down-sights, recoil punch and distance-based bot accuracy
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
 - ✅ HUD: health, ammo, round timer and defuse progress

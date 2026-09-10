@@ -130,16 +130,6 @@ final class GameRulesTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(far, 0.14)
     }
 
-    func testAimSpreadGrowsWhenMoving() {
-        let still = GameRules.aimSpread(moving: false, sprinting: false)
-        let run = GameRules.aimSpread(moving: true, sprinting: true)
-        let walk = GameRules.aimSpread(moving: true, sprinting: false, walking: true)
-        let ads = GameRules.aimSpread(moving: true, sprinting: false, aiming: true)
-        XCTAssertGreaterThan(run, still)
-        XCTAssertLessThan(walk, run)
-        XCTAssertLessThan(ads, run)
-    }
-
     func testMatchSizeCountsAllies() {
         XCTAssertEqual(MatchSize.one.allyCount, 0)
         XCTAssertEqual(MatchSize.two.allyCount, 1)

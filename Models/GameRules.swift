@@ -97,22 +97,4 @@ struct GameRules {
         let closeness = 1 - min(1, max(0, distance / 30))
         return 0.14 + closeness * 0.36
     }
-
-    static func aimSpread(
-        moving: Bool,
-        sprinting: Bool,
-        aiming: Bool = false,
-        walking: Bool = false,
-        crouching: Bool = false,
-        airborne: Bool = false
-    ) -> Float {
-        var spread: Float = 0.006
-        if moving { spread += 0.022 }
-        if sprinting { spread += 0.01 }
-        if walking { spread *= 0.45 }
-        if crouching { spread *= 0.4 }
-        if aiming { spread *= 0.42 }
-        if airborne { spread += 0.05 }
-        return spread
-    }
 }

@@ -37,7 +37,7 @@ struct RootView: View {
                 HUDView(session: session)
             }
             if session.screen == .menu {
-                MainMenuView(onPlay: startRound)
+                MainMenuView(session: session, onPlay: startRound)
             }
             if session.screen == .result {
                 ResultView(
@@ -51,11 +51,7 @@ struct RootView: View {
     }
 
     private func startRound() {
-        if world == nil {
-            world = GameWorld(session: session, sounds: sounds)
-        } else {
-            world?.resetRound()
-        }
+        world = GameWorld(session: session, sounds: sounds)
         session.screen = .playing
         session.outcome = .inProgress
         session.capturedMouse = true

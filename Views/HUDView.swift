@@ -101,6 +101,7 @@ struct HUDView: View {
                 Circle().fill(UDTheme.orange).frame(width: 7, height: 7)
                 Text("\(session.attackersAlive) \(language.t(.attackers).uppercased())")
             }
+            Text("\(session.defendersAlive) \(language.t(.teammates).uppercased())")
             Text("\(session.kills) \(language.t(.kills).uppercased())")
                 .foregroundStyle(UDTheme.burnt)
             Spacer()

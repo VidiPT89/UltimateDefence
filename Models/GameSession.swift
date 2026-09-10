@@ -10,7 +10,10 @@ final class GameSession: ObservableObject {
     @Published var bombPlanted = false
     @Published var defuseProgress: Double = 0
     @Published var plantHint = false
-    @Published var attackersAlive = GameRules.attackerCount
+    @Published var attackersAlive = 5
+    @Published var defendersAlive = 5
+    @Published var arena: ArenaMap = .dust2
+    @Published var matchSize: MatchSize = .five
     @Published var outcome: RoundOutcome = .inProgress
     @Published var reloading = false
     @Published var capturedMouse = false

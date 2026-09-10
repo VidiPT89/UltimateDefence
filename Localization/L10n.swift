@@ -20,6 +20,10 @@ enum L10nKey: String, CaseIterable {
     case aim
     case aimHint
     case kills
+    case map
+    case match
+    case sandlot, dust2, mill
+    case teammates
 }
 
 enum L10n {
@@ -66,7 +70,13 @@ enum L10n {
         .sprintJumpHint: "Andar, agachar e saltar",
         .aim: "Botão direito · scroll",
         .aimHint: "Mirar e trocar de arma",
-        .kills: "abates"
+        .kills: "abates",
+        .map: "Mapa",
+        .match: "Partida",
+        .sandlot: "Sandlot",
+        .dust2: "Dust II",
+        .mill: "Mill",
+        .teammates: "defesa"
     ]
 
     private static let en: [L10nKey: String] = [
@@ -107,6 +117,12 @@ enum L10n {
         .sprintJumpHint: "Walk, crouch and jump",
         .aim: "Right click · scroll",
         .aimHint: "Aim and switch weapon",
-        .kills: "kills"
+        .kills: "kills",
+        .map: "Map",
+        .match: "Match",
+        .sandlot: "Sandlot",
+        .dust2: "Dust II",
+        .mill: "Mill",
+        .teammates: "defence"
     ]
 }

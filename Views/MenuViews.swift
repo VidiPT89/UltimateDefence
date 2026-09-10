@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MainMenuView: View {
+    @ObservedObject var session: GameSession
     let onPlay: () -> Void
     @EnvironmentObject private var language: LanguageManager
     @EnvironmentObject private var theme: ThemeManager
@@ -91,6 +92,18 @@ struct MainMenuView: View {
                 get: { sounds.soundEnabled },
                 set: { sounds.setEnabled($0) }
             ))
+            Picker(language.t(.map), selection: $session.arena) {
+                Text(language.t(.dust2)).tag(ArenaMap.dust2)
+                Text(language.t(.sandlot)).tag(ArenaMap.sandlot)
+                Text(language.t(.mill)).tag(ArenaMap.mill)
+            }
+            .pickerStyle(.segmented)
+            Picker(language.t(.match), selection: $session.matchSize) {
+                Text("2v2").tag(MatchSize.two)
+                Text("3v3").tag(MatchSize.three)
+                Text("5v5").tag(MatchSize.five)
+            }
+            .pickerStyle(.segmented)
         }
         .padding(18)
         .frame(maxWidth: 520)

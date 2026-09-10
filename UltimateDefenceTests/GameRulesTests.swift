@@ -165,17 +165,17 @@ final class GameRulesTests: XCTestCase {
         XCTAssertEqual(result, .attackersWinElimination)
     }
 
-    func testFloorHeightUsesHighestPlatform() {
-        let low = Platform(minX: -2, maxX: 2, minZ: -2, maxZ: 2, height: 0.4)
-        let high = Platform(minX: -1, maxX: 1, minZ: -1, maxZ: 1, height: 1.5)
-        XCTAssertEqual(Collision.floorHeight(x: 0, z: 0, floors: [low, high]), 1.5)
-        XCTAssertEqual(Collision.floorHeight(x: 8, z: 8, floors: [low, high]), 0)
+    func testOnlyThePlanterCanArmTheArtefact() {
+        XCTAssertTrue(GameRules.canPlant(isTerrorist: true, botId: 0, planterId: 0, planted: false, onSite: true))
+        XCTAssertFalse(GameRules.canPlant(isTerrorist: true, botId: 2, planterId: 0, planted: false, onSite: true))
+        XCTAssertFalse(GameRules.canPlant(isTerrorist: false, botId: 0, planterId: 0, planted: false, onSite: true))
+        XCTAssertFalse(GameRules.canPlant(isTerrorist: true, botId: 0, planterId: 0, planted: true, onSite: true))
+        XCTAssertFalse(GameRules.canPlant(isTerrorist: true, botId: 0, planterId: 0, planted: false, onSite: false))
     }
 
     func testMapsStayFlat() {
         for arena in ArenaMap.allCases {
             let layout = MapBuilder.make(arena).1
-            XCTAssertTrue(layout.floors.isEmpty, "\(arena.rawValue) should be flat")
             XCTAssertFalse(layout.attackPaths.isEmpty)
             XCTAssertFalse(layout.defendPosts.isEmpty)
         }

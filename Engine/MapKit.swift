@@ -16,7 +16,6 @@ enum NodeName {
 
 struct MapLayout {
     let walls: [AABB]
-    let floors: [Platform]
     let siteCenter: SIMD3<Float>
     let playerSpawn: SIMD3<Float>
     let playerYaw: Float
@@ -29,7 +28,6 @@ struct MapLayout {
 final class MapKit {
     let scene = SCNScene()
     var walls: [AABB] = []
-    var floors: [Platform] = []
     private let wallTexture: NSImage
 
     init(sky: NSImage, fog: NSColor, wall: NSImage, indoor: Bool) {
@@ -170,7 +168,6 @@ final class MapKit {
     ) -> MapLayout {
         MapLayout(
             walls: walls,
-            floors: floors,
             siteCenter: site,
             playerSpawn: player,
             playerYaw: yaw,

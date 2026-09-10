@@ -93,6 +93,10 @@ struct GameRules {
         return .inProgress
     }
 
+    static func canPlant(isTerrorist: Bool, botId: Int, planterId: Int, planted: Bool, onSite: Bool) -> Bool {
+        isTerrorist && !planted && onSite && botId == planterId
+    }
+
     static func botHitChance(distance: Float) -> Float {
         let closeness = 1 - min(1, max(0, distance / 30))
         return 0.14 + closeness * 0.36

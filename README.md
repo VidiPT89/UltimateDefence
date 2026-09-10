@@ -61,7 +61,7 @@ Select the `UltimateDefence` scheme and run on My Mac (`⌘R`).
 4. **1** / **2** or the scroll wheel switch weapons, **R** reloads, **E** defuses while standing on the site
 5. Toggle sound, language and theme from the main menu. **Esc** returns to the menu and releases the pointer
 
-Win by eliminating every attacker before they plant, by surviving until the round timer ends, or by defusing after a plant. You lose if the whole defence is downed or if the artefact detonates. If you go down and teammates remain, the round keeps going.
+Win by eliminating every attacker before they plant, by surviving until the round timer ends, or by defusing after a plant. You lose if you are downed or if the artefact detonates.
 
 ## 🧪 Testing
 

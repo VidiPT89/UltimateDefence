@@ -75,15 +75,17 @@ enum WeaponRig {
         root.name = "weaponRig"
         switch slot {
         case .rifle:
-            root.addChildNode(box(0.07, 0.07, 0.72, x: 0.22, y: -0.16, z: -0.48, color: wood))
-            root.addChildNode(box(0.08, 0.1, 0.22, x: 0.22, y: -0.14, z: -0.22, color: dark))
-            root.addChildNode(box(0.06, 0.22, 0.1, x: 0.22, y: -0.28, z: -0.18, color: wood))
-            root.addChildNode(box(0.05, 0.2, 0.12, x: 0.22, y: -0.3, z: -0.34, color: dark))
-            root.addChildNode(box(0.04, 0.04, 0.16, x: 0.22, y: -0.12, z: -0.78, color: steel))
+            root.addChildNode(box(0.08, 0.08, 0.18, x: 0.08, y: -0.22, z: -0.28, color: skin))
+            root.addChildNode(box(0.1, 0.08, 0.22, x: 0.2, y: -0.2, z: -0.18, color: skin))
+            root.addChildNode(box(0.07, 0.07, 0.55, x: 0.2, y: -0.16, z: -0.52, color: steel))
+            root.addChildNode(box(0.05, 0.12, 0.16, x: 0.2, y: -0.24, z: -0.28, color: dark))
+            root.addChildNode(box(0.04, 0.05, 0.12, x: 0.2, y: -0.12, z: -0.72, color: dark))
+            root.addChildNode(box(0.08, 0.06, 0.1, x: 0.08, y: -0.18, z: -0.42, color: glove))
         case .pistol:
-            root.addChildNode(box(0.05, 0.07, 0.22, x: 0.18, y: -0.14, z: -0.36, color: steel))
-            root.addChildNode(box(0.045, 0.16, 0.07, x: 0.18, y: -0.26, z: -0.24, color: dark))
-            root.addChildNode(box(0.03, 0.03, 0.08, x: 0.18, y: -0.11, z: -0.46, color: dark))
+            root.addChildNode(box(0.08, 0.08, 0.16, x: 0.16, y: -0.2, z: -0.28, color: skin))
+            root.addChildNode(box(0.05, 0.07, 0.22, x: 0.18, y: -0.16, z: -0.4, color: steel))
+            root.addChildNode(box(0.045, 0.14, 0.07, x: 0.18, y: -0.26, z: -0.28, color: dark))
+            root.addChildNode(box(0.07, 0.05, 0.08, x: 0.12, y: -0.18, z: -0.34, color: glove))
         }
         camera.addChildNode(root)
     }
@@ -98,9 +100,10 @@ enum WeaponRig {
         rig.runAction(.sequence([back, rest]))
     }
 
-    private static let steel = NSColor(calibratedRed: 0.32, green: 0.33, blue: 0.34, alpha: 1)
-    private static let dark = NSColor(calibratedRed: 0.14, green: 0.13, blue: 0.12, alpha: 1)
-    private static let wood = NSColor(calibratedRed: 0.45, green: 0.28, blue: 0.12, alpha: 1)
+    private static let steel = NSColor(calibratedRed: 0.22, green: 0.24, blue: 0.22, alpha: 1)
+    private static let dark = NSColor(calibratedRed: 0.1, green: 0.1, blue: 0.1, alpha: 1)
+    private static let skin = NSColor(calibratedRed: 0.72, green: 0.54, blue: 0.42, alpha: 1)
+    private static let glove = NSColor(calibratedRed: 0.12, green: 0.12, blue: 0.1, alpha: 1)
 
     private static func box(_ w: CGFloat, _ h: CGFloat, _ l: CGFloat, x: CGFloat, y: CGFloat, z: CGFloat, color: NSColor) -> SCNNode {
         let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0)

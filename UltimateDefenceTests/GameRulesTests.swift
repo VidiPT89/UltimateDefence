@@ -87,8 +87,24 @@ final class GameRulesTests: XCTestCase {
     }
 
     func testMatchSizeCountsAllies() {
+        XCTAssertEqual(MatchSize.one.allyCount, 0)
         XCTAssertEqual(MatchSize.two.allyCount, 1)
         XCTAssertEqual(MatchSize.three.allyCount, 2)
+        XCTAssertEqual(MatchSize.four.allyCount, 3)
         XCTAssertEqual(MatchSize.five.allyCount, 4)
+        XCTAssertEqual(MatchSize.six.allyCount, 5)
+    }
+
+    func testPlayerDeathDoesNotEndRoundIfAlliesRemain() {
+        let result = GameRules.outcome(
+            playerAlive: false,
+            defendersAlive: 2,
+            attackersAlive: 3,
+            timeLeft: 40,
+            bombPlanted: false,
+            bombTimeLeft: 40,
+            defused: false
+        )
+        XCTAssertEqual(result, .inProgress)
     }
 }

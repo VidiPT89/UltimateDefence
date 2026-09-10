@@ -11,8 +11,6 @@ final class BotActor {
     var lastShot: TimeInterval = 0
     var plantProgress: TimeInterval = 0
     private var wander: Float
-    private let leftLeg: SCNNode
-    private let rightLeg: SCNNode
 
     var isAlive: Bool { health > 0 }
     var isTerrorist: Bool { team == .terrorist }
@@ -25,42 +23,13 @@ final class BotActor {
         node = SCNNode()
         node.name = "\(prefix)\(id)"
         node.position = SCNVector3(spawn.x, 0, spawn.z)
-
-        let pants = team == .terrorist
-            ? NSColor(calibratedRed: 0.42, green: 0.34, blue: 0.22, alpha: 1)
-            : NSColor(calibratedRed: 0.18, green: 0.22, blue: 0.3, alpha: 1)
-        let jacket = team == .terrorist
-            ? NSColor(calibratedRed: 0.48, green: 0.36, blue: 0.2, alpha: 1)
-            : NSColor(calibratedRed: 0.22, green: 0.38, blue: 0.62, alpha: 1)
-        let skin = NSColor(calibratedRed: 0.76, green: 0.58, blue: 0.44, alpha: 1)
-        let boot = NSColor(calibratedRed: 0.1, green: 0.09, blue: 0.08, alpha: 1)
-
-        leftLeg = Self.box(0.17, 0.74, 0.19, at: SCNVector3(-0.13, 0.48, 0), color: pants)
-        rightLeg = Self.box(0.17, 0.74, 0.19, at: SCNVector3(0.13, 0.48, 0), color: pants)
-        node.addChildNode(leftLeg)
-        node.addChildNode(rightLeg)
-        node.addChildNode(Self.box(0.22, 0.12, 0.3, at: SCNVector3(-0.13, 0.08, 0.02), color: boot))
-        node.addChildNode(Self.box(0.22, 0.12, 0.3, at: SCNVector3(0.13, 0.08, 0.02), color: boot))
-        node.addChildNode(Self.box(0.44, 0.22, 0.26, at: SCNVector3(0, 0.94, 0), color: pants))
-        let torso = Self.box(0.48, 0.54, 0.3, at: SCNVector3(0, 1.3, 0), color: jacket)
-        torso.name = "\(prefix)\(id)"
-        node.addChildNode(torso)
-
-        let headGeom = SCNBox(width: 0.24, height: 0.28, length: 0.24, chamferRadius: 0)
-        headGeom.firstMaterial = MapTextures.goldSrc(skin)
-        head = SCNNode(geometry: headGeom)
-        head.name = "\(prefix)\(id)\(NodeName.headSuffix)"
-        head.position = SCNVector3(0, 1.7, 0)
-        node.addChildNode(head)
-        let hatColor = team == .terrorist
-            ? NSColor(calibratedRed: 0.16, green: 0.14, blue: 0.1, alpha: 1)
-            : NSColor(calibratedRed: 0.12, green: 0.16, blue: 0.22, alpha: 1)
-        head.addChildNode(Self.box(0.26, 0.1, 0.26, at: SCNVector3(0, 0.16, 0), color: hatColor))
-        node.addChildNode(Self.box(0.15, 0.52, 0.15, at: SCNVector3(-0.34, 1.24, 0.02), color: jacket))
-        node.addChildNode(Self.box(0.15, 0.52, 0.15, at: SCNVector3(0.34, 1.24, 0.02), color: jacket))
-        let rifle = Self.box(0.07, 0.08, 0.8, at: SCNVector3(0.3, 1.2, -0.3), color: NSColor(calibratedRed: 0.16, green: 0.15, blue: 0.12, alpha: 1))
-        rifle.eulerAngles.x = -0.12
-        node.addChildNode(rifle)
+        head = CharacterMesh.attach(
+            to: node,
+            team: team,
+            variant: id,
+            name: "\(prefix)\(id)",
+            headName: "\(prefix)\(id)\(NodeName.headSuffix)"
+        )
     }
 
     func update(
@@ -121,9 +90,7 @@ final class BotActor {
             let resolved = Collision.resolve(position: pos, proposed: next, radius: 0.45, walls: walls)
             node.position = SCNVector3(resolved.x, 0, resolved.z)
             node.eulerAngles.y = CGFloat(atan2(-dir.x, -dir.z))
-            let swing = sin(wander * 8) * 0.18
-            leftLeg.eulerAngles.x = CGFloat(swing)
-            rightLeg.eulerAngles.x = CGFloat(-swing)
+            node.eulerAngles.x = CGFloat(sin(wander * 8) * 0.03)
         } else if len > 0.2 {
             node.eulerAngles.y = CGFloat(atan2(-dir.x, -dir.z))
         }
@@ -175,14 +142,6 @@ final class BotActor {
             current = node.parent
         }
         return false
-    }
-
-    private static func box(_ w: CGFloat, _ h: CGFloat, _ l: CGFloat, at: SCNVector3, color: NSColor) -> SCNNode {
-        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0)
-        g.firstMaterial = MapTextures.goldSrc(color)
-        let n = SCNNode(geometry: g)
-        n.position = at
-        return n
     }
 }
 

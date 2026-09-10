@@ -58,7 +58,6 @@ struct GameRules {
     static let defuseTime: TimeInterval = 5
     static let playerMaxHealth = 100
     static let botMaxHealth = 100
-    static let attackerCount = 4
     static let siteRadius: Float = 4.5
     static let playerSpeed: Float = 6.6
     static let walkMultiplier: Float = 0.52

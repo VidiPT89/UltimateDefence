@@ -1,196 +1,131 @@
 import SceneKit
 import AppKit
-
-enum NodeName {
-    static let player = "player"
-    static let camera = "fpsCamera"
-    static let ground = "ground"
-    static let site = "siteA"
-    static let botPrefix = "bot-"
-    static let headSuffix = "-head"
-}
-
-struct MapLayout {
-    let walls: [AABB]
-    let siteCenter: SIMD3<Float>
-    let playerSpawn: SIMD3<Float>
-    let attackerSpawns: [SIMD3<Float>]
-}
+import simd
 
 enum MapBuilder {
-    static func make() -> (SCNScene, MapLayout) {
-        let scene = SCNScene()
-        scene.background.contents = NSColor(calibratedRed: 0.58, green: 0.73, blue: 0.88, alpha: 1)
-        scene.fogStartDistance = 70
-        scene.fogEndDistance = 140
-        scene.fogColor = NSColor(calibratedRed: 0.62, green: 0.74, blue: 0.86, alpha: 1)
-
-        addLights(to: scene)
-        scene.rootNode.addParticleSystem(FX.dustField())
-
-        let ground = SCNBox(width: 66, height: 0.4, length: 66, chamferRadius: 0)
-        let groundTile: CGFloat = 32
-        ground.materials = Array(repeating: MapTextures.tiled(MapTextures.sand, repeatU: groundTile, repeatV: groundTile), count: 6)
-        let floor = SCNNode(geometry: ground)
-        floor.position = SCNVector3(0, -0.2, 0)
-        floor.name = NodeName.ground
-        scene.rootNode.addChildNode(floor)
-
-        var walls: [AABB] = []
-        func wall(x: Float, z: Float, w: Float, d: Float, h: Float = 3.6, texture: NSImage) {
-            let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
-            let ru = max(1, CGFloat(w / 2))
-            let rv = max(1, CGFloat(h / 2))
-            let rt = max(1, CGFloat(d / 2))
-            box.materials = [
-                MapTextures.tiled(texture, repeatU: ru, repeatV: rv),
-                MapTextures.tiled(texture, repeatU: rt, repeatV: rv),
-                MapTextures.tiled(texture, repeatU: ru, repeatV: rv),
-                MapTextures.tiled(texture, repeatU: rt, repeatV: rv),
-                MapTextures.tiled(texture, repeatU: ru, repeatV: rt),
-                MapTextures.tiled(texture, repeatU: ru, repeatV: rt)
-            ]
-            let node = SCNNode(geometry: box)
-            node.position = SCNVector3(x, h / 2, z)
-            scene.rootNode.addChildNode(node)
-            walls.append(AABB(minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2))
+    static func make(_ arena: ArenaMap) -> (SCNScene, MapLayout) {
+        switch arena {
+        case .sandlot: return sandlot()
+        case .dust2: return dust2()
+        case .mill: return mill()
         }
+    }
 
-        wall(x: 0, z: -32, w: 64, d: 1.4, texture: MapTextures.sandstone)
-        wall(x: 0, z: 32, w: 64, d: 1.4, texture: MapTextures.sandstone)
-        wall(x: -32, z: 0, w: 1.4, d: 64, texture: MapTextures.sandstone)
-        wall(x: 32, z: 0, w: 1.4, d: 64, texture: MapTextures.sandstone)
-
-        wall(x: -12, z: -8, w: 14, d: 1.6, texture: MapTextures.sandstone)
-        wall(x: 8, z: 6, w: 1.6, d: 18, texture: MapTextures.sandstone)
-        wall(x: -4, z: 14, w: 16, d: 1.6, texture: MapTextures.sandstone)
-        wall(x: 16, z: -14, w: 10, d: 1.6, texture: MapTextures.sandstone)
-        wall(x: -18, z: 4, w: 1.6, d: 12, texture: MapTextures.sandstone)
-        wall(x: 10, z: -4, w: 8, d: 1.4, h: 3.2, texture: MapTextures.concrete)
-
-        addCrate(to: scene, x: 18, z: 18, w: 1.6, h: 1.6, d: 1.6, walls: &walls)
-        addCrate(to: scene, x: 19.7, z: 18, w: 1.6, h: 1.6, d: 1.6, walls: &walls)
-        addCrate(to: scene, x: 18.8, z: 18, w: 1.6, h: 1.6, d: 1.6, y: 1.6, walls: &walls)
-        addCrate(to: scene, x: 22, z: 16, w: 1.4, h: 1.4, d: 1.4, walls: &walls)
-        addCrate(to: scene, x: -20, z: -18, w: 1.8, h: 1.8, d: 1.6, walls: &walls)
-        addCrate(to: scene, x: 4, z: -20, w: 1.5, h: 1.5, d: 1.5, walls: &walls)
-        addCrate(to: scene, x: -8, z: 20, w: 1.6, h: 1.2, d: 1.6, walls: &walls)
-        addCrate(to: scene, x: -24, z: 18, w: 1.5, h: 1.5, d: 1.5, walls: &walls)
-        addCrate(to: scene, x: -23, z: 19.4, w: 1.5, h: 1.5, d: 1.5, walls: &walls)
-        addCrate(to: scene, x: -23.5, z: 18.6, w: 1.5, h: 1.5, d: 1.5, y: 1.5, walls: &walls)
-
-        addBarrel(to: scene, x: 12, z: -18, walls: &walls)
-        addBarrel(to: scene, x: 13.2, z: -16.8, walls: &walls)
-        addBarrel(to: scene, x: -6, z: -10, walls: &walls)
-
-        addLamps(to: scene, at: [SIMD3(0, 5.2, 0), SIMD3(14, 5.2, -10), SIMD3(-16, 5.2, 10), SIMD3(-20, 4.6, 20)])
-
-        let siteCenter = SIMD3<Float>(-22, 0, 22)
-        addSite(to: scene, center: siteCenter)
-
-        let layout = MapLayout(
-            walls: walls,
-            siteCenter: siteCenter,
-            playerSpawn: SIMD3<Float>(18, 1.64, -20),
-            attackerSpawns: [
-                SIMD3<Float>(-22, 1.5, -22),
-                SIMD3<Float>(-18, 1.5, -24),
-                SIMD3<Float>(-26, 1.5, -20),
-                SIMD3<Float>(-14, 1.5, -22)
-            ]
+    private static func sandlot() -> (SCNScene, MapLayout) {
+        let kit = MapKit(
+            sky: NSColor(calibratedRed: 0.58, green: 0.73, blue: 0.88, alpha: 1),
+            fog: NSColor(calibratedRed: 0.62, green: 0.74, blue: 0.86, alpha: 1),
+            wall: MapTextures.sandstone,
+            ground: MapTextures.sand,
+            groundSize: 68
         )
-        return (scene, layout)
+        kit.wall(x: 0, z: -33, w: 66, d: 1.4)
+        kit.wall(x: 0, z: 33, w: 66, d: 1.4)
+        kit.wall(x: -33, z: 0, w: 1.4, d: 66)
+        kit.wall(x: 33, z: 0, w: 1.4, d: 66)
+        kit.wall(x: -12, z: -8, w: 14, d: 1.6)
+        kit.wall(x: 8, z: 6, w: 1.6, d: 18)
+        kit.wall(x: -4, z: 14, w: 16, d: 1.6)
+        kit.wall(x: 16, z: -14, w: 10, d: 1.6)
+        kit.wall(x: -18, z: 4, w: 1.6, d: 12)
+        kit.wall(x: 10, z: -4, w: 8, d: 1.4, h: 3.2, texture: MapTextures.concrete)
+        kit.crate(x: 18, z: 18)
+        kit.crate(x: 19.7, z: 18)
+        kit.crate(x: 18.8, z: 18, y: 1.5)
+        kit.crate(x: -24, z: 20)
+        kit.crate(x: -22.4, z: 21.2)
+        kit.crate(x: -23.2, z: 20.5, y: 1.5)
+        kit.barrel(x: 12, z: -18)
+        kit.barrel(x: 13.2, z: -16.8)
+        kit.lamps([SIMD3(0, 5, 0), SIMD3(14, 5, -10), SIMD3(-16, 5, 10), SIMD3(-20, 4.8, 20)])
+        let site = SIMD3<Float>(-22, 0, 22)
+        kit.site(at: site)
+        return (kit.scene, kit.layout(
+            site: site,
+            player: SIMD3(18, 1.64, -20),
+            terrorists: Self.cluster(SIMD3(-22, 0, -22), count: 5, alongX: true),
+            defenders: Self.cluster(SIMD3(16, 0, -18), count: 4, alongX: true)
+        ))
     }
 
-    private static func addSite(to scene: SCNScene, center: SIMD3<Float>) {
-        let pad = SCNCylinder(radius: 4.5, height: 0.04)
-        pad.firstMaterial = MapTextures.goldSrc(NSColor(calibratedRed: 0.55, green: 0.18, blue: 0.12, alpha: 1))
-        let siteNode = SCNNode(geometry: pad)
-        siteNode.name = NodeName.site
-        siteNode.position = SCNVector3(center.x, 0.02, center.z)
-        scene.rootNode.addChildNode(siteNode)
-
-        let c4 = SCNBox(width: 0.42, height: 0.14, length: 0.28, chamferRadius: 0)
-        c4.firstMaterial = MapTextures.goldSrc(NSColor(calibratedRed: 0.12, green: 0.14, blue: 0.12, alpha: 1))
-        let c4Node = SCNNode(geometry: c4)
-        c4Node.position = SCNVector3(center.x, 0.12, center.z)
-        scene.rootNode.addChildNode(c4Node)
+    private static func dust2() -> (SCNScene, MapLayout) {
+        let kit = MapKit(
+            sky: NSColor(calibratedRed: 0.62, green: 0.78, blue: 0.92, alpha: 1),
+            fog: NSColor(calibratedRed: 0.7, green: 0.78, blue: 0.86, alpha: 1),
+            wall: MapTextures.sandstone,
+            ground: MapTextures.sand,
+            groundSize: 84
+        )
+        kit.wall(x: 0, z: -40, w: 80, d: 1.6)
+        kit.wall(x: 0, z: 40, w: 80, d: 1.6)
+        kit.wall(x: -40, z: 0, w: 1.6, d: 80)
+        kit.wall(x: 40, z: 0, w: 1.6, d: 80)
+        kit.wall(x: 22, z: -8, w: 1.6, d: 36)
+        kit.wall(x: 30, z: 10, w: 16, d: 1.6)
+        kit.wall(x: -6, z: -6, w: 18, d: 1.6)
+        kit.wall(x: -18, z: 8, w: 1.6, d: 22)
+        kit.wall(x: 6, z: 18, w: 22, d: 1.6)
+        kit.wall(x: -28, z: -16, w: 12, d: 1.6)
+        kit.wall(x: 10, z: -22, w: 1.6, d: 14, h: 3.2, texture: MapTextures.concrete)
+        kit.crate(x: 26, z: 28, w: 1.7, h: 1.7, d: 1.7)
+        kit.crate(x: 28, z: 28, w: 1.7, h: 1.7, d: 1.7)
+        kit.crate(x: 27, z: 28, y: 1.7)
+        kit.crate(x: 24, z: 24)
+        kit.crate(x: -8, z: 22)
+        kit.crate(x: 12, z: -28)
+        kit.barrel(x: 18, z: -12)
+        kit.barrel(x: -12, z: -20)
+        kit.lamps([SIMD3(22, 5.2, 22), SIMD3(0, 5.2, 0), SIMD3(-20, 5, -20), SIMD3(24, 5, -18)])
+        let site = SIMD3<Float>(26, 0, 30)
+        kit.site(at: site)
+        return (kit.scene, kit.layout(
+            site: site,
+            player: SIMD3(8, 1.64, 32),
+            terrorists: Self.cluster(SIMD3(-8, 0, -32), count: 5, alongX: true),
+            defenders: Self.cluster(SIMD3(12, 0, 30), count: 4, alongX: true)
+        ))
     }
 
-    private static func addLamps(to scene: SCNScene, at points: [SIMD3<Float>]) {
-        for p in points {
-            let housing = SCNBox(width: 0.7, height: 0.12, length: 0.7, chamferRadius: 0)
-            housing.firstMaterial = MapTextures.goldSrc(MapTextures.metal)
-            let lamp = SCNNode(geometry: housing)
-            lamp.position = SCNVector3(p.x, p.y, p.z)
-            scene.rootNode.addChildNode(lamp)
+    private static func mill() -> (SCNScene, MapLayout) {
+        let kit = MapKit(
+            sky: NSColor(calibratedRed: 0.45, green: 0.52, blue: 0.58, alpha: 1),
+            fog: NSColor(calibratedRed: 0.5, green: 0.54, blue: 0.56, alpha: 1),
+            wall: MapTextures.concrete,
+            ground: MapTextures.metal,
+            groundSize: 64
+        )
+        kit.wall(x: 0, z: -30, w: 60, d: 1.4)
+        kit.wall(x: 0, z: 30, w: 60, d: 1.4)
+        kit.wall(x: -30, z: 0, w: 1.4, d: 60)
+        kit.wall(x: 30, z: 0, w: 1.4, d: 60)
+        kit.wall(x: -10, z: 0, w: 1.5, d: 28, texture: MapTextures.sandstone)
+        kit.wall(x: 10, z: 6, w: 1.5, d: 22, texture: MapTextures.sandstone)
+        kit.wall(x: 0, z: -10, w: 20, d: 1.5, texture: MapTextures.sandstone)
+        kit.wall(x: 0, z: 16, w: 14, d: 1.5, texture: MapTextures.sandstone)
+        kit.crate(x: -18, z: 18, w: 1.8, h: 2.2, d: 1.8)
+        kit.crate(x: -16, z: 18, w: 1.8, h: 1.4, d: 1.8)
+        kit.crate(x: 16, z: -16)
+        kit.crate(x: 18, z: 20)
+        kit.barrel(x: 4, z: 8)
+        kit.barrel(x: 5.2, z: 9)
+        kit.lamps([SIMD3(-12, 4.8, 12), SIMD3(12, 4.8, -8), SIMD3(0, 5, 0), SIMD3(-18, 4.6, -16)])
+        let site = SIMD3<Float>(-18, 0, 22)
+        kit.site(at: site)
+        return (kit.scene, kit.layout(
+            site: site,
+            player: SIMD3(18, 1.64, -22),
+            terrorists: Self.cluster(SIMD3(-20, 0, -22), count: 5, alongX: true),
+            defenders: Self.cluster(SIMD3(16, 0, -20), count: 4, alongX: true)
+        ))
+    }
 
-            let bulb = SCNNode()
-            bulb.light = SCNLight()
-            bulb.light?.type = .spot
-            bulb.light?.spotInnerAngle = 40
-            bulb.light?.spotOuterAngle = 78
-            bulb.light?.color = NSColor(calibratedRed: 1, green: 0.86, blue: 0.62, alpha: 1)
-            bulb.light?.intensity = 650
-            bulb.light?.castsShadow = false
-            bulb.eulerAngles = SCNVector3(-CGFloat.pi / 2, 0, 0)
-            bulb.position = SCNVector3(p.x, p.y - 0.2, p.z)
-            scene.rootNode.addChildNode(bulb)
+    private static func cluster(_ origin: SIMD3<Float>, count: Int, alongX: Bool) -> [SIMD3<Float>] {
+        (0..<count).map { index in
+            let offset = (Float(index) - Float(count - 1) / 2) * 2.2
+            if alongX {
+                return SIMD3(origin.x + offset, 0, origin.z)
+            }
+            return SIMD3(origin.x, 0, origin.z + offset)
         }
-    }
-
-    private static func addLights(to scene: SCNScene) {
-        let ambient = SCNNode()
-        ambient.light = SCNLight()
-        ambient.light?.type = .ambient
-        ambient.light?.intensity = 420
-        ambient.light?.color = NSColor(calibratedRed: 0.78, green: 0.74, blue: 0.62, alpha: 1)
-        scene.rootNode.addChildNode(ambient)
-
-        let sun = SCNNode()
-        sun.light = SCNLight()
-        sun.light?.type = .directional
-        sun.light?.intensity = 780
-        sun.light?.color = NSColor(calibratedRed: 1, green: 0.94, blue: 0.78, alpha: 1)
-        sun.light?.castsShadow = false
-        sun.eulerAngles = SCNVector3(-0.95, 0.7, 0)
-        scene.rootNode.addChildNode(sun)
-    }
-
-    private static func addCrate(
-        to scene: SCNScene,
-        x: Float,
-        z: Float,
-        w: Float,
-        h: Float,
-        d: Float,
-        y: Float = 0,
-        walls: inout [AABB]
-    ) {
-        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
-        let ru = max(1, CGFloat(w))
-        let rv = max(1, CGFloat(h))
-        let rt = max(1, CGFloat(d))
-        box.materials = [
-            MapTextures.tiled(MapTextures.crate, repeatU: ru, repeatV: rv),
-            MapTextures.tiled(MapTextures.crate, repeatU: rt, repeatV: rv),
-            MapTextures.tiled(MapTextures.crate, repeatU: ru, repeatV: rv),
-            MapTextures.tiled(MapTextures.crate, repeatU: rt, repeatV: rv),
-            MapTextures.tiled(MapTextures.crate, repeatU: ru, repeatV: rt),
-            MapTextures.tiled(MapTextures.crate, repeatU: ru, repeatV: rt)
-        ]
-        let node = SCNNode(geometry: box)
-        node.position = SCNVector3(x, y + h / 2, z)
-        scene.rootNode.addChildNode(node)
-        walls.append(AABB(minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2))
-    }
-
-    private static func addBarrel(to scene: SCNScene, x: Float, z: Float, walls: inout [AABB]) {
-        let cyl = SCNCylinder(radius: 0.38, height: 1.1)
-        cyl.firstMaterial = MapTextures.goldSrc(MapTextures.hazard)
-        let node = SCNNode(geometry: cyl)
-        node.position = SCNVector3(x, 0.55, z)
-        scene.rootNode.addChildNode(node)
-        walls.append(AABB(minX: x - 0.4, maxX: x + 0.4, minZ: z - 0.4, maxZ: z + 0.4))
     }
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		096E3E38DA174BADC4A6C9F6 /* MatchConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B56FD732AEF947219518DFB /* MatchConfig.swift */; };
 		14210416560DF4CA18554448 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B8C5F52F991BADB3B5B57E7 /* L10n.swift */; };
 		1FC3351CC8ED974F7C852057 /* BotActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F353C5B66BE5DBFC692629A /* BotActor.swift */; };
 		36BCE65EA78A51D93BEF4861 /* GameRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE643867503408AC169E47 /* GameRules.swift */; };
@@ -29,6 +30,7 @@
 		CE4924412C9D5C33293EB881 /* Collision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9420E157C4A4A2DC783AD852 /* Collision.swift */; };
 		D401D3F6A10E5D9D979F2646 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A24C22D61AB8F4B68D8AE83 /* RootView.swift */; };
 		E1610D5374B7C9D919BE0F0E /* MapBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ABF2451B82F0ED2B103754 /* MapBuilder.swift */; };
+		FC37CE196157E8939C4A5C6D /* MapKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A59CDE0CB7938A7911EC75B /* MapKit.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,8 +48,10 @@
 		0BEAB5AD22D5DDFDE621415C /* GameWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorld.swift; sourceTree = "<group>"; };
 		1F353C5B66BE5DBFC692629A /* BotActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotActor.swift; sourceTree = "<group>"; };
 		29A6E07F683EF914F09B9C10 /* UltimateDefence.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UltimateDefence.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2B56FD732AEF947219518DFB /* MatchConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchConfig.swift; sourceTree = "<group>"; };
 		2CD2A6D9951865A6B5634E93 /* UDTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDTheme.swift; sourceTree = "<group>"; };
 		39C12CCAD1489F8611E89BED /* FX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FX.swift; sourceTree = "<group>"; };
+		3A59CDE0CB7938A7911EC75B /* MapKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapKit.swift; sourceTree = "<group>"; };
 		3B8C5F52F991BADB3B5B57E7 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
 		3EF1842BCDE0955C2B7DEC6C /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
 		4A24C22D61AB8F4B68D8AE83 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -130,6 +134,7 @@
 				39C12CCAD1489F8611E89BED /* FX.swift */,
 				0BEAB5AD22D5DDFDE621415C /* GameWorld.swift */,
 				52ABF2451B82F0ED2B103754 /* MapBuilder.swift */,
+				3A59CDE0CB7938A7911EC75B /* MapKit.swift */,
 				A904DB37884AD527D5495B15 /* MapTextures.swift */,
 				87B4DD48650809730878F70F /* PlayerController.swift */,
 			);
@@ -149,6 +154,7 @@
 			children = (
 				69DE643867503408AC169E47 /* GameRules.swift */,
 				909757D56B96DA4E6592071E /* GameSession.swift */,
+				2B56FD732AEF947219518DFB /* MatchConfig.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -276,7 +282,9 @@
 				14210416560DF4CA18554448 /* L10n.swift in Sources */,
 				623D639505B8CF302C71F388 /* LanguageManager.swift in Sources */,
 				E1610D5374B7C9D919BE0F0E /* MapBuilder.swift in Sources */,
+				FC37CE196157E8939C4A5C6D /* MapKit.swift in Sources */,
 				84151BDE4617480DFD6E3F76 /* MapTextures.swift in Sources */,
+				096E3E38DA174BADC4A6C9F6 /* MatchConfig.swift in Sources */,
 				3B269A4C526D770B195A67B9 /* MenuViews.swift in Sources */,
 				954101E433CF55DFE4EA8678 /* PlayerController.swift in Sources */,
 				D401D3F6A10E5D9D979F2646 /* RootView.swift in Sources */,

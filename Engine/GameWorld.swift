@@ -25,7 +25,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     init(session: GameSession, sounds: SoundManager) {
         self.session = session
         self.sounds = sounds
-        let built = MapBuilder.make()
+        let built = MapBuilder.make(session.arena)
         scene = built.0
         layout = built.1
         super.init()
@@ -63,8 +63,17 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         scene.rootNode.addChildNode(player.node)
 
         bots.forEach { $0.node.removeFromParentNode() }
-        bots = layout.attackerSpawns.enumerated().map { index, spawn in
-            let bot = BotActor(id: index, at: spawn)
+        let tCount = session.matchSize.rawValue
+        let ctCount = session.matchSize.allyCount
+        let tSpawns = Array(layout.attackerSpawns.prefix(tCount))
+        let ctSpawns = Array(layout.defenderSpawns.prefix(ctCount))
+        bots = tSpawns.enumerated().map { index, spawn in
+            let bot = BotActor(id: index, team: .terrorist, at: spawn)
+            scene.rootNode.addChildNode(bot.node)
+            return bot
+        }
+        bots += ctSpawns.enumerated().map { index, spawn in
+            let bot = BotActor(id: index, team: .counter, at: spawn)
             scene.rootNode.addChildNode(bot.node)
             return bot
         }
@@ -147,7 +156,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         FX.tracer(from: start, to: hit.worldCoordinates, in: scene.rootNode)
         FX.spark(at: hit.worldCoordinates, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
         let name = hit.node.name ?? hit.node.parent?.name ?? ""
-        guard name.hasPrefix(NodeName.botPrefix) else { return }
+        guard name.hasPrefix(NodeName.terroristPrefix) else { return }
         onMain { self.session.hitTick += 1 }
         sounds.playHit()
         let headshot = name.contains(NodeName.headSuffix)
@@ -156,7 +165,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             headshot: headshot,
             multiplier: player.currentStats.headshotMultiplier
         )
-        if let bot = bots.first(where: { name.hasPrefix("\(NodeName.botPrefix)\($0.id)") }) {
+        if let bot = bots.first(where: { $0.isTerrorist && name.hasPrefix("\(NodeName.terroristPrefix)\($0.id)") }) {
             let wasAlive = bot.isAlive
             bot.takeDamage(dmg)
             if wasAlive && !bot.isAlive {
@@ -166,11 +175,17 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     }
 
     private func updateBots(dt: Float, now: TimeInterval) {
+        let terrorists = bots.filter(\.isTerrorist)
+        let defenders = bots.filter { !$0.isTerrorist }
         for bot in bots where bot.isAlive {
+            let enemies = bot.isTerrorist ? defenders : terrorists
+            let allies = bot.isTerrorist ? terrorists : defenders
             let action = bot.update(
                 dt: dt,
                 now: now,
                 player: player,
+                allies: allies,
+                enemies: enemies,
                 site: layout.siteCenter,
                 walls: layout.walls,
                 bombPlanted: bombPlanted,
@@ -179,33 +194,49 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             switch action {
             case .idle:
                 break
-            case .shoot:
-                sounds.playShoot()
-                let muzzlePos = SCNVector3(
-                    bot.node.worldPosition.x,
-                    bot.node.worldPosition.y + 1.2,
-                    bot.node.worldPosition.z
-                )
-                FX.spark(at: muzzlePos, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
-                FX.tracer(from: muzzlePos, to: player.cameraNode.worldPosition, in: scene.rootNode)
-                let distance = Collision.distanceXZ(
-                    SIMD3(Float(bot.node.position.x), 0, Float(bot.node.position.z)),
-                    player.worldPosition
-                )
-                if Float.random(in: 0...1) < GameRules.botHitChance(distance: distance) {
-                    let before = player.health
-                    player.takeDamage(Int.random(in: 8...16))
-                    if player.health < before {
-                        onMain { self.session.damageTick += 1 }
-                        sounds.playHit()
-                    }
-                }
+            case .fireAtPlayer:
+                applyBotShot(from: bot, toPlayer: true, toBot: nil)
+            case .fireAtBot(let id):
+                let target = enemies.first { $0.id == id && $0.isAlive }
+                applyBotShot(from: bot, toPlayer: false, toBot: target)
             case .plant:
                 if !bombPlanted {
                     bombPlanted = true
                     sounds.playPlantBeep()
                 }
             }
+        }
+    }
+
+    private func applyBotShot(from bot: BotActor, toPlayer: Bool, toBot: BotActor?) {
+        sounds.playShoot()
+        let muzzlePos = SCNVector3(bot.node.worldPosition.x, bot.node.worldPosition.y + 1.2, bot.node.worldPosition.z)
+        let dest: SCNVector3
+        if toPlayer {
+            dest = player.cameraNode.worldPosition
+        } else if let toBot {
+            dest = SCNVector3(toBot.node.position.x, 1.3, toBot.node.position.z)
+        } else {
+            return
+        }
+        FX.spark(at: muzzlePos, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.72, blue: 0.25, alpha: 1))
+        FX.tracer(from: muzzlePos, to: dest, in: scene.rootNode)
+        let origin = SIMD3(Float(bot.node.position.x), 0, Float(bot.node.position.z))
+        let targetPos = toPlayer
+            ? player.worldPosition
+            : SIMD3(Float(toBot?.node.position.x ?? 0), 0, Float(toBot?.node.position.z ?? 0))
+        let distance = Collision.distanceXZ(origin, targetPos)
+        guard Float.random(in: 0...1) < GameRules.botHitChance(distance: distance) else { return }
+        if toPlayer {
+            let before = player.health
+            player.takeDamage(Int.random(in: 8...16))
+            if player.health < before {
+                onMain { self.session.damageTick += 1 }
+                sounds.playHit()
+            }
+        } else if let toBot {
+            toBot.takeDamage(Int.random(in: 10...22))
+            sounds.playHit()
         }
     }
 
@@ -236,7 +267,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         guard !roundClosed else { return }
         let timeLeft = max(0, GameRules.roundTime - roundElapsed)
         let bombLeft = max(0, GameRules.bombTime - bombElapsed)
-        let aliveBots = bots.filter(\.isAlive).count
+        let aliveBots = bots.filter { $0.isTerrorist && $0.isAlive }.count
         let result = GameRules.outcome(
             playerAlive: player.isAlive,
             attackersAlive: aliveBots,
@@ -276,7 +307,8 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let timeLeft = bombPlanted ? max(0, GameRules.bombTime - bombElapsed) : max(0, GameRules.roundTime - roundElapsed)
         let planted = bombPlanted
         let defuse = min(1, player.defuseProgress / GameRules.defuseTime)
-        let attackers = bots.filter(\.isAlive).count
+        let attackers = bots.filter { $0.isTerrorist && $0.isAlive }.count
+        let defenders = bots.filter { !$0.isTerrorist && $0.isAlive }.count + (player.isAlive ? 1 : 0)
         let reloading = CACurrentMediaTime() < player.reloadingUntil
         let moving = player.moving
         let aiming = player.aiming
@@ -289,6 +321,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             if self.session.bombPlanted != planted { self.session.bombPlanted = planted }
             if abs(self.session.defuseProgress - defuse) > 0.01 { self.session.defuseProgress = defuse }
             if self.session.attackersAlive != attackers { self.session.attackersAlive = attackers }
+            if self.session.defendersAlive != defenders { self.session.defendersAlive = defenders }
             if self.session.reloading != reloading { self.session.reloading = reloading }
             if self.session.moving != moving { self.session.moving = moving }
             if self.session.aiming != aiming { self.session.aiming = aiming }

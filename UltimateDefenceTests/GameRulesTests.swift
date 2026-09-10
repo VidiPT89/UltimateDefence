@@ -85,4 +85,10 @@ final class GameRulesTests: XCTestCase {
         XCTAssertLessThan(walk, run)
         XCTAssertLessThan(ads, run)
     }
+
+    func testMatchSizeCountsAllies() {
+        XCTAssertEqual(MatchSize.two.allyCount, 1)
+        XCTAssertEqual(MatchSize.three.allyCount, 2)
+        XCTAssertEqual(MatchSize.five.allyCount, 4)
+    }
 }

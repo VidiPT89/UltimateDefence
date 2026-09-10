@@ -10,6 +10,8 @@ enum NodeName {
     static let terroristPrefix = "bot-t-"
     static let counterPrefix = "bot-ct-"
     static let headSuffix = "-head"
+    static let solid = "solid"
+    static let trim = "trim"
 }
 
 enum WallOpening {
@@ -33,6 +35,7 @@ final class MapKit {
     var walls: [AABB] = []
     private let wallTexture: NSImage
     private let thickness: Float = 1.1
+    private let doorHeight: Float = 2.52
 
     init(sky: NSImage, fog: NSColor, wall: NSImage, ground: NSImage, groundSize: CGFloat) {
         wallTexture = wall
@@ -67,34 +70,109 @@ final class MapKit {
         spanX(z: minZ, minX: minX, maxX: maxX, gaps: south, h: h)
         spanZ(x: maxX, minZ: minZ, maxZ: maxZ, gaps: east, h: h)
         spanZ(x: minX, minZ: minZ, maxZ: maxZ, gaps: west, h: h)
+        slab(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, y: 0.02, h: 0.05, texture: MapTextures.concrete, name: NodeName.trim)
+        slab(minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, y: h - 0.12, h: 0.22, texture: MapTextures.concrete, name: NodeName.solid)
+        for opening in openings {
+            doorway(opening, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, h: h)
+        }
     }
 
-    func wall(x: Float, z: Float, w: Float, d: Float, h: Float = 4.4, texture: NSImage? = nil) {
+    func wall(
+        x: Float,
+        z: Float,
+        w: Float,
+        d: Float,
+        h: Float = 4.4,
+        y: Float = 0,
+        texture: NSImage? = nil,
+        collide: Bool = true
+    ) {
         let tex = texture ?? wallTexture
-        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
+        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0.02)
         box.materials = Self.tiledBox(tex, w: w, h: h, d: d)
         let node = SCNNode(geometry: box)
-        node.position = SCNVector3(x, h / 2, z)
+        node.name = collide ? NodeName.solid : NodeName.trim
+        node.position = SCNVector3(x, y + h / 2, z)
         scene.rootNode.addChildNode(node)
-        walls.append(AABB(minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2))
+        if y < 0.05, collide {
+            let cap = SCNBox(width: CGFloat(w + 0.08), height: 0.14, length: CGFloat(d + 0.08), chamferRadius: 0)
+            cap.materials = Self.tiledBox(MapTextures.concrete, w: w, h: 0.14, d: d)
+            let lid = SCNNode(geometry: cap)
+            lid.name = NodeName.trim
+            lid.position = SCNVector3(x, y + h + 0.05, z)
+            scene.rootNode.addChildNode(lid)
+        }
+        if collide {
+            walls.append(AABB(minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2, blocksSight: true))
+        }
+    }
+
+    func compound(minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float = 5.2) {
+        let t = thickness
+        wall(x: (minX + maxX) / 2, z: minZ, w: maxX - minX + t, d: t, h: h)
+        wall(x: (minX + maxX) / 2, z: maxZ, w: maxX - minX + t, d: t, h: h)
+        wall(x: minX, z: (minZ + maxZ) / 2, w: t, d: maxZ - minZ, h: h)
+        wall(x: maxX, z: (minZ + maxZ) / 2, w: t, d: maxZ - minZ, h: h)
     }
 
     func crate(x: Float, z: Float, w: Float = 1.5, h: Float = 1.5, d: Float = 1.5, y: Float = 0) {
-        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0.04)
+        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0.03)
         box.materials = Self.tiledBox(MapTextures.crate, w: w, h: h, d: d)
         let node = SCNNode(geometry: box)
+        node.name = NodeName.solid
         node.position = SCNVector3(x, y + h / 2, z)
         scene.rootNode.addChildNode(node)
-        walls.append(AABB(minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2))
+        let strap = SCNBox(width: CGFloat(w + 0.04), height: 0.08, length: CGFloat(d + 0.04), chamferRadius: 0)
+        strap.firstMaterial = MapTextures.goldSrc(MapTextures.metal)
+        for offset in [-h * 0.28, h * 0.28] {
+            let band = SCNNode(geometry: strap)
+            band.position = SCNVector3(x, y + h / 2 + offset, z)
+            scene.rootNode.addChildNode(band)
+        }
+        walls.append(AABB(minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2, blocksSight: false))
     }
 
     func barrel(x: Float, z: Float) {
-        let cyl = SCNCylinder(radius: 0.38, height: 1.15)
+        let cyl = SCNCylinder(radius: 0.38, height: 1.12)
         cyl.firstMaterial = MapTextures.goldSrc(MapTextures.hazard)
         let node = SCNNode(geometry: cyl)
+        node.name = NodeName.solid
         node.position = SCNVector3(x, 0.58, z)
         scene.rootNode.addChildNode(node)
-        walls.append(AABB(minX: x - 0.4, maxX: x + 0.4, minZ: z - 0.4, maxZ: z + 0.4))
+        let ring = SCNTorus(ringRadius: 0.39, pipeRadius: 0.035)
+        ring.firstMaterial = MapTextures.goldSrc(MapTextures.metal)
+        for y in [0.18, 0.58, 0.98] as [Float] {
+            let rim = SCNNode(geometry: ring)
+            rim.position = SCNVector3(x, y, z)
+            scene.rootNode.addChildNode(rim)
+        }
+        let lid = SCNCylinder(radius: 0.36, height: 0.05)
+        lid.firstMaterial = MapTextures.goldSrc(MapTextures.metal)
+        let cap = SCNNode(geometry: lid)
+        cap.position = SCNVector3(x, 1.16, z)
+        scene.rootNode.addChildNode(cap)
+        walls.append(AABB(minX: x - 0.4, maxX: x + 0.4, minZ: z - 0.4, maxZ: z + 0.4, blocksSight: false))
+    }
+
+    func pillar(x: Float, z: Float, h: Float = 4.2) {
+        wall(x: x, z: z, w: 0.72, d: 0.72, h: h, texture: MapTextures.concrete)
+        wall(x: x, z: z, w: 0.92, d: 0.92, h: 0.22, y: 0, texture: MapTextures.concrete, collide: false)
+        wall(x: x, z: z, w: 0.88, d: 0.88, h: 0.18, y: h - 0.18, texture: MapTextures.concrete, collide: false)
+    }
+
+    func pipe(from: SIMD3<Float>, to: SIMD3<Float>) {
+        let dx = to.x - from.x
+        let dy = to.y - from.y
+        let dz = to.z - from.z
+        let length = hypot(hypot(dx, dy), dz)
+        guard length > 0.3 else { return }
+        let cyl = SCNCylinder(radius: 0.09, height: CGFloat(length))
+        cyl.firstMaterial = MapTextures.goldSrc(MapTextures.metal)
+        let node = SCNNode(geometry: cyl)
+        node.position = SCNVector3((from.x + to.x) / 2, (from.y + to.y) / 2, (from.z + to.z) / 2)
+        node.look(at: SCNVector3(to.x, to.y, to.z))
+        node.eulerAngles.x += .pi / 2
+        scene.rootNode.addChildNode(node)
     }
 
     func water(minX: Float, maxX: Float, minZ: Float, maxZ: Float) {
@@ -132,11 +210,55 @@ final class MapKit {
             bulb.light = SCNLight()
             bulb.light?.type = .omni
             bulb.light?.color = NSColor(calibratedRed: 1, green: 0.92, blue: 0.74, alpha: 1)
-            bulb.light?.intensity = 520
-            bulb.light?.attenuationEndDistance = 22
+            bulb.light?.intensity = 780
+            bulb.light?.attenuationEndDistance = 26
             bulb.position = SCNVector3(p.x, p.y - 0.25, p.z)
             scene.rootNode.addChildNode(bulb)
         }
+    }
+
+    private func slab(minX: Float, maxX: Float, minZ: Float, maxZ: Float, y: Float, h: Float, texture: NSImage, name: String) {
+        let w = maxX - minX
+        let d = maxZ - minZ
+        guard w > 1, d > 1 else { return }
+        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
+        box.materials = Self.tiledBox(texture, w: w, h: h, d: d)
+        let node = SCNNode(geometry: box)
+        node.name = name
+        node.position = SCNVector3((minX + maxX) / 2, y + h / 2, (minZ + maxZ) / 2)
+        scene.rootNode.addChildNode(node)
+    }
+
+    private func doorway(_ opening: WallOpening, minX: Float, maxX: Float, minZ: Float, maxZ: Float, h: Float) {
+        let lintel = max(0.6, h - doorHeight)
+        switch opening {
+        case .north(let center, let width):
+            wall(x: center, z: maxZ, w: width, d: thickness, h: lintel, y: doorHeight, collide: false)
+            frameX(center: center, z: maxZ, width: width)
+        case .south(let center, let width):
+            wall(x: center, z: minZ, w: width, d: thickness, h: lintel, y: doorHeight, collide: false)
+            frameX(center: center, z: minZ, width: width)
+        case .east(let center, let width):
+            wall(x: maxX, z: center, w: thickness, d: width, h: lintel, y: doorHeight, collide: false)
+            frameZ(center: center, x: maxX, width: width)
+        case .west(let center, let width):
+            wall(x: minX, z: center, w: thickness, d: width, h: lintel, y: doorHeight, collide: false)
+            frameZ(center: center, x: minX, width: width)
+        }
+    }
+
+    private func frameX(center: Float, z: Float, width: Float) {
+        let wood = MapTextures.wood
+        wall(x: center - width / 2, z: z, w: 0.18, d: thickness + 0.16, h: doorHeight, y: 0, texture: wood, collide: false)
+        wall(x: center + width / 2, z: z, w: 0.18, d: thickness + 0.16, h: doorHeight, y: 0, texture: wood, collide: false)
+        wall(x: center, z: z, w: width + 0.2, d: thickness + 0.16, h: 0.16, y: doorHeight - 0.08, texture: wood, collide: false)
+    }
+
+    private func frameZ(center: Float, x: Float, width: Float) {
+        let wood = MapTextures.wood
+        wall(x: x, z: center - width / 2, w: thickness + 0.16, d: 0.18, h: doorHeight, y: 0, texture: wood, collide: false)
+        wall(x: x, z: center + width / 2, w: thickness + 0.16, d: 0.18, h: doorHeight, y: 0, texture: wood, collide: false)
+        wall(x: x, z: center, w: thickness + 0.16, d: width + 0.2, h: 0.16, y: doorHeight - 0.08, texture: wood, collide: false)
     }
 
     func layout(
@@ -190,23 +312,23 @@ final class MapKit {
         let ambient = SCNNode()
         ambient.light = SCNLight()
         ambient.light?.type = .ambient
-        ambient.light?.intensity = 240
-        ambient.light?.color = NSColor(calibratedRed: 0.72, green: 0.66, blue: 0.52, alpha: 1)
+        ambient.light?.intensity = 220
+        ambient.light?.color = NSColor(calibratedRed: 0.48, green: 0.46, blue: 0.42, alpha: 1)
         scene.rootNode.addChildNode(ambient)
         let sun = SCNNode()
         sun.light = SCNLight()
         sun.light?.type = .directional
-        sun.light?.intensity = 1500
-        sun.light?.color = NSColor(calibratedRed: 1, green: 0.96, blue: 0.84, alpha: 1)
+        sun.light?.intensity = 2400
+        sun.light?.color = NSColor(calibratedRed: 1, green: 0.94, blue: 0.82, alpha: 1)
         sun.light?.castsShadow = false
         sun.eulerAngles = SCNVector3(-0.9, 0.65, 0)
         scene.rootNode.addChildNode(sun)
     }
 
     private static func tiledBox(_ tex: NSImage, w: Float, h: Float, d: Float) -> [SCNMaterial] {
-        let ru = max(1, CGFloat(w / 0.7))
-        let rv = max(1, CGFloat(h / 0.7))
-        let rt = max(1, CGFloat(d / 0.7))
+        let ru = max(1, CGFloat(w / 0.42))
+        let rv = max(1, CGFloat(h / 0.42))
+        let rt = max(1, CGFloat(d / 0.42))
         return [
             MapTextures.tiled(tex, repeatU: ru, repeatV: rv),
             MapTextures.tiled(tex, repeatU: rt, repeatV: rv),

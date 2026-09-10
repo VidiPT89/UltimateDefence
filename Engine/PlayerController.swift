@@ -27,6 +27,7 @@ final class PlayerController {
     var crouching = false
     var punch: Float = 0
     var roundStart: TimeInterval = 0
+    var velocity = SIMD3<Float>(repeating: 0)
     private var lastSlot: WeaponSlot?
 
     var isAlive: Bool { health > 0 }
@@ -38,14 +39,15 @@ final class PlayerController {
         node.position = SCNVector3(spawn.x, spawn.y, spawn.z)
         cameraNode.name = NodeName.camera
         cameraNode.camera = SCNCamera()
-        cameraNode.camera?.fieldOfView = 75
-        cameraNode.camera?.zNear = 0.05
+        cameraNode.camera?.fieldOfView = 88
+        cameraNode.camera?.zNear = 0.12
         cameraNode.camera?.zFar = 220
-        cameraNode.camera?.wantsHDR = false
-        cameraNode.camera?.bloomIntensity = 0
+        cameraNode.camera?.wantsHDR = true
+        cameraNode.camera?.bloomIntensity = 0.22
         cameraNode.camera?.motionBlurIntensity = 0
-        cameraNode.camera?.vignettingIntensity = 0
-        cameraNode.camera?.screenSpaceAmbientOcclusionIntensity = 0
+        cameraNode.camera?.vignettingIntensity = 0.22
+        cameraNode.camera?.screenSpaceAmbientOcclusionIntensity = 0.7
+        cameraNode.camera?.screenSpaceAmbientOcclusionRadius = 1.8
         cameraNode.position = SCNVector3Zero
         if cameraNode.parent !== node {
             node.addChildNode(cameraNode)
@@ -90,7 +92,7 @@ final class PlayerController {
         let standEye: Float = 1.64
         let crouchEye: Float = 1.18
         let layoutEye = crouching ? crouchEye : standEye
-        let targetFOV: CGFloat = aiming ? 58 : 75
+        let targetFOV: CGFloat = aiming ? 62 : 88
         if let cam = cameraNode.camera {
             cam.fieldOfView += (targetFOV - cam.fieldOfView) * CGFloat(min(1, dt * 10))
         }
@@ -108,25 +110,31 @@ final class PlayerController {
         }
 
         if !moving {
+            velocity *= max(0, 1 - dt * 10)
             bob = max(0, bob - dt * 6)
-            cameraNode.position.y = CGFloat(sin(bob) * 0.01)
+            cameraNode.position.y = CGFloat(sin(bob) * 0.014)
             node.position.y = CGFloat(y)
             return
         }
         dir /= length
-        bob += dt * (walking ? 7 : crouching ? 6 : 12)
-        cameraNode.position = SCNVector3(sin(bob) * 0.012, sin(bob * 2) * 0.028, 0)
         var speed = GameRules.playerSpeed
         if walking { speed *= GameRules.walkMultiplier }
         if crouching { speed *= GameRules.crouchMultiplier }
         if aiming { speed *= 0.78 }
-        let proposed = SIMD3(Float(node.position.x), y, Float(node.position.z)) + dir * speed * dt
+        let target = dir * speed
+        velocity += (target - velocity) * min(1, dt * 11)
+        bob += dt * (walking ? 7 : crouching ? 6 : 12)
+        cameraNode.position = SCNVector3(sin(bob) * 0.018, sin(bob * 2) * 0.038, 0)
+        let proposed = SIMD3(Float(node.position.x), y, Float(node.position.z)) + velocity * dt
         let resolved = Collision.resolve(
             position: SIMD3(Float(node.position.x), y, Float(node.position.z)),
             proposed: proposed,
             radius: 0.42,
             walls: walls
         )
+        if hypot(resolved.x - proposed.x, resolved.z - proposed.z) > 0.01 {
+            velocity = SIMD3(resolved.x - Float(node.position.x), 0, resolved.z - Float(node.position.z)) / max(dt, 0.001)
+        }
         node.position = SCNVector3(resolved.x, y, resolved.z)
     }
 

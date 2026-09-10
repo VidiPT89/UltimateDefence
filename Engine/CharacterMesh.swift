@@ -38,9 +38,19 @@ enum CharacterMesh {
         if team == .terrorist {
             root.addChildNode(box(0.22, 0.28, 0.16, at: SCNVector3(-0.02, 1.3, 0.18), color: look.vestColor))
         }
-        let gun = box(0.06, 0.08, 0.42, at: SCNVector3(0.12, 1.38, -0.42), color: look.gun)
-        gun.eulerAngles.x = -0.08
-        root.addChildNode(gun)
+        root.addChildNode(box(0.1, 0.08, 0.08, at: SCNVector3(-0.14, 1.22, 0.16), color: look.vestColor))
+        root.addChildNode(box(0.1, 0.08, 0.08, at: SCNVector3(0.14, 1.22, 0.16), color: look.vestColor))
+        let stock = box(0.05, 0.07, 0.16, at: SCNVector3(0.12, 1.36, -0.18), color: look.gun)
+        let receiver = box(0.055, 0.07, 0.2, at: SCNVector3(0.12, 1.38, -0.36), color: look.gun)
+        let barrel = box(0.03, 0.03, 0.28, at: SCNVector3(0.12, 1.4, -0.58), color: look.gun)
+        let mag = box(0.04, 0.12, 0.06, at: SCNVector3(0.12, 1.3, -0.34), color: look.gun)
+        stock.eulerAngles.x = -0.08
+        receiver.eulerAngles.x = -0.08
+        barrel.eulerAngles.x = -0.08
+        root.addChildNode(stock)
+        root.addChildNode(receiver)
+        root.addChildNode(barrel)
+        root.addChildNode(mag)
         return head
     }
 
@@ -155,7 +165,14 @@ enum CharacterMesh {
         case .beanie:
             head.addChildNode(box(0.22, 0.1, 0.24, at: SCNVector3(0, 0.14, 0), color: NSColor(calibratedRed: 0.12, green: 0.14, blue: 0.12, alpha: 1)))
         case .helmet:
-            head.addChildNode(box(0.24, 0.12, 0.26, at: SCNVector3(0, 0.14, 0.01), color: NSColor(calibratedRed: 0.14, green: 0.16, blue: 0.14, alpha: 1)))
+            let pot = SCNSphere(radius: 0.13)
+            pot.segmentCount = 10
+            pot.firstMaterial = MapTextures.goldSrc(NSColor(calibratedRed: 0.14, green: 0.16, blue: 0.14, alpha: 1))
+            let helm = SCNNode(geometry: pot)
+            helm.position = SCNVector3(0, 0.1, 0.01)
+            helm.scale = SCNVector3(1.05, 0.72, 1.1)
+            head.addChildNode(helm)
+            head.addChildNode(box(0.22, 0.04, 0.08, at: SCNVector3(0, 0.02, 0.12), color: NSColor(calibratedRed: 0.12, green: 0.13, blue: 0.12, alpha: 1)))
         }
     }
 

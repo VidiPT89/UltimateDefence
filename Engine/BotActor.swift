@@ -40,19 +40,21 @@ final class BotActor {
         site: SIMD3<Float>,
         walls: [AABB],
         bombPlanted: Bool,
-        world: SCNNode
+        planterId: Int,
+        others: [BotActor]
     ) -> BotAction {
         guard isAlive else { return .idle }
         let pos = SIMD3(Float(node.position.x), 0, Float(node.position.z))
         let playerPos = player.worldPosition
-        var aim = site
+        let hold = holdPoint(site: site)
+        var aim = hold
         var canShoot = false
         var shootPlayer = false
         var shootBot: BotActor?
 
         if isTerrorist {
-            let seesPlayer = player.isAlive && visible(from: pos, to: playerPos, world: world)
-            let visibleEnemy = enemies.first { $0.isAlive && visible(from: pos, to: $0.xz, world: world) }
+            let seesPlayer = player.isAlive && visible(from: pos, to: playerPos, walls: walls)
+            let visibleEnemy = enemies.first { $0.isAlive && visible(from: pos, to: $0.xz, walls: walls) }
             if seesPlayer {
                 aim = playerPos
                 canShoot = true
@@ -61,31 +63,38 @@ final class BotActor {
                 aim = visibleEnemy.xz
                 canShoot = true
                 shootBot = visibleEnemy
-            } else if id == 0 {
+            } else if id == planterId && !bombPlanted {
                 aim = site
             } else {
-                aim = site
+                aim = hold
             }
         } else {
-            let visibleEnemy = enemies.first { $0.isAlive && visible(from: pos, to: $0.xz, world: world) }
+            let visibleEnemy = enemies.first { $0.isAlive && visible(from: pos, to: $0.xz, walls: walls) }
             if let visibleEnemy {
                 aim = visibleEnemy.xz
                 canShoot = true
                 shootBot = visibleEnemy
             } else {
-                aim = site
+                aim = hold
             }
         }
 
         var dir = SIMD3(aim.x - pos.x, 0, aim.z - pos.z)
         let len = simd_length(dir)
-        let hold = canShoot && len < 14
-        if len > 0.6, !hold || len > 9 {
+        let holdFire = canShoot && len < 12
+        if len > 0.7, !holdFire || len > 8 {
             dir /= len
             wander += dt * (canShoot ? 2.1 : 1)
-            let side = SIMD3(-dir.z, 0, dir.x) * sin(wander) * 0.5
+            let side = SIMD3(-dir.z, 0, dir.x) * sin(wander) * 0.45
             let speed = GameRules.botSpeed * (plantProgress > 0 ? 0.28 : 1)
-            let next = pos + (dir + side) * speed * dt
+            var next = pos + (dir + side) * speed * dt
+            for other in others where other.id != id && other.isAlive && other.team == team {
+                let o = other.xz
+                let gap = Collision.distanceXZ(next, o)
+                if gap < 0.95, gap > 0.01 {
+                    next += (next - o) / gap * (0.95 - gap)
+                }
+            }
             let resolved = Collision.resolve(position: pos, proposed: next, radius: 0.45, walls: walls)
             node.position = SCNVector3(resolved.x, 0, resolved.z)
             node.eulerAngles.y = CGFloat(atan2(-dir.x, -dir.z))
@@ -124,22 +133,15 @@ final class BotActor {
         }
     }
 
-    private func visible(from: SIMD3<Float>, to: SIMD3<Float>, world: SCNNode) -> Bool {
+    private func holdPoint(site: SIMD3<Float>) -> SIMD3<Float> {
+        let angle = Float(id) * 1.1 + (isTerrorist ? 0.4 : 2.2)
+        let radius: Float = isTerrorist ? 7.5 : 5.5
+        return SIMD3(site.x + cos(angle) * radius, 0, site.z + sin(angle) * radius)
+    }
+
+    private func visible(from: SIMD3<Float>, to: SIMD3<Float>, walls: [AABB]) -> Bool {
         guard Collision.distanceXZ(from, to) < 34 else { return false }
-        let origin = SCNVector3(from.x, from.y + 1.5, from.z)
-        let dest = SCNVector3(to.x, to.y + 1.4, to.z)
-        let hits = world.hitTestWithSegment(from: origin, to: dest, options: [
-            SCNHitTestOption.searchMode.rawValue: NSNumber(value: SCNHitTestSearchMode.closest.rawValue)
-        ])
-        guard let first = hits.first else { return true }
-        var current: SCNNode? = first.node
-        while let node = current {
-            let name = node.name ?? ""
-            if name == NodeName.player || name == NodeName.camera || name == "weaponRig" { return true }
-            if name.hasPrefix(NodeName.terroristPrefix) || name.hasPrefix(NodeName.counterPrefix) { return true }
-            current = node.parent
-        }
-        return false
+        return Collision.losClear(from, to, walls: walls)
     }
 }
 

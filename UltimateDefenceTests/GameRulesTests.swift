@@ -58,7 +58,7 @@ final class GameRulesTests: XCTestCase {
         let start = SIMD3<Float>(0, 1.6, -3)
         let proposed = SIMD3<Float>(0, 1.6, 0)
         let resolved = Collision.resolve(position: start, proposed: proposed, radius: 0.5, walls: [wall])
-        XCTAssertLessThan(resolved.z, -1)
+        XCTAssertFalse(Collision.isBlocked(resolved, radius: 0.5, walls: [wall]))
     }
 
     func testUnstickPushesOutOfWall() {
@@ -66,6 +66,33 @@ final class GameRulesTests: XCTestCase {
         let stuck = SIMD3<Float>(0, 0, 0)
         let free = Collision.unstick(stuck, radius: 0.4, walls: [wall])
         XCTAssertFalse(Collision.isBlocked(free, radius: 0.4, walls: [wall]))
+    }
+
+    func testLineOfSightBlockedByWall() {
+        let wall = AABB(minX: -2, maxX: 2, minZ: -0.4, maxZ: 0.4)
+        let a = SIMD3<Float>(0, 0, -6)
+        let b = SIMD3<Float>(0, 0, 6)
+        XCTAssertFalse(Collision.losClear(a, b, walls: [wall]))
+    }
+
+    func testLineOfSightOpenThroughDoorGap() {
+        let left = AABB(minX: -8, maxX: -2, minZ: -0.4, maxZ: 0.4)
+        let right = AABB(minX: 2, maxX: 8, minZ: -0.4, maxZ: 0.4)
+        let a = SIMD3<Float>(0, 0, -6)
+        let b = SIMD3<Float>(0, 0, 6)
+        XCTAssertTrue(Collision.losClear(a, b, walls: [left, right]))
+    }
+
+    func testMapsBlockSightAcrossRooms() {
+        for arena in ArenaMap.allCases {
+            let layout = MapBuilder.make(arena).1
+            let fromT = layout.attackerSpawns[0]
+            let toSite = layout.siteCenter
+            XCTAssertFalse(
+                Collision.losClear(fromT, toSite, walls: layout.walls),
+                "T spawn should not see site through walls on \(arena.rawValue)"
+            )
+        }
     }
 
     func testMapSpawnsAreWalkable() {
@@ -122,7 +149,7 @@ final class GameRulesTests: XCTestCase {
         XCTAssertEqual(MatchSize.six.allyCount, 5)
     }
 
-    func testPlayerDeathEndsTheRoundImmediately() {
+    func testPlayerDeathDoesNotEndRoundIfAlliesRemain() {
         let result = GameRules.outcome(
             playerAlive: false,
             defendersAlive: 3,
@@ -132,6 +159,26 @@ final class GameRulesTests: XCTestCase {
             bombTimeLeft: 40,
             defused: false
         )
+        XCTAssertEqual(result, .inProgress)
+    }
+
+    func testLastDefenderDeathEndsTheRound() {
+        let result = GameRules.outcome(
+            playerAlive: false,
+            defendersAlive: 0,
+            attackersAlive: 3,
+            timeLeft: 40,
+            bombPlanted: false,
+            bombTimeLeft: 40,
+            defused: false
+        )
         XCTAssertEqual(result, .attackersWinElimination)
+    }
+
+    func testCrateDoesNotBlockSight() {
+        let crate = AABB(minX: -1, maxX: 1, minZ: -1, maxZ: 1, blocksSight: false)
+        let a = SIMD3<Float>(0, 0, -4)
+        let b = SIMD3<Float>(0, 0, 4)
+        XCTAssertTrue(Collision.losClear(a, b, walls: [crate]))
     }
 }

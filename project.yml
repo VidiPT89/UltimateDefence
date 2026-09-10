@@ -1,0 +1,56 @@
+name: UltimateDefence
+options:
+  bundleIdPrefix: com.vidi
+  createIntermediateGroups: true
+configs:
+  Debug: debug
+  Release: release
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+targets:
+  UltimateDefence:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: UltimateDefenceApp.swift
+      - path: Models
+      - path: Engine
+      - path: Views
+      - path: Resources
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: "Ultimate Defence"
+        LSApplicationCategoryType: "public.app-category.action-games"
+        NSHumanReadableCopyright: "Copyright © 2026 David Arsénio Martins"
+        NSHighResolutionCapable: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.vidi.UltimateDefence
+        PRODUCT_NAME: UltimateDefence
+        MACOSX_DEPLOYMENT_TARGET: "13.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: true
+        GENERATE_INFOPLIST_FILE: false
+    scheme:
+      testTargets:
+        - UltimateDefenceTests
+  UltimateDefenceTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: UltimateDefenceTests
+    dependencies:
+      - target: UltimateDefence
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.vidi.UltimateDefence.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/UltimateDefence.app/Contents/MacOS/UltimateDefence"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        MACOSX_DEPLOYMENT_TARGET: "13.0"

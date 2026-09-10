@@ -1,0 +1,490 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1FC3351CC8ED974F7C852057 /* BotActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F353C5B66BE5DBFC692629A /* BotActor.swift */; };
+		36BCE65EA78A51D93BEF4861 /* GameRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE643867503408AC169E47 /* GameRules.swift */; };
+		3B269A4C526D770B195A67B9 /* MenuViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDBDA6CE0248F473EE4116B /* MenuViews.swift */; };
+		5E7EBD1EC56F6F9E01C39439 /* GameWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BEAB5AD22D5DDFDE621415C /* GameWorld.swift */; };
+		6A0726D14BCFE810909D56F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A80285572682944FE46267DB /* Assets.xcassets */; };
+		75CA6581CDADC20EC77ACC79 /* GameRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B71BC957B2C007D927F3647 /* GameRulesTests.swift */; };
+		954101E433CF55DFE4EA8678 /* PlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B4DD48650809730878F70F /* PlayerController.swift */; };
+		97C8288C3A5A698AEB31FA1A /* GameSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05AE6CD1527F7FF852DFB2F /* GameSceneView.swift */; };
+		9B456D6DCC89FFCCBAAF92C0 /* UltimateDefenceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73776F14207A17635276CA62 /* UltimateDefenceApp.swift */; };
+		A20E4A06A1B9AC36B62BF8F3 /* GameSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909757D56B96DA4E6592071E /* GameSession.swift */; };
+		A6908A33105D18A86826A3F7 /* HUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E71E51F1610A6A861740C /* HUDView.swift */; };
+		B129A89248304018A4F02D92 /* UDTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD2A6D9951865A6B5634E93 /* UDTheme.swift */; };
+		C7FF313FC52086AAC86AB4D6 /* FX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39C12CCAD1489F8611E89BED /* FX.swift */; };
+		CE4924412C9D5C33293EB881 /* Collision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9420E157C4A4A2DC783AD852 /* Collision.swift */; };
+		D401D3F6A10E5D9D979F2646 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A24C22D61AB8F4B68D8AE83 /* RootView.swift */; };
+		E1610D5374B7C9D919BE0F0E /* MapBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ABF2451B82F0ED2B103754 /* MapBuilder.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		EB145F11444B4753DA4A5015 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 38C0AD8F3647384AF114755E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 619BDE8760858796771A697F;
+			remoteInfo = UltimateDefence;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0BEAB5AD22D5DDFDE621415C /* GameWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorld.swift; sourceTree = "<group>"; };
+		1F353C5B66BE5DBFC692629A /* BotActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotActor.swift; sourceTree = "<group>"; };
+		29A6E07F683EF914F09B9C10 /* UltimateDefence.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UltimateDefence.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CD2A6D9951865A6B5634E93 /* UDTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDTheme.swift; sourceTree = "<group>"; };
+		39C12CCAD1489F8611E89BED /* FX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FX.swift; sourceTree = "<group>"; };
+		4A24C22D61AB8F4B68D8AE83 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		52ABF2451B82F0ED2B103754 /* MapBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapBuilder.swift; sourceTree = "<group>"; };
+		5FDBDA6CE0248F473EE4116B /* MenuViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViews.swift; sourceTree = "<group>"; };
+		69DE643867503408AC169E47 /* GameRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRules.swift; sourceTree = "<group>"; };
+		73776F14207A17635276CA62 /* UltimateDefenceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UltimateDefenceApp.swift; sourceTree = "<group>"; };
+		87B4DD48650809730878F70F /* PlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerController.swift; sourceTree = "<group>"; };
+		8B71BC957B2C007D927F3647 /* GameRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRulesTests.swift; sourceTree = "<group>"; };
+		909757D56B96DA4E6592071E /* GameSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSession.swift; sourceTree = "<group>"; };
+		923AEC0AA8A3C51B52854F48 /* UltimateDefenceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UltimateDefenceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9420E157C4A4A2DC783AD852 /* Collision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collision.swift; sourceTree = "<group>"; };
+		A80285572682944FE46267DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B05AE6CD1527F7FF852DFB2F /* GameSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneView.swift; sourceTree = "<group>"; };
+		B39E71E51F1610A6A861740C /* HUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		03B9058CA4680F00856E291A /* UltimateDefenceTests */ = {
+			isa = PBXGroup;
+			children = (
+				8B71BC957B2C007D927F3647 /* GameRulesTests.swift */,
+			);
+			path = UltimateDefenceTests;
+			sourceTree = "<group>";
+		};
+		1A5D07670C23D1ED82892D08 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				29A6E07F683EF914F09B9C10 /* UltimateDefence.app */,
+				923AEC0AA8A3C51B52854F48 /* UltimateDefenceTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		27874F59CBD67DB978937575 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B05AE6CD1527F7FF852DFB2F /* GameSceneView.swift */,
+				B39E71E51F1610A6A861740C /* HUDView.swift */,
+				5FDBDA6CE0248F473EE4116B /* MenuViews.swift */,
+				4A24C22D61AB8F4B68D8AE83 /* RootView.swift */,
+				2CD2A6D9951865A6B5634E93 /* UDTheme.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5171592F7DC2BF7D0C103B1B = {
+			isa = PBXGroup;
+			children = (
+				73776F14207A17635276CA62 /* UltimateDefenceApp.swift */,
+				AA758219A3EFB605B4866949 /* Engine */,
+				B8B0AD02AAF8F0AD873F6114 /* Models */,
+				AF124D8C3886C23B13DC03AD /* Resources */,
+				03B9058CA4680F00856E291A /* UltimateDefenceTests */,
+				27874F59CBD67DB978937575 /* Views */,
+				1A5D07670C23D1ED82892D08 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AA758219A3EFB605B4866949 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				1F353C5B66BE5DBFC692629A /* BotActor.swift */,
+				9420E157C4A4A2DC783AD852 /* Collision.swift */,
+				39C12CCAD1489F8611E89BED /* FX.swift */,
+				0BEAB5AD22D5DDFDE621415C /* GameWorld.swift */,
+				52ABF2451B82F0ED2B103754 /* MapBuilder.swift */,
+				87B4DD48650809730878F70F /* PlayerController.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		AF124D8C3886C23B13DC03AD /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A80285572682944FE46267DB /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		B8B0AD02AAF8F0AD873F6114 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				69DE643867503408AC169E47 /* GameRules.swift */,
+				909757D56B96DA4E6592071E /* GameSession.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		619BDE8760858796771A697F /* UltimateDefence */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B4B2BF90609F8E49FA00569C /* Build configuration list for PBXNativeTarget "UltimateDefence" */;
+			buildPhases = (
+				4D74567F084F8E6689C5819C /* Sources */,
+				B564FDD202A6A471E29BD570 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UltimateDefence;
+			packageProductDependencies = (
+			);
+			productName = UltimateDefence;
+			productReference = 29A6E07F683EF914F09B9C10 /* UltimateDefence.app */;
+			productType = "com.apple.product-type.application";
+		};
+		89C2F3E852AE28B4157B24E6 /* UltimateDefenceTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAD08C2BE382128802EE30F7 /* Build configuration list for PBXNativeTarget "UltimateDefenceTests" */;
+			buildPhases = (
+				42120B1023D0C3B8CE639BC6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				439858FDB8BA64273F7C7BF6 /* PBXTargetDependency */,
+			);
+			name = UltimateDefenceTests;
+			packageProductDependencies = (
+			);
+			productName = UltimateDefenceTests;
+			productReference = 923AEC0AA8A3C51B52854F48 /* UltimateDefenceTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		38C0AD8F3647384AF114755E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					619BDE8760858796771A697F = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					89C2F3E852AE28B4157B24E6 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 55AA496AE2D3CE4DB5B73D01 /* Build configuration list for PBXProject "UltimateDefence" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 5171592F7DC2BF7D0C103B1B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1A5D07670C23D1ED82892D08 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				619BDE8760858796771A697F /* UltimateDefence */,
+				89C2F3E852AE28B4157B24E6 /* UltimateDefenceTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B564FDD202A6A471E29BD570 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A0726D14BCFE810909D56F2 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		42120B1023D0C3B8CE639BC6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				75CA6581CDADC20EC77ACC79 /* GameRulesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D74567F084F8E6689C5819C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FC3351CC8ED974F7C852057 /* BotActor.swift in Sources */,
+				CE4924412C9D5C33293EB881 /* Collision.swift in Sources */,
+				C7FF313FC52086AAC86AB4D6 /* FX.swift in Sources */,
+				36BCE65EA78A51D93BEF4861 /* GameRules.swift in Sources */,
+				97C8288C3A5A698AEB31FA1A /* GameSceneView.swift in Sources */,
+				A20E4A06A1B9AC36B62BF8F3 /* GameSession.swift in Sources */,
+				5E7EBD1EC56F6F9E01C39439 /* GameWorld.swift in Sources */,
+				A6908A33105D18A86826A3F7 /* HUDView.swift in Sources */,
+				E1610D5374B7C9D919BE0F0E /* MapBuilder.swift in Sources */,
+				3B269A4C526D770B195A67B9 /* MenuViews.swift in Sources */,
+				954101E433CF55DFE4EA8678 /* PlayerController.swift in Sources */,
+				D401D3F6A10E5D9D979F2646 /* RootView.swift in Sources */,
+				B129A89248304018A4F02D92 /* UDTheme.swift in Sources */,
+				9B456D6DCC89FFCCBAAF92C0 /* UltimateDefenceApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		439858FDB8BA64273F7C7BF6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 619BDE8760858796771A697F /* UltimateDefence */;
+			targetProxy = EB145F11444B4753DA4A5015 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0BAD34D5F136E09CE67B2FC6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		3E2FF022F2AB077F938AC207 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vidi.UltimateDefence;
+				PRODUCT_NAME = UltimateDefence;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		5D291633E35CAA60B93665BF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vidi.UltimateDefence.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/UltimateDefence.app/Contents/MacOS/UltimateDefence";
+			};
+			name = Debug;
+		};
+		B0E2E2AE61E127E7305B22AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		BAA8CDD27D9A78DD589F3704 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vidi.UltimateDefence.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/UltimateDefence.app/Contents/MacOS/UltimateDefence";
+			};
+			name = Release;
+		};
+		EC1B498543100CA067D51AB5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vidi.UltimateDefence;
+				PRODUCT_NAME = UltimateDefence;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		55AA496AE2D3CE4DB5B73D01 /* Build configuration list for PBXProject "UltimateDefence" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B0E2E2AE61E127E7305B22AD /* Debug */,
+				0BAD34D5F136E09CE67B2FC6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B4B2BF90609F8E49FA00569C /* Build configuration list for PBXNativeTarget "UltimateDefence" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC1B498543100CA067D51AB5 /* Debug */,
+				3E2FF022F2AB077F938AC207 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DAD08C2BE382128802EE30F7 /* Build configuration list for PBXNativeTarget "UltimateDefenceTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5D291633E35CAA60B93665BF /* Debug */,
+				BAA8CDD27D9A78DD589F3704 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 38C0AD8F3647384AF114755E /* Project object */;
+}

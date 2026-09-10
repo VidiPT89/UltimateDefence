@@ -35,11 +35,7 @@ enum MapBuilder {
         scene.rootNode.addParticleSystem(FX.dustField())
 
         let floor = SCNNode(geometry: SCNFloor())
-        floor.geometry?.firstMaterial = pbr(
-            NSColor(calibratedRed: 0.16, green: 0.15, blue: 0.13, alpha: 1),
-            metal: 0.05,
-            rough: 0.92
-        )
+        floor.geometry?.firstMaterial = pbr(MapTextures.concrete, metal: 0.05, rough: 0.92)
         if let floorGeom = floor.geometry as? SCNFloor {
             floorGeom.reflectivity = 0.04
         }
@@ -48,9 +44,9 @@ enum MapBuilder {
         scene.rootNode.addChildNode(floor)
 
         var walls: [AABB] = []
-        func wall(x: Float, z: Float, w: Float, d: Float, h: Float = 4.4, color: NSColor, metal: CGFloat = 0.08) {
+        func wall(x: Float, z: Float, w: Float, d: Float, h: Float = 4.4, color: NSColor, metal: CGFloat = 0.08, texture: NSImage? = nil) {
             let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0.04)
-            box.firstMaterial = pbr(color, metal: metal, rough: 0.62)
+            box.firstMaterial = pbr(texture ?? color, metal: metal, rough: 0.62)
             let node = SCNNode(geometry: box)
             node.position = SCNVector3(x, h / 2, z)
             node.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(geometry: box, options: nil))
@@ -60,25 +56,28 @@ enum MapBuilder {
         }
 
         let concrete = NSColor(calibratedRed: 0.28, green: 0.27, blue: 0.24, alpha: 1)
-        let rust = NSColor(calibratedRed: 0.42, green: 0.22, blue: 0.12, alpha: 1)
-        let crate = NSColor(calibratedRed: 0.36, green: 0.27, blue: 0.14, alpha: 1)
+        wall(x: 0, z: -32, w: 64, d: 1.2, color: concrete, metal: 0.2, texture: MapTextures.concrete)
+        wall(x: 0, z: 32, w: 64, d: 1.2, color: concrete, metal: 0.2, texture: MapTextures.concrete)
+        wall(x: -32, z: 0, w: 1.2, d: 64, color: concrete, metal: 0.2, texture: MapTextures.concrete)
+        wall(x: 32, z: 0, w: 1.2, d: 64, color: concrete, metal: 0.2, texture: MapTextures.concrete)
 
-        wall(x: 0, z: -32, w: 64, d: 1.2, color: concrete, metal: 0.2)
-        wall(x: 0, z: 32, w: 64, d: 1.2, color: concrete, metal: 0.2)
-        wall(x: -32, z: 0, w: 1.2, d: 64, color: concrete, metal: 0.2)
-        wall(x: 32, z: 0, w: 1.2, d: 64, color: concrete, metal: 0.2)
+        wall(x: -12, z: -8, w: 14, d: 1.4, color: concrete, texture: MapTextures.rust)
+        wall(x: 8, z: 6, w: 1.4, d: 18, color: concrete, texture: MapTextures.rust)
+        wall(x: -4, z: 14, w: 16, d: 1.4, color: concrete, texture: MapTextures.rust)
+        wall(x: 16, z: -14, w: 10, d: 1.4, color: concrete, texture: MapTextures.rust)
+        wall(x: -18, z: 4, w: 1.4, d: 12, color: concrete, texture: MapTextures.rust)
+        wall(x: 10, z: -4, w: 8, d: 1.2, h: 2.8, color: concrete, texture: MapTextures.rust)
 
-        wall(x: -12, z: -8, w: 14, d: 1.4, color: rust)
-        wall(x: 8, z: 6, w: 1.4, d: 18, color: rust)
-        wall(x: -4, z: 14, w: 16, d: 1.4, color: rust)
-        wall(x: 16, z: -14, w: 10, d: 1.4, color: rust)
-        wall(x: -18, z: 4, w: 1.4, d: 12, color: rust)
+        wall(x: 18, z: 18, w: 3, d: 3, h: 2.2, color: concrete, texture: MapTextures.hazard)
+        wall(x: 22, z: 16, w: 2.4, d: 2.4, h: 1.6, color: concrete, texture: MapTextures.hazard)
+        wall(x: -20, z: -18, w: 3.2, d: 2.8, h: 2.0, color: concrete, texture: MapTextures.hazard)
+        wall(x: 4, z: -20, w: 2.6, d: 2.6, h: 1.8, color: concrete, texture: MapTextures.hazard)
+        wall(x: -8, z: 20, w: 2.8, d: 2.4, h: 1.7, color: concrete, texture: MapTextures.hazard)
+        wall(x: -24, z: 8, w: 2.2, d: 2.2, h: 1.5, color: concrete, texture: MapTextures.hazard)
 
-        wall(x: 18, z: 18, w: 3, d: 3, h: 2.2, color: crate)
-        wall(x: 22, z: 16, w: 2.4, d: 2.4, h: 1.6, color: crate)
-        wall(x: -20, z: -18, w: 3.2, d: 2.8, h: 2.0, color: crate)
-        wall(x: 4, z: -20, w: 2.6, d: 2.6, h: 1.8, color: crate)
-        wall(x: -8, z: 20, w: 2.8, d: 2.4, h: 1.7, color: crate)
+        addBarrel(to: scene, x: 12, z: -18, walls: &walls)
+        addBarrel(to: scene, x: 13.2, z: -16.8, walls: &walls)
+        addBarrel(to: scene, x: -6, z: -10, walls: &walls)
 
         addLamps(to: scene, at: [SIMD3(0, 5.2, 0), SIMD3(14, 5.2, -10), SIMD3(-16, 5.2, 10), SIMD3(-20, 4.6, 20)])
 
@@ -182,10 +181,21 @@ enum MapBuilder {
         scene.rootNode.addChildNode(sun)
     }
 
-    private static func pbr(_ color: NSColor, metal: CGFloat, rough: CGFloat) -> SCNMaterial {
+    private static func addBarrel(to scene: SCNScene, x: Float, z: Float, walls: inout [AABB]) {
+        let cyl = SCNCylinder(radius: 0.38, height: 1.1)
+        cyl.firstMaterial = pbr(MapTextures.hazard, metal: 0.35, rough: 0.4)
+        let node = SCNNode(geometry: cyl)
+        node.position = SCNVector3(x, 0.55, z)
+        scene.rootNode.addChildNode(node)
+        walls.append(AABB(minX: x - 0.4, maxX: x + 0.4, minZ: z - 0.4, maxZ: z + 0.4))
+    }
+
+    private static func pbr(_ contents: Any, metal: CGFloat, rough: CGFloat) -> SCNMaterial {
         let mat = SCNMaterial()
         mat.lightingModel = .physicallyBased
-        mat.diffuse.contents = color
+        mat.diffuse.contents = contents
+        mat.diffuse.wrapS = .repeat
+        mat.diffuse.wrapT = .repeat
         mat.metalness.contents = metal
         mat.roughness.contents = rough
         return mat

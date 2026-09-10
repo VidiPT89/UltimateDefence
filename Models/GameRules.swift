@@ -64,7 +64,10 @@ struct GameRules {
     static let attackerCount = 4
     static let siteRadius: Float = 4.5
     static let playerSpeed: Float = 8.5
-    static let botSpeed: Float = 5.2
+    static let sprintMultiplier: Float = 1.32
+    static let botSpeed: Float = 5.4
+    static let jumpVelocity: Float = 7.4
+    static let gravity: Float = 22
 
     static func applyDamage(base: Int, headshot: Bool, multiplier: Double) -> Int {
         let raw = headshot ? Double(base) * multiplier : Double(base)
@@ -89,5 +92,17 @@ struct GameRules {
         if attackersAlive <= 0 && !bombPlanted { return .defendersWinElimination }
         if !bombPlanted && timeLeft <= 0 { return .defendersWinTime }
         return .inProgress
+    }
+
+    static func botHitChance(distance: Float) -> Float {
+        let closeness = 1 - min(1, max(0, distance / 30))
+        return 0.14 + closeness * 0.36
+    }
+
+    static func aimSpread(moving: Bool, sprinting: Bool) -> Float {
+        var spread: Float = 0.008
+        if moving { spread += 0.018 }
+        if sprinting { spread += 0.012 }
+        return spread
     }
 }

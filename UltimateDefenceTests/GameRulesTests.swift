@@ -67,4 +67,18 @@ final class GameRulesTests: XCTestCase {
             XCTAssertNotEqual(pt, key.rawValue)
         }
     }
+
+    func testBotHitChanceFallsOffWithDistance() {
+        let close = GameRules.botHitChance(distance: 2)
+        let far = GameRules.botHitChance(distance: 28)
+        XCTAssertGreaterThan(close, far)
+        XCTAssertLessThanOrEqual(close, 0.55)
+        XCTAssertGreaterThanOrEqual(far, 0.14)
+    }
+
+    func testAimSpreadGrowsWhenMoving() {
+        let still = GameRules.aimSpread(moving: false, sprinting: false)
+        let run = GameRules.aimSpread(moving: true, sprinting: true)
+        XCTAssertGreaterThan(run, still)
+    }
 }

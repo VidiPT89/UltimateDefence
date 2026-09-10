@@ -32,6 +32,13 @@ final class BotActor {
         headGeom.firstMaterial = Self.pbr(NSColor(calibratedRed: 0.78, green: 0.58, blue: 0.46, alpha: 1), metal: 0.05, rough: 0.7)
         head = SCNNode(geometry: headGeom)
         head.name = "\(NodeName.botPrefix)\(id)\(NodeName.headSuffix)"
+        let visor = SCNBox(width: 0.38, height: 0.12, length: 0.18, chamferRadius: 0.02)
+        visor.firstMaterial = Self.pbr(NSColor(calibratedRed: 0.98, green: 0.45, blue: 0.08, alpha: 1), metal: 0.8, rough: 0.18)
+        visor.firstMaterial?.emission.contents = NSColor(calibratedRed: 0.98, green: 0.61, blue: 0, alpha: 1)
+        visor.firstMaterial?.emission.intensity = 0.6
+        let visorNode = SCNNode(geometry: visor)
+        visorNode.position = SCNVector3(0, 0.04, 0.16)
+        head.addChildNode(visorNode)
         head.position = SCNVector3(0, 0.95, 0)
         node.addChildNode(head)
 
@@ -57,11 +64,16 @@ final class BotActor {
         let toPlayer = Collision.distanceXZ(pos, playerPos)
         let seesPlayer = toPlayer < 28 && player.isAlive && hasLineOfSight(from: pos, to: playerPos, world: world)
 
+        let planter = id == 0
         let target: SIMD3<Float>
-        if seesPlayer && toPlayer < 16 {
+        if bombPlanted {
             target = playerPos
-        } else if bombPlanted {
+        } else if planter && toPlayer > 10 {
+            target = site
+        } else if seesPlayer && toPlayer < 18 {
             target = playerPos
+        } else if planter {
+            target = site
         } else {
             target = site
         }
@@ -71,14 +83,15 @@ final class BotActor {
         if len > 0.4 {
             dir /= len
             wander += dt
-            let side = SIMD3(-dir.z, 0, dir.x) * sin(wander) * 0.35
-            let next = pos + (dir + side) * GameRules.botSpeed * dt
+            let side = SIMD3(-dir.z, 0, dir.x) * sin(wander * (seesPlayer ? 2.4 : 1)) * (seesPlayer ? 0.7 : 0.35)
+            let speed = GameRules.botSpeed * (plantProgress > 0 ? 0.35 : 1)
+            let next = pos + (dir + side) * speed * dt
             let resolved = Collision.resolve(position: pos, proposed: next, radius: 0.5, walls: walls)
             node.position = SCNVector3(resolved.x, resolved.y, resolved.z)
             node.eulerAngles.y = CGFloat(atan2(-dir.x, -dir.z))
         }
 
-        if seesPlayer, now - lastShot > 0.42 {
+        if seesPlayer, now - lastShot > TimeInterval(0.48) + TimeInterval(id) * 0.05 {
             lastShot = now
             return .shoot
         }

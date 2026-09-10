@@ -4,6 +4,7 @@ struct MainMenuView: View {
     let onPlay: () -> Void
     @EnvironmentObject private var language: LanguageManager
     @EnvironmentObject private var theme: ThemeManager
+    @EnvironmentObject private var sounds: SoundManager
     @Environment(\.colorScheme) private var scheme
     @State private var pulse = false
 
@@ -85,6 +86,11 @@ struct MainMenuView: View {
                 Text(language.t(.systemMode)).tag(AppTheme.system)
             }
             .pickerStyle(.segmented)
+
+            Toggle(language.t(.sound), isOn: Binding(
+                get: { sounds.soundEnabled },
+                set: { sounds.setEnabled($0) }
+            ))
         }
         .padding(18)
         .frame(maxWidth: 520)
@@ -94,6 +100,7 @@ struct MainMenuView: View {
     private var controlsCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             controlRow("WASD", language.t(.move))
+            controlRow(language.t(.sprintJump), language.t(.sprintJumpHint))
             controlRow(language.t(.mouseLook), language.t(.lookShoot))
             controlRow("1 / 2 · R · E", language.t(.weaponsReloadDefuse))
             controlRow("Esc", language.t(.escapeMenu))

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject private var theme: ThemeManager
+    @EnvironmentObject private var sounds: SoundManager
     @StateObject private var session = GameSession()
     @State private var world: GameWorld?
     @State private var showSplash = true
@@ -51,7 +52,7 @@ struct RootView: View {
 
     private func startRound() {
         if world == nil {
-            world = GameWorld(session: session)
+            world = GameWorld(session: session, sounds: sounds)
         } else {
             world?.resetRound()
         }

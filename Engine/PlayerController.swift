@@ -19,6 +19,9 @@ final class PlayerController {
     var interacting = false
     var bob: Float = 0
     var moving = false
+    var sprinting = false
+    var grounded = true
+    var vertical: Float = 0
     private var lastSlot: WeaponSlot?
 
     var isAlive: Bool { health > 0 }
@@ -33,8 +36,8 @@ final class PlayerController {
         cameraNode.camera?.fieldOfView = 68
         cameraNode.camera?.zFar = 140
         cameraNode.camera?.wantsHDR = true
-        cameraNode.camera?.bloomIntensity = 0.35
-        cameraNode.camera?.motionBlurIntensity = 0.15
+        cameraNode.camera?.bloomIntensity = 0.55
+        cameraNode.camera?.motionBlurIntensity = 0.22
         cameraNode.position = SCNVector3Zero
         if cameraNode.parent !== node {
             node.addChildNode(cameraNode)
@@ -73,22 +76,39 @@ final class PlayerController {
         if keys.contains(2) || keys.contains(124) { dir += right() } // D
         let length = simd_length(dir)
         moving = length > 0.001
+        let layoutEye: Float = 1.6
+        let sprintingNow = keys.contains(56)
+        sprinting = sprintingNow && moving
+        if keys.contains(49), grounded {
+            vertical = GameRules.jumpVelocity
+            grounded = false
+        }
+        vertical -= GameRules.gravity * dt
+        var y = Float(node.position.y) + vertical * dt
+        if y <= layoutEye {
+            y = layoutEye
+            vertical = 0
+            grounded = true
+        }
+
         if !moving {
             bob = max(0, bob - dt * 6)
             cameraNode.position.y = CGFloat(sin(bob) * 0.01)
+            node.position.y = CGFloat(y)
             return
         }
         dir /= length
-        bob += dt * 11
+        bob += dt * (sprintingNow ? 14 : 11)
         cameraNode.position = SCNVector3(sin(bob) * 0.018, sin(bob * 2) * 0.045, 0)
-        let proposed = SIMD3(Float(node.position.x), Float(node.position.y), Float(node.position.z)) + dir * GameRules.playerSpeed * dt
+        let speed = GameRules.playerSpeed * (sprintingNow ? GameRules.sprintMultiplier : 1)
+        let proposed = SIMD3(Float(node.position.x), y, Float(node.position.z)) + dir * speed * dt
         let resolved = Collision.resolve(
-            position: SIMD3(Float(node.position.x), Float(node.position.y), Float(node.position.z)),
+            position: SIMD3(Float(node.position.x), y, Float(node.position.z)),
             proposed: proposed,
             radius: 0.55,
             walls: walls
         )
-        node.position = SCNVector3(resolved.x, resolved.y, resolved.z)
+        node.position = SCNVector3(resolved.x, y, resolved.z)
     }
 
     func selectSlot(_ newSlot: WeaponSlot) {

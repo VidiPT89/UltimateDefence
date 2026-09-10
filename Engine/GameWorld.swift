@@ -5,6 +5,7 @@ import simd
 
 final class GameWorld: NSObject, SCNSceneRendererDelegate {
     let session: GameSession
+    let sounds: SoundManager
     let scene: SCNScene
     let layout: MapLayout
     let player = PlayerController()
@@ -15,9 +16,14 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     private var bombPlanted = false
     private var defused = false
     private var muzzle: SCNNode?
+    private var lastStep: TimeInterval = 0
+    private var lastDry: TimeInterval = 0
+    private var lastBeep: TimeInterval = 0
+    private var wasReloading = false
 
-    init(session: GameSession) {
+    init(session: GameSession, sounds: SoundManager) {
         self.session = session
+        self.sounds = sounds
         let built = MapBuilder.make()
         scene = built.0
         layout = built.1
@@ -44,6 +50,9 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         player.pitch = 0
         player.bob = 0
         player.interacting = false
+        player.vertical = 0
+        player.grounded = true
+        wasReloading = false
         player.node.removeFromParentNode()
         player.setup(at: layout.playerSpawn)
         scene.rootNode.addChildNode(player.node)
@@ -73,17 +82,34 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
 
     private func tick(dt: Float, now: TimeInterval) {
         player.finishReloadIfNeeded(now: now)
+        let reloading = now < player.reloadingUntil
+        if reloading && !wasReloading {
+            sounds.playReload()
+        }
+        wasReloading = reloading
         player.move(dt: dt, walls: layout.walls)
+        if player.moving, player.grounded, now - lastStep > (player.sprinting ? 0.28 : 0.38) {
+            lastStep = now
+            sounds.playStep()
+        }
         handleCombat(now: now)
         updateBots(dt: dt, now: now)
-        updateObjective(dt: dt)
+        updateObjective(dt: dt, now: now)
         evaluateRound()
         publishHUD()
     }
 
     private func handleCombat(now: TimeInterval) {
+        if player.shooting, player.currentMag == 0, now >= player.reloadingUntil, now - lastDry > 0.28 {
+            lastDry = now
+            sounds.playDry()
+        }
         guard player.canShoot(now: now) else { return }
         player.consumeShot(now: now)
+        sounds.playShoot()
+        player.pitch += 0.016
+        player.yaw += Float.random(in: -0.01...0.01)
+        player.applyLook()
         flashMuzzle()
         WeaponRig.kick(player.cameraNode)
         let origin = player.cameraNode.worldPosition
@@ -115,6 +141,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let name = hit.node.name ?? hit.node.parent?.name ?? ""
         guard name.hasPrefix(NodeName.botPrefix) else { return }
         session.hitTick += 1
+        sounds.playHit()
         let headshot = name.contains(NodeName.headSuffix)
         let dmg = GameRules.applyDamage(
             base: player.currentStats.damage,
@@ -141,20 +168,28 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             case .idle:
                 break
             case .shoot:
-                if Float.random(in: 0...1) < 0.42 {
+                let distance = Collision.distanceXZ(
+                    SIMD3(Float(bot.node.position.x), 0, Float(bot.node.position.z)),
+                    player.worldPosition
+                )
+                if Float.random(in: 0...1) < GameRules.botHitChance(distance: distance) {
                     let before = player.health
                     player.takeDamage(Int.random(in: 8...16))
                     if player.health < before {
                         session.damageTick += 1
+                        sounds.playHit()
                     }
                 }
             case .plant:
-                bombPlanted = true
+                if !bombPlanted {
+                    bombPlanted = true
+                    sounds.playPlantBeep()
+                }
             }
         }
     }
 
-    private func updateObjective(dt: Float) {
+    private func updateObjective(dt: Float, now: TimeInterval) {
         if bombPlanted {
             bombElapsed += TimeInterval(dt)
         } else {
@@ -165,6 +200,10 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         session.plantHint = onSite && bombPlanted
         if bombPlanted && player.interacting && onSite && player.isAlive {
             player.defuseProgress += TimeInterval(dt)
+            if now - lastBeep > 0.45 {
+                lastBeep = now
+                sounds.playPlantBeep()
+            }
             if player.defuseProgress >= GameRules.defuseTime {
                 defused = true
             }
@@ -189,6 +228,12 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             session.outcome = result
             session.screen = .result
             session.capturedMouse = false
+            switch result {
+            case .defendersWinElimination, .defendersWinTime, .defendersWinDefuse:
+                sounds.playWin()
+            default:
+                sounds.playLose()
+            }
         }
     }
 
@@ -205,23 +250,25 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     }
 
     private func lookDirection() -> SIMD3<Float> {
-        let pitch = player.pitch
-        let yaw = player.yaw
+        let spread = GameRules.aimSpread(moving: player.moving, sprinting: player.sprinting)
+        let pitch = player.pitch + Float.random(in: -spread...spread)
+        let yaw = player.yaw + Float.random(in: -spread...spread)
         let cy = cos(pitch)
         return SIMD3(-sin(yaw) * cy, sin(pitch), -cos(yaw) * cy)
     }
 
     private func flashMuzzle() {
         muzzle?.removeFromParentNode()
-        let flash = SCNSphere(radius: 0.05)
+        let flash = SCNSphere(radius: 0.08)
         flash.firstMaterial = SCNMaterial()
-        flash.firstMaterial?.diffuse.contents = NSColor.orange
-        flash.firstMaterial?.emission.contents = NSColor.yellow
+        flash.firstMaterial?.diffuse.contents = NSColor(calibratedRed: 0.98, green: 0.61, blue: 0, alpha: 1)
+        flash.firstMaterial?.emission.contents = NSColor(calibratedRed: 1, green: 0.85, blue: 0.35, alpha: 1)
+        flash.firstMaterial?.emission.intensity = 2
         let node = SCNNode(geometry: flash)
-        node.position = SCNVector3(0.18, -0.12, -0.45)
+        node.position = SCNVector3(0.22, -0.14, -0.58)
         player.cameraNode.addChildNode(node)
         muzzle = node
-        node.runAction(.sequence([.wait(duration: 0.04), .removeFromParentNode()]))
+        node.runAction(.sequence([.wait(duration: 0.045), .removeFromParentNode()]))
     }
 
     func handleKey(_ code: UInt16, down: Bool) {
@@ -229,8 +276,12 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             player.keys.insert(code)
             switch code {
             case 15: player.startReload(now: CACurrentMediaTime()) // R
-            case 18: player.selectSlot(.rifle) // 1
-            case 19: player.selectSlot(.pistol) // 2
+            case 18:
+                player.selectSlot(.rifle)
+                sounds.playUI()
+            case 19:
+                player.selectSlot(.pistol)
+                sounds.playUI()
             case 14: player.interacting = true // E
             case 53: // Esc
                 session.capturedMouse = false

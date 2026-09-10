@@ -24,34 +24,37 @@ struct MapLayout {
 enum MapBuilder {
     static func make() -> (SCNScene, MapLayout) {
         let scene = SCNScene()
-        let sky = NSColor(calibratedRed: 0.55, green: 0.72, blue: 0.88, alpha: 1)
-        scene.background.contents = sky
-        scene.fogStartDistance = 40
-        scene.fogEndDistance = 95
-        scene.fogColor = NSColor(calibratedRed: 0.62, green: 0.68, blue: 0.72, alpha: 1)
+        scene.background.contents = NSColor(calibratedRed: 0.58, green: 0.73, blue: 0.88, alpha: 1)
+        scene.fogStartDistance = 70
+        scene.fogEndDistance = 140
+        scene.fogColor = NSColor(calibratedRed: 0.62, green: 0.74, blue: 0.86, alpha: 1)
 
-        addSky(to: scene)
         addLights(to: scene)
         scene.rootNode.addParticleSystem(FX.dustField())
 
-        let floor = SCNNode(geometry: SCNFloor())
-        floor.geometry?.firstMaterial = MapTextures.goldSrc(MapTextures.sand)
-        if let floorGeom = floor.geometry as? SCNFloor {
-            floorGeom.reflectivity = 0
-        }
-        floor.physicsBody = SCNPhysicsBody(type: .static, shape: nil)
-        floor.physicsBody?.categoryBitMask = PhysicsCategory.world
+        let ground = SCNBox(width: 64, height: 0.4, length: 64, chamferRadius: 0)
+        let groundTile: CGFloat = 32
+        ground.materials = Array(repeating: MapTextures.tiled(MapTextures.sand, repeatU: groundTile, repeatV: groundTile), count: 6)
+        let floor = SCNNode(geometry: ground)
+        floor.position = SCNVector3(0, -0.2, 0)
         scene.rootNode.addChildNode(floor)
 
         var walls: [AABB] = []
-        func wall(x: Float, z: Float, w: Float, d: Float, h: Float = 4.8, texture: NSImage) {
+        func wall(x: Float, z: Float, w: Float, d: Float, h: Float = 3.6, texture: NSImage) {
             let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
-            box.firstMaterial = MapTextures.goldSrc(texture)
-            box.firstMaterial?.diffuse.contentsTransform = SCNMatrix4MakeScale(max(1, CGFloat(w / 2)), max(1, CGFloat(h / 2)), 1)
+            let ru = max(1, CGFloat(w / 2))
+            let rv = max(1, CGFloat(h / 2))
+            let rt = max(1, CGFloat(d / 2))
+            box.materials = [
+                MapTextures.tiled(texture, repeatU: ru, repeatV: rv),
+                MapTextures.tiled(texture, repeatU: rt, repeatV: rv),
+                MapTextures.tiled(texture, repeatU: ru, repeatV: rv),
+                MapTextures.tiled(texture, repeatU: rt, repeatV: rv),
+                MapTextures.tiled(texture, repeatU: ru, repeatV: rt),
+                MapTextures.tiled(texture, repeatU: ru, repeatV: rt)
+            ]
             let node = SCNNode(geometry: box)
             node.position = SCNVector3(x, h / 2, z)
-            node.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(geometry: box, options: nil))
-            node.physicsBody?.categoryBitMask = PhysicsCategory.world
             scene.rootNode.addChildNode(node)
             walls.append(AABB(minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2))
         }
@@ -91,7 +94,7 @@ enum MapBuilder {
         let layout = MapLayout(
             walls: walls,
             siteCenter: siteCenter,
-            playerSpawn: SIMD3<Float>(20, 1.6, -22),
+            playerSpawn: SIMD3<Float>(18, 1.64, -20),
             attackerSpawns: [
                 SIMD3<Float>(-22, 1.5, -22),
                 SIMD3<Float>(-18, 1.5, -24),
@@ -152,23 +155,9 @@ enum MapBuilder {
         sun.light?.type = .directional
         sun.light?.intensity = 780
         sun.light?.color = NSColor(calibratedRed: 1, green: 0.94, blue: 0.78, alpha: 1)
-        sun.light?.castsShadow = true
-        sun.light?.shadowSampleCount = 4
+        sun.light?.castsShadow = false
         sun.eulerAngles = SCNVector3(-0.95, 0.7, 0)
         scene.rootNode.addChildNode(sun)
-    }
-
-    private static func addSky(to scene: SCNScene) {
-        let box = SCNBox(width: 160, height: 70, length: 160, chamferRadius: 0)
-        let mat = SCNMaterial()
-        mat.lightingModel = .constant
-        mat.diffuse.contents = NSColor(calibratedRed: 0.52, green: 0.70, blue: 0.88, alpha: 1)
-        mat.isDoubleSided = true
-        mat.cullMode = .front
-        box.firstMaterial = mat
-        let node = SCNNode(geometry: box)
-        node.position = SCNVector3(0, 20, 0)
-        scene.rootNode.addChildNode(node)
     }
 
     private static func addCrate(
@@ -182,7 +171,17 @@ enum MapBuilder {
         walls: inout [AABB]
     ) {
         let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
-        box.firstMaterial = MapTextures.goldSrc(MapTextures.crate)
+        let ru = max(1, CGFloat(w))
+        let rv = max(1, CGFloat(h))
+        let rt = max(1, CGFloat(d))
+        box.materials = [
+            MapTextures.tiled(MapTextures.crate, repeatU: ru, repeatV: rv),
+            MapTextures.tiled(MapTextures.crate, repeatU: rt, repeatV: rv),
+            MapTextures.tiled(MapTextures.crate, repeatU: ru, repeatV: rv),
+            MapTextures.tiled(MapTextures.crate, repeatU: rt, repeatV: rv),
+            MapTextures.tiled(MapTextures.crate, repeatU: ru, repeatV: rt),
+            MapTextures.tiled(MapTextures.crate, repeatU: ru, repeatV: rt)
+        ]
         let node = SCNNode(geometry: box)
         node.position = SCNVector3(x, y + h / 2, z)
         scene.rootNode.addChildNode(node)

@@ -46,7 +46,7 @@ enum FX {
         dust.spreadingAngle = 180
         dust.particleVelocity = 0.15
         dust.emitterShape = SCNBox(width: 50, height: 6, length: 50, chamferRadius: 0)
-        dust.blendMode = .additive
+        dust.blendMode = .alpha
         return dust
     }
 

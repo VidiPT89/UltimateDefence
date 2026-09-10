@@ -38,8 +38,9 @@ final class PlayerController {
         node.position = SCNVector3(spawn.x, spawn.y, spawn.z)
         cameraNode.name = NodeName.camera
         cameraNode.camera = SCNCamera()
-        cameraNode.camera?.fieldOfView = 90
-        cameraNode.camera?.zFar = 160
+        cameraNode.camera?.fieldOfView = 75
+        cameraNode.camera?.zNear = 0.05
+        cameraNode.camera?.zFar = 220
         cameraNode.camera?.wantsHDR = false
         cameraNode.camera?.bloomIntensity = 0
         cameraNode.camera?.motionBlurIntensity = 0
@@ -89,7 +90,7 @@ final class PlayerController {
         let standEye: Float = 1.64
         let crouchEye: Float = 1.18
         let layoutEye = crouching ? crouchEye : standEye
-        let targetFOV: CGFloat = aiming ? 70 : 90
+        let targetFOV: CGFloat = aiming ? 58 : 75
         if let cam = cameraNode.camera {
             cam.fieldOfView += (targetFOV - cam.fieldOfView) * CGFloat(min(1, dt * 10))
         }
@@ -123,7 +124,7 @@ final class PlayerController {
         let resolved = Collision.resolve(
             position: SIMD3(Float(node.position.x), y, Float(node.position.z)),
             proposed: proposed,
-            radius: 0.55,
+            radius: 0.7,
             walls: walls
         )
         node.position = SCNVector3(resolved.x, y, resolved.z)

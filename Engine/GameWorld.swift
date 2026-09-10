@@ -20,6 +20,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     private var lastDry: TimeInterval = 0
     private var lastBeep: TimeInterval = 0
     private var wasReloading = false
+    private var roundClosed = false
 
     init(session: GameSession, sounds: SoundManager) {
         self.session = session
@@ -37,6 +38,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         bombElapsed = 0
         bombPlanted = false
         defused = false
+        roundClosed = false
         player.keys.removeAll()
         player.shooting = false
         player.health = GameRules.playerMaxHealth
@@ -75,7 +77,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     }
 
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        guard session.screen == .playing, session.outcome == .inProgress else { return }
+        guard session.screen == .playing, session.outcome == .inProgress, !roundClosed else { return }
         let dt: Float
         if let lastTime {
             dt = Float(min(0.05, time - lastTime))
@@ -231,6 +233,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     }
 
     private func evaluateRound() {
+        guard !roundClosed else { return }
         let timeLeft = max(0, GameRules.roundTime - roundElapsed)
         let bombLeft = max(0, GameRules.bombTime - bombElapsed)
         let aliveBots = bots.filter(\.isAlive).count
@@ -243,6 +246,9 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             defused: defused
         )
         if result != .inProgress {
+            roundClosed = true
+            player.shooting = false
+            player.keys.removeAll()
             if result == .attackersWinPlant {
                 let site = layout.siteCenter
                 FX.explosion(at: SCNVector3(site.x, 1.2, site.z), in: scene.rootNode)
@@ -347,6 +353,9 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 sounds.playUI()
             case 14: player.interacting = true // E
             case 53: // Esc
+                player.shooting = false
+                player.keys.removeAll()
+                player.aiming = false
                 onMain {
                     self.session.capturedMouse = false
                     self.session.screen = .menu

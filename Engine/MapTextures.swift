@@ -10,7 +10,6 @@ enum MapTextures {
     static let sandstone = make(size: 64) { x, y, _ in
         let brickW = 16
         let brickH = 8
-        let gx = x % brickW
         let gy = y % brickH
         let row = y / brickH
         let shift = (row % 2) * (brickW / 2)
@@ -38,11 +37,6 @@ enum MapTextures {
         let n = noise(x, y)
         let v = 0.42 + n * 0.08
         return (v, v * 0.96, v * 0.88)
-    }
-
-    static let rust = make(size: 64) { x, y, _ in
-        let n = noise(x, y)
-        return (0.48 + n * 0.1, 0.28 + n * 0.05, 0.12)
     }
 
     static let hazard = make(size: 32) { x, y, size in

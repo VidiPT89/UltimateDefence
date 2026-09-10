@@ -50,19 +50,6 @@ enum FX {
         return dust
     }
 
-    static func siteEmbers() -> SCNParticleSystem {
-        let embers = SCNParticleSystem()
-        embers.birthRate = 10
-        embers.particleLifeSpan = 1.8
-        embers.particleSize = 0.05
-        embers.particleColor = NSColor(calibratedRed: 1, green: 0.45, blue: 0.08, alpha: 0.7)
-        embers.spreadingAngle = 80
-        embers.particleVelocity = 0.55
-        embers.emitterShape = SCNCylinder(radius: 3.8, height: 0.2)
-        embers.blendMode = .additive
-        return embers
-    }
-
     static func explosion(at position: SCNVector3, in parent: SCNNode) {
         spark(at: position, in: parent, color: NSColor(calibratedRed: 1, green: 0.5, blue: 0.12, alpha: 1))
         let wave = SCNSphere(radius: 0.4)

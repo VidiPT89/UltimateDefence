@@ -10,7 +10,6 @@ enum RoundOutcome: Equatable {
 }
 
 struct WeaponStats: Equatable {
-    let name: String
     let damage: Int
     let headshotMultiplier: Double
     let fireInterval: TimeInterval
@@ -20,7 +19,6 @@ struct WeaponStats: Equatable {
     let range: Float
 
     static let rifle = WeaponStats(
-        name: "UD-4 Carbine",
         damage: 27,
         headshotMultiplier: 4.0,
         fireInterval: 0.1,
@@ -31,7 +29,6 @@ struct WeaponStats: Equatable {
     )
 
     static let pistol = WeaponStats(
-        name: "UD-9 Sidearm",
         damage: 34,
         headshotMultiplier: 2.1,
         fireInterval: 0.18,
@@ -66,7 +63,6 @@ struct GameRules {
     static let playerSpeed: Float = 6.6
     static let walkMultiplier: Float = 0.52
     static let crouchMultiplier: Float = 0.34
-    static let sprintMultiplier: Float = 1.0
     static let botSpeed: Float = 4.6
     static let jumpVelocity: Float = 7.4
     static let gravity: Float = 22

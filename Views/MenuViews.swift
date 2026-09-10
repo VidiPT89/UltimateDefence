@@ -102,6 +102,7 @@ struct MainMenuView: View {
             controlRow("WASD", language.t(.move))
             controlRow(language.t(.sprintJump), language.t(.sprintJumpHint))
             controlRow(language.t(.mouseLook), language.t(.lookShoot))
+            controlRow(language.t(.aim), language.t(.aimHint))
             controlRow("1 / 2 · R · E", language.t(.weaponsReloadDefuse))
             controlRow("Esc", language.t(.escapeMenu))
         }

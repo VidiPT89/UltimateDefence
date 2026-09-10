@@ -129,6 +129,7 @@ enum MapBuilder {
         ])
         beaconNode.runAction(.repeatForever(pulse))
         scene.rootNode.addChildNode(beaconNode)
+        siteNode.addParticleSystem(FX.siteEmbers())
 
         let light = SCNNode()
         light.light = SCNLight()

@@ -16,8 +16,8 @@
 - ✅ Bilingual PT-PT / English language switch
 - ✅ Dark, Light and System appearance, with iVidi.dev orange, burnt yellow and black
 - ✅ Animated splash with developer credits, then the main menu
-- ✅ Sound effects for gunfire, footsteps, reloads, hits and round results
-- ✅ Sprint, jump, recoil and distance-based bot accuracy
+- ✅ Sound effects for gunfire, footsteps, reloads, hits, plant beeps and round results
+- ✅ Sprint, jump, aim-down-sights, recoil and distance-based bot accuracy
 - ✅ Native macOS window with pointer lock while you play
 
 ## 🛠️ Tech Stack
@@ -55,8 +55,8 @@ Select the `UltimateDefence` scheme and run on My Mac (`⌘R`).
 
 1. Click **INICIAR RONDA** and click the game view to capture the mouse
 2. Hold Site A (the glowing ring). Attackers spawn on the far side of the compound
-3. Use **WASD** to move, **Shift** to sprint, **Space** to jump, the mouse to look, left click to fire
-4. **1** / **2** switch weapons, **R** reloads, **E** defuses while standing on the site
+3. Use **WASD** to move, **Shift** to sprint, **Space** to jump, the mouse to look, left click to fire and right click to aim
+4. **1** / **2** or the scroll wheel switch weapons, **R** reloads, **E** defuses while standing on the site
 5. Toggle sound, language and theme from the main menu. **Esc** returns to the menu and releases the pointer
 
 Win by eliminating every attacker before they plant, by surviving until the round timer ends, or by defusing after a plant. You lose if you are downed or if the artefact detonates.

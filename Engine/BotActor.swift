@@ -42,6 +42,12 @@ final class BotActor {
         head.position = SCNVector3(0, 0.95, 0)
         node.addChildNode(head)
 
+        let rifle = SCNBox(width: 0.08, height: 0.08, length: 0.72, chamferRadius: 0.01)
+        rifle.firstMaterial = Self.pbr(NSColor(calibratedRed: 0.22, green: 0.23, blue: 0.24, alpha: 1), metal: 0.7, rough: 0.28)
+        let rifleNode = SCNNode(geometry: rifle)
+        rifleNode.position = SCNVector3(0.32, 0.22, -0.28)
+        node.addChildNode(rifleNode)
+
         let shape = SCNPhysicsShape(geometry: body, options: nil)
         node.physicsBody = SCNPhysicsBody(type: .kinematic, shape: shape)
         node.physicsBody?.categoryBitMask = PhysicsCategory.bot

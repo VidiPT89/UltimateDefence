@@ -6,6 +6,8 @@ final class FPSSceneView: SCNView {
     var onKey: ((UInt16, Bool) -> Void)?
     var onLook: ((CGFloat, CGFloat) -> Void)?
     var onFire: ((Bool) -> Void)?
+    var onAim: ((Bool) -> Void)?
+    var onCycle: ((Int) -> Void)?
     var onFocus: ((Bool) -> Void)?
     private var tracking = false
 
@@ -46,6 +48,24 @@ final class FPSSceneView: SCNView {
         onFire?(false)
     }
 
+    override func rightMouseDown(with event: NSEvent) {
+        window?.makeFirstResponder(self)
+        onFocus?(true)
+        onAim?(true)
+    }
+
+    override func rightMouseUp(with event: NSEvent) {
+        onAim?(false)
+    }
+
+    override func scrollWheel(with event: NSEvent) {
+        if event.scrollingDeltaY > 0.4 {
+            onCycle?(-1)
+        } else if event.scrollingDeltaY < -0.4 {
+            onCycle?(1)
+        }
+    }
+
     override func mouseMoved(with event: NSEvent) {
         guard tracking else { return }
         onLook?(event.deltaX, event.deltaY)
@@ -73,6 +93,8 @@ struct GameSceneView: NSViewRepresentable {
         view.onKey = { code, down in world.handleKey(code, down: down) }
         view.onLook = { dx, dy in world.player.look(dx: dx, dy: dy) }
         view.onFire = { down in world.player.shooting = down }
+        view.onAim = { down in world.player.aiming = down }
+        view.onCycle = { dir in world.cycleWeapon(dir) }
         view.onFocus = { focused in
             session.capturedMouse = focused
         }

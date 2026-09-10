@@ -175,6 +175,19 @@ final class GameRulesTests: XCTestCase {
         XCTAssertEqual(result, .attackersWinElimination)
     }
 
+    func testFloorHeightUsesHighestPlatform() {
+        let low = Platform(minX: -2, maxX: 2, minZ: -2, maxZ: 2, height: 0.4)
+        let high = Platform(minX: -1, maxX: 1, minZ: -1, maxZ: 1, height: 1.5)
+        XCTAssertEqual(Collision.floorHeight(x: 0, z: 0, floors: [low, high]), 1.5)
+        XCTAssertEqual(Collision.floorHeight(x: 8, z: 8, floors: [low, high]), 0)
+    }
+
+    func testDust2CatwalkIsRaised() {
+        let layout = MapBuilder.make(.dust2).1
+        XCTAssertGreaterThan(Collision.floorHeight(x: 10, z: 16, floors: layout.floors), 1.2)
+        XCTAssertEqual(Collision.floorHeight(x: 0, z: -40, floors: layout.floors), 0)
+    }
+
     func testCrateDoesNotBlockSight() {
         let crate = AABB(minX: -1, maxX: 1, minZ: -1, maxZ: 1, blocksSight: false)
         let a = SIMD3<Float>(0, 0, -4)

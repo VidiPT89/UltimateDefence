@@ -39,6 +39,7 @@ final class BotActor {
         enemies: [BotActor],
         site: SIMD3<Float>,
         walls: [AABB],
+        floors: [Platform],
         bombPlanted: Bool,
         planterId: Int,
         others: [BotActor]
@@ -96,7 +97,8 @@ final class BotActor {
                 }
             }
             let resolved = Collision.resolve(position: pos, proposed: next, radius: 0.45, walls: walls)
-            node.position = SCNVector3(resolved.x, 0, resolved.z)
+            let ground = Collision.floorHeight(x: resolved.x, z: resolved.z, floors: floors)
+            node.position = SCNVector3(resolved.x, ground, resolved.z)
             node.eulerAngles.y = CGFloat(atan2(-dir.x, -dir.z))
             node.eulerAngles.x = CGFloat(sin(wander * 8) * 0.03)
         } else if len > 0.2 {

@@ -87,11 +87,13 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             return bot
         }
         muzzle?.removeFromParentNode()
+        scene.rootNode.childNode(withName: NodeName.artefact, recursively: true)?.isHidden = true
         session.kills = 0
         session.clearMatchFeed()
         session.aiming = false
         session.moving = false
         session.crouchWanted = false
+        session.plantHint = false
         session.outcome = .inProgress
         publishHUD()
     }
@@ -218,6 +220,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             case .plant:
                 if !bombPlanted {
                     bombPlanted = true
+                    scene.rootNode.childNode(withName: NodeName.artefact, recursively: true)?.isHidden = false
                     sounds.playPlantBeep()
                 }
             }

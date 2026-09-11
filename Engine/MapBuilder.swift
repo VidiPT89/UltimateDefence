@@ -23,38 +23,42 @@ enum MapBuilder {
             indoor: false
         )
         let grid = GridMap()
-        grid.fill(x0: -4, x1: 3, z0: -19, z1: -14)
-        grid.fill(x0: 4, x1: 10, z0: -19, z1: -14)
-        grid.fill(x0: -11, x1: -5, z0: -19, z1: -14)
-        grid.fill(x0: -1, x1: 0, z0: -13, z1: -8)
-        grid.fill(x0: 6, x1: 7, z0: -13, z1: 4)
-        grid.fill(x0: -9, x1: -8, z0: -13, z1: -4)
-        grid.fill(x0: -6, x1: 5, z0: -7, z1: 1)
-        grid.fill(x0: -10, x1: -7, z0: -5, z1: 0)
-        grid.fill(x0: -1, x1: 0, z0: 2, z1: 4)
-        grid.fill(x0: -3, x1: 11, z0: 5, z1: 13)
+        grid.fill(x0: -3, x1: 5, z0: -24, z1: -18)
+        grid.fill(x0: 6, x1: 12, z0: -24, z1: -18)
+        grid.fill(x0: -10, x1: -4, z0: -24, z1: -18)
+        grid.fill(x0: 0, x1: 2, z0: -17, z1: -10)
+        grid.fill(x0: 10, x1: 12, z0: -17, z1: 8)
+        grid.fill(x0: -9, x1: -7, z0: -17, z1: -6)
+        grid.fill(x0: -4, x1: 8, z0: -9, z1: 2)
+        grid.fill(x0: -12, x1: -5, z0: -5, z1: 1)
+        grid.fill(x0: -16, x1: -8, z0: 2, z1: 12)
+        grid.fill(x0: 1, x1: 3, z0: 3, z1: 8)
+        grid.fill(x0: -1, x1: 4, z0: 8, z1: 11)
+        grid.fill(x0: 4, x1: 16, z0: 9, z1: 18)
+        grid.fill(x0: -2, x1: 3, z0: 12, z1: 18)
         grid.emit(into: kit, walkTexture: MapTextures.sand, ceiling: nil)
-        kit.crate(x: GridMap.world(10, 6).x, z: GridMap.world(10, 6).z)
-        kit.crate(x: GridMap.world(9, 6).x, z: GridMap.world(9, 6).z)
-        kit.barrel(x: GridMap.world(9, -17).x, z: GridMap.world(9, -17).z)
-        kit.lamps([SIMD3(0, 4.2, -32), SIMD3(0, 4.2, -5), SIMD3(15, 4.2, -8), SIMD3(8, 4.2, 18)])
-        let site = GridMap.world(4, 10)
+        prop(kit, crate: true, 4, -3)
+        prop(kit, crate: true, 15, 17)
+        prop(kit, crate: false, 8, -20)
+        prop(kit, crate: false, -14, 8)
+        kit.lamps([c(1, -21, 4.2), c(2, -3, 4.2), c(11, 0, 4.2), c(8, 13, 4.2), c(-12, 6, 4.2)])
+        let site = w(9, 13)
         kit.site(at: site)
         return finish(
             kit: kit,
             site: site,
-            player: GridMap.world(2, 11),
+            player: w(0, 15),
             yaw: .pi,
-            terrorists: cluster(GridMap.world(0, -16), count: 6),
-            defenders: cluster(GridMap.world(3, 11), count: 6),
+            terrorists: cluster(w(1, -21), count: 6),
+            defenders: cluster(w(1, 15), count: 6),
             attackPaths: [
-                [GridMap.world(0, -16), GridMap.world(0, -10), GridMap.world(0, -3), GridMap.world(0, 3), GridMap.world(3, 9)],
-                [GridMap.world(7, -16), GridMap.world(7, -8), GridMap.world(7, 2), GridMap.world(7, 8)],
-                [GridMap.world(-8, -16), GridMap.world(-8, -8), GridMap.world(-8, -2), GridMap.world(-4, -3), GridMap.world(0, -2), GridMap.world(3, 9)]
+                [w(1, -21), w(1, -12), w(2, -4), w(2, 5), w(6, 12)],
+                [w(11, -21), w(11, -10), w(11, 0), w(11, 7), w(12, 12)],
+                [w(-8, -21), w(-8, -10), w(-8, -2), w(-2, -2), w(2, 5), w(6, 12)]
             ],
             defendPosts: [
-                GridMap.world(3, 10), GridMap.world(7, 8), GridMap.world(0, 7),
-                GridMap.world(5, 11), GridMap.world(-1, 9), GridMap.world(9, 10)
+                w(8, 13), w(12, 10), w(2, 7),
+                w(1, 10), w(5, 16), w(14, 12)
             ]
         )
     }
@@ -70,33 +74,40 @@ enum MapBuilder {
             indoor: false
         )
         let grid = GridMap()
-        grid.fill(x0: -4, x1: 3, z0: -18, z1: -13)
-        grid.fill(x0: -1, x1: 0, z0: -12, z1: -7)
-        grid.fill(x0: -4, x1: 3, z0: -6, z1: 1)
-        grid.fill(x0: -1, x1: 0, z0: 2, z1: 5)
-        grid.fill(x0: -10, x1: 3, z0: 6, z1: 13)
-        grid.fill(x0: 4, x1: 10, z0: 6, z1: 12)
+        grid.fill(x0: -4, x1: 4, z0: -22, z1: -16)
+        grid.fill(x0: -10, x1: -5, z0: -22, z1: -16)
+        grid.fill(x0: -1, x1: 1, z0: -15, z1: -10)
+        grid.fill(x0: -10, x1: -4, z0: -15, z1: -10)
+        grid.fill(x0: -6, x1: 6, z0: -9, z1: -6)
+        grid.fill(x0: -6, x1: -4, z0: -5, z1: 2)
+        grid.fill(x0: 3, x1: 5, z0: -5, z1: 2)
+        grid.fill(x0: -6, x1: 6, z0: 3, z1: 6)
+        grid.fill(x0: 7, x1: 10, z0: 3, z1: 7)
+        grid.fill(x0: -2, x1: 0, z0: 7, z1: 10)
+        grid.fill(x0: -12, x1: 2, z0: 11, z1: 18)
+        grid.fill(x0: 3, x1: 6, z0: 12, z1: 16)
+        grid.fill(x0: 7, x1: 14, z0: 8, z1: 16)
         grid.emit(into: kit, walkTexture: MapTextures.sand, ceiling: nil)
-        kit.water(minX: -5, maxX: 5, minZ: -8, maxZ: 0)
-        kit.crate(x: GridMap.world(-3, -17).x, z: GridMap.world(-3, -17).z)
-        kit.crate(x: GridMap.world(10, 11).x, z: GridMap.world(10, 11).z)
-        kit.lamps([SIMD3(0, 4.2, -30), SIMD3(0, 4.2, -4), SIMD3(-10, 4.2, 20), SIMD3(14, 4.2, 18)])
-        let site = GridMap.world(-6, 10)
+        kit.water(minX: -11, maxX: 13, minZ: -10, maxZ: 5)
+        prop(kit, crate: true, -8, -20)
+        prop(kit, crate: true, -11, 17)
+        kit.lamps([c(0, -19, 4.2), c(-5, -2, 4.2), c(4, -2, 4.2), c(-8, 15, 4.2), c(11, 12, 4.2)])
+        let site = w(-8, 15)
         kit.site(at: site)
         return finish(
             kit: kit,
             site: site,
-            player: GridMap.world(9, 11),
-            yaw: .pi * 0.75,
-            terrorists: cluster(GridMap.world(0, -15), count: 6),
-            defenders: cluster(GridMap.world(7, 9), count: 6),
+            player: w(11, 13),
+            yaw: .pi * 0.85,
+            terrorists: cluster(w(0, -19), count: 6),
+            defenders: cluster(w(10, 12), count: 6),
             attackPaths: [
-                [GridMap.world(0, -15), GridMap.world(0, -9), GridMap.world(0, -2), GridMap.world(0, 4), GridMap.world(-5, 9)],
-                [GridMap.world(0, -15), GridMap.world(0, -2), GridMap.world(0, 8), GridMap.world(6, 9)]
+                [w(0, -19), w(0, -12), w(-5, -7), w(-5, 0), w(-5, 8), w(-8, 14)],
+                [w(0, -19), w(4, -7), w(4, 4), w(8, 6), w(10, 12), w(0, 14), w(-7, 15)]
             ],
             defendPosts: [
-                GridMap.world(-5, 10), GridMap.world(6, 9), GridMap.world(0, 8),
-                GridMap.world(-8, 11), GridMap.world(3, 10), GridMap.world(8, 8)
+                w(-8, 15), w(-1, 12), w(10, 12),
+                w(2, 5), w(-10, 16), w(8, 10)
             ]
         )
     }
@@ -113,33 +124,35 @@ enum MapBuilder {
             indoor: true
         )
         let grid = GridMap()
-        grid.fill(x0: -4, x1: 3, z0: -16, z1: -11)
-        grid.fill(x0: -1, x1: 0, z0: -10, z1: -5)
-        grid.fill(x0: -4, x1: 3, z0: -4, z1: 2)
-        grid.fill(x0: 4, x1: 8, z0: -2, z1: -1)
-        grid.fill(x0: 9, x1: 13, z0: -5, z1: 2)
-        grid.fill(x0: -1, x1: 0, z0: 3, z1: 6)
-        grid.fill(x0: -9, x1: 3, z0: 7, z1: 13)
+        grid.fill(x0: -3, x1: 4, z0: -20, z1: -14)
+        grid.fill(x0: -3, x1: 4, z0: -13, z1: -9)
+        grid.fill(x0: 0, x1: 2, z0: -8, z1: 8)
+        grid.fill(x0: -8, x1: -1, z0: -4, z1: 2)
+        grid.fill(x0: 3, x1: 12, z0: -6, z1: 2)
+        grid.fill(x0: -6, x1: -4, z0: 3, z1: 11)
+        grid.fill(x0: -2, x1: 3, z0: 9, z1: 11)
+        grid.fill(x0: -10, x1: 4, z0: 12, z1: 18)
+        grid.fill(x0: 4, x1: 8, z0: 8, z1: 12)
         grid.emit(into: kit, walkTexture: MapTextures.carpet, ceiling: MapTextures.tiles)
-        kit.crate(x: GridMap.world(12, -4).x, z: GridMap.world(12, -4).z)
-        kit.crate(x: GridMap.world(-8, 8).x, z: GridMap.world(-8, 8).z)
-        kit.lamps([SIMD3(0, 4.0, -26), SIMD3(0, 4.0, -1), SIMD3(22, 4.0, -2), SIMD3(-8, 4.0, 20)])
-        let site = GridMap.world(-5, 11)
+        prop(kit, crate: true, 11, -5)
+        prop(kit, crate: true, -9, 13)
+        kit.lamps([c(0, -17, 4.0), c(1, -2, 4.0), c(8, -2, 4.0), c(-5, 15, 4.0), c(1, 15, 4.0)])
+        let site = w(-6, 15)
         kit.site(at: site)
         return finish(
             kit: kit,
             site: site,
-            player: GridMap.world(1, 11),
+            player: w(1, 16),
             yaw: .pi,
-            terrorists: cluster(GridMap.world(0, -13), count: 6),
-            defenders: cluster(GridMap.world(1, 11), count: 6),
+            terrorists: cluster(w(0, -17), count: 6),
+            defenders: cluster(w(1, 16), count: 6),
             attackPaths: [
-                [GridMap.world(0, -13), GridMap.world(0, -7), GridMap.world(0, -1), GridMap.world(0, 5), GridMap.world(-3, 10)],
-                [GridMap.world(0, -13), GridMap.world(0, -1), GridMap.world(6, -1), GridMap.world(11, -1)]
+                [w(0, -17), w(1, -11), w(1, -2), w(1, 8), w(-4, 14)],
+                [w(0, -17), w(1, -2), w(8, -2), w(6, 10), w(1, 14), w(-4, 15)]
             ],
             defendPosts: [
-                GridMap.world(-4, 11), GridMap.world(1, 10), GridMap.world(0, 8),
-                GridMap.world(-7, 12), GridMap.world(2, 12), GridMap.world(11, 0)
+                w(-5, 15), w(1, 10), w(-5, 8),
+                w(-8, 16), w(2, 16), w(6, 10)
             ]
         )
     }
@@ -156,33 +169,34 @@ enum MapBuilder {
             indoor: true
         )
         let grid = GridMap()
-        grid.fill(x0: -4, x1: 3, z0: -15, z1: -10)
-        grid.fill(x0: -1, x1: 0, z0: -9, z1: -4)
-        grid.fill(x0: -6, x1: 3, z0: -3, z1: 3)
-        grid.fill(x0: 4, x1: 8, z0: -1, z1: 0)
-        grid.fill(x0: 9, x1: 13, z0: -3, z1: 5)
-        grid.fill(x0: -3, x1: -2, z0: 4, z1: 6)
-        grid.fill(x0: -9, x1: 1, z0: 7, z1: 13)
+        grid.fill(x0: -4, x1: 5, z0: -18, z1: -12)
+        grid.fill(x0: -1, x1: 2, z0: -11, z1: -7)
+        grid.fill(x0: -8, x1: 6, z0: -6, z1: 4)
+        grid.fill(x0: -14, x1: -9, z0: -4, z1: 4)
+        grid.fill(x0: 7, x1: 14, z0: -3, z1: 6)
+        grid.fill(x0: -4, x1: 2, z0: 5, z1: 8)
+        grid.fill(x0: 3, x1: 8, z0: 5, z1: 10)
+        grid.fill(x0: -12, x1: 4, z0: 9, z1: 16)
         grid.emit(into: kit, walkTexture: MapTextures.concrete, ceiling: MapTextures.metal)
-        kit.crate(x: GridMap.world(-8, 8).x, z: GridMap.world(-8, 8).z)
-        kit.barrel(x: GridMap.world(12, 4).x, z: GridMap.world(12, 4).z)
-        kit.lamps([SIMD3(0, 4.0, -24), SIMD3(-4, 4.0, 1), SIMD3(22, 4.0, 2), SIMD3(-10, 4.0, 20)])
-        let site = GridMap.world(-5, 10)
+        prop(kit, crate: true, -12, 11)
+        prop(kit, crate: false, 13, 5)
+        kit.lamps([c(0, -15, 4.0), c(-1, 0, 4.0), c(11, 2, 4.0), c(-6, 13, 4.0), c(1, 13, 4.0)])
+        let site = w(-6, 13)
         kit.site(at: site)
         return finish(
             kit: kit,
             site: site,
-            player: GridMap.world(11, 2),
-            yaw: .pi * 0.8,
-            terrorists: cluster(GridMap.world(0, -12), count: 6),
-            defenders: cluster(GridMap.world(11, 1), count: 6),
+            player: w(1, 14),
+            yaw: .pi,
+            terrorists: cluster(w(0, -15), count: 6),
+            defenders: cluster(w(1, 14), count: 6),
             attackPaths: [
-                [GridMap.world(0, -12), GridMap.world(0, -6), GridMap.world(0, 0), GridMap.world(-2, 5), GridMap.world(-4, 9)],
-                [GridMap.world(0, -12), GridMap.world(0, 0), GridMap.world(6, 0), GridMap.world(11, 1)]
+                [w(0, -15), w(0, -8), w(-1, 0), w(-2, 7), w(-5, 12)],
+                [w(0, -15), w(1, -1), w(10, 2), w(6, 8), w(1, 12), w(-5, 13)]
             ],
             defendPosts: [
-                GridMap.world(-4, 10), GridMap.world(11, 2), GridMap.world(-2, 8),
-                GridMap.world(-7, 11), GridMap.world(1, 9), GridMap.world(10, 4)
+                w(-5, 13), w(1, 12), w(-10, 12),
+                w(-2, 8), w(3, 14), w(11, 3)
             ]
         )
     }
@@ -212,6 +226,24 @@ enum MapBuilder {
         (0..<count).map { index in
             let offset = (Float(index) - Float(count - 1) / 2) * 1.6
             return SIMD3(origin.x + offset, 0, origin.z)
+        }
+    }
+
+    private static func w(_ x: Int, _ z: Int) -> SIMD3<Float> {
+        GridMap.world(x, z)
+    }
+
+    private static func c(_ x: Int, _ z: Int, _ y: Float) -> SIMD3<Float> {
+        let p = GridMap.world(x, z)
+        return SIMD3(p.x, y, p.z)
+    }
+
+    private static func prop(_ kit: MapKit, crate: Bool, _ x: Int, _ z: Int) {
+        let p = GridMap.world(x, z)
+        if crate {
+            kit.crate(x: p.x, z: p.z)
+        } else {
+            kit.barrel(x: p.x, z: p.z)
         }
     }
 }

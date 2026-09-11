@@ -16,7 +16,7 @@
 - ✅ Walk (Shift), crouch (Ctrl), jump, ADS, recoil punch, fire slowdown, freeze time and movement spread
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
 - ✅ Bots follow their route, stop to shoot, then push the site; CTs hold their post
-- ✅ HUD: health, ammo, round timer and defuse progress
+- ✅ HUD: radar, kill feed, health, ammo, round timer and defuse progress
 - ✅ Bilingual PT-PT / English language switch
 - ✅ Dark, Light and System appearance, with iVidi.dev orange, burnt yellow and black
 - ✅ Animated splash with developer credits, then the main menu

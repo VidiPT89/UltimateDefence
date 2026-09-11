@@ -20,6 +20,7 @@
 		75CA6581CDADC20EC77ACC79 /* GameRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B71BC957B2C007D927F3647 /* GameRulesTests.swift */; };
 		79B7E6B1EB26479F3DEED9E0 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EED2D740B41C6DBEB79DACD /* ThemeManager.swift */; };
 		84151BDE4617480DFD6E3F76 /* MapTextures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A904DB37884AD527D5495B15 /* MapTextures.swift */; };
+		84A3F3081913381E64FD6082 /* NodeQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B3C81483CCB17006E61A1E4 /* NodeQuery.swift */; };
 		954101E433CF55DFE4EA8678 /* PlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B4DD48650809730878F70F /* PlayerController.swift */; };
 		97C8288C3A5A698AEB31FA1A /* GameSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05AE6CD1527F7FF852DFB2F /* GameSceneView.swift */; };
 		9B456D6DCC89FFCCBAAF92C0 /* UltimateDefenceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73776F14207A17635276CA62 /* UltimateDefenceApp.swift */; };
@@ -49,6 +50,7 @@
 		000F3545C0EC34A8CB9A3F4A /* CharacterMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterMesh.swift; sourceTree = "<group>"; };
 		0A3C8A7EE6F61A413444FE2C /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		0BEAB5AD22D5DDFDE621415C /* GameWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameWorld.swift; sourceTree = "<group>"; };
+		1B3C81483CCB17006E61A1E4 /* NodeQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeQuery.swift; sourceTree = "<group>"; };
 		1F353C5B66BE5DBFC692629A /* BotActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotActor.swift; sourceTree = "<group>"; };
 		29A6E07F683EF914F09B9C10 /* UltimateDefence.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UltimateDefence.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B56FD732AEF947219518DFB /* MatchConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchConfig.swift; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 				52ABF2451B82F0ED2B103754 /* MapBuilder.swift */,
 				3A59CDE0CB7938A7911EC75B /* MapKit.swift */,
 				A904DB37884AD527D5495B15 /* MapTextures.swift */,
+				1B3C81483CCB17006E61A1E4 /* NodeQuery.swift */,
 				87B4DD48650809730878F70F /* PlayerController.swift */,
 			);
 			path = Engine;
@@ -294,6 +297,7 @@
 				84151BDE4617480DFD6E3F76 /* MapTextures.swift in Sources */,
 				096E3E38DA174BADC4A6C9F6 /* MatchConfig.swift in Sources */,
 				3B269A4C526D770B195A67B9 /* MenuViews.swift in Sources */,
+				84A3F3081913381E64FD6082 /* NodeQuery.swift in Sources */,
 				954101E433CF55DFE4EA8678 /* PlayerController.swift in Sources */,
 				D401D3F6A10E5D9D979F2646 /* RootView.swift in Sources */,
 				B439321BB763DB1DD17B31A8 /* SoundManager.swift in Sources */,

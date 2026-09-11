@@ -23,6 +23,10 @@ struct MapLayout {
     let defenderSpawns: [SIMD3<Float>]
     let attackPaths: [[SIMD3<Float>]]
     let defendPosts: [SIMD3<Float>]
+    let mapMinX: Float
+    let mapMaxX: Float
+    let mapMinZ: Float
+    let mapMaxZ: Float
 }
 
 final class MapKit {
@@ -166,7 +170,9 @@ final class MapKit {
         attackPaths: [[SIMD3<Float>]],
         defendPosts: [SIMD3<Float>]
     ) -> MapLayout {
-        MapLayout(
+        let xs = walls.map(\.minX) + walls.map(\.maxX)
+        let zs = walls.map(\.minZ) + walls.map(\.maxZ)
+        return MapLayout(
             walls: walls,
             siteCenter: site,
             playerSpawn: player,
@@ -174,7 +180,11 @@ final class MapKit {
             attackerSpawns: terrorists,
             defenderSpawns: defenders,
             attackPaths: attackPaths,
-            defendPosts: defendPosts
+            defendPosts: defendPosts,
+            mapMinX: xs.min() ?? -40,
+            mapMaxX: xs.max() ?? 40,
+            mapMinZ: zs.min() ?? -40,
+            mapMaxZ: zs.max() ?? 40
         )
     }
 

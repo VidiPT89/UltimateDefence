@@ -1,4 +1,5 @@
 import Foundation
+import simd
 
 final class GameSession: ObservableObject {
     @Published var screen: Screen = .menu
@@ -22,6 +23,22 @@ final class GameSession: ObservableObject {
     @Published var kills = 0
     @Published var aiming = false
     @Published var moving = false
+    @Published var radarBlips: [RadarBlip] = []
+    @Published var radarMe = SIMD3<Float>(repeating: 0)
+    @Published var radarYaw: Float = 0
+    @Published var radarSpan: Float = 80
+    @Published var killFeed: [KillLine] = []
+    private var feedSeq = 0
+
+    func pushKill(killer: CombatSide, victim: CombatSide) {
+        feedSeq += 1
+        killFeed = Array((killFeed + [KillLine(id: feedSeq, killer: killer, victim: victim)]).suffix(5))
+    }
+
+    func clearMatchFeed() {
+        killFeed = []
+        radarBlips = []
+    }
 
     enum Screen {
         case menu

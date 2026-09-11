@@ -228,4 +228,22 @@ final class GameRulesTests: XCTestCase {
         let b = SIMD3<Float>(0, 0, 4)
         XCTAssertTrue(Collision.losClear(a, b, walls: [crate]))
     }
+
+    func testMapsHaveRadarBounds() {
+        for arena in ArenaMap.allCases {
+            let layout = MapBuilder.make(arena).1
+            XCTAssertGreaterThan(layout.mapMaxX, layout.mapMinX)
+            XCTAssertGreaterThan(layout.mapMaxZ, layout.mapMinZ)
+        }
+    }
+
+    func testKillFeedKeepsTheLastFiveLines() {
+        let session = GameSession()
+        for index in 0..<7 {
+            session.pushKill(killer: .you, victim: .t)
+            XCTAssertEqual(session.killFeed.last?.id, index + 1)
+        }
+        XCTAssertEqual(session.killFeed.count, 5)
+        XCTAssertEqual(session.killFeed.first?.id, 3)
+    }
 }

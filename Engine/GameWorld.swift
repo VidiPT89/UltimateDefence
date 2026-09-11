@@ -87,6 +87,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         }
         muzzle?.removeFromParentNode()
         session.kills = 0
+        session.clearMatchFeed()
         session.aiming = false
         session.moving = false
         session.outcome = .inProgress
@@ -151,7 +152,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             FX.tracer(from: start, to: hit.worldCoordinates, in: scene.rootNode)
             FX.spark(at: hit.worldCoordinates, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.7, blue: 0.2, alpha: 1))
             let name = hit.node.name ?? hit.node.parent?.name ?? ""
-            if !Self.isSolidCover(hit.node),
+            if !NodeQuery.isSolidCover(hit.node),
                name.hasPrefix(NodeName.terroristPrefix),
                let bot = bots.first(where: { $0.isTerrorist && name.hasPrefix("\(NodeName.terroristPrefix)\($0.id)") }),
                Collision.losClear(player.worldPosition, bot.xz, walls: layout.walls) {
@@ -166,7 +167,10 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 let wasAlive = bot.isAlive
                 bot.takeDamage(dmg)
                 if wasAlive && !bot.isAlive {
-                    onMain { self.session.kills += 1 }
+                    onMain {
+                        self.session.kills += 1
+                        self.session.pushKill(killer: .you, victim: .t)
+                    }
                 }
             }
         } else {
@@ -244,8 +248,14 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 sounds.playHit()
             }
         } else if let toBot {
+            let wasAlive = toBot.isAlive
             toBot.takeDamage(Int.random(in: 10...22))
             sounds.playHit()
+            if wasAlive && !toBot.isAlive {
+                let killer: CombatSide = bot.isTerrorist ? .t : .ct
+                let victim: CombatSide = toBot.isTerrorist ? .t : .ct
+                onMain { self.session.pushKill(killer: killer, victim: victim) }
+            }
         }
     }
 
@@ -323,6 +333,28 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let reloading = CACurrentMediaTime() < player.reloadingUntil
         let moving = player.moving
         let aiming = player.aiming
+        let me = player.worldPosition
+        let yaw = player.yaw
+        let span = max(layout.mapMaxX - layout.mapMinX, layout.mapMaxZ - layout.mapMinZ, 40)
+        var blips: [RadarBlip] = [
+            RadarBlip(id: "me", x: me.x, z: me.z, kind: .player),
+            RadarBlip(id: "site", x: layout.siteCenter.x, z: layout.siteCenter.z, kind: .site)
+        ]
+        if planted {
+            blips.append(RadarBlip(id: "bomb", x: layout.siteCenter.x, z: layout.siteCenter.z, kind: .bomb))
+        }
+        let living = bots.filter(\.isAlive)
+        for bot in living {
+            if bot.isTerrorist {
+                let spotted = Collision.losClear(me, bot.xz, walls: layout.walls)
+                    || living.contains { !$0.isTerrorist && Collision.losClear($0.xz, bot.xz, walls: layout.walls) }
+                if spotted {
+                    blips.append(RadarBlip(id: "t-\(bot.id)", x: bot.xz.x, z: bot.xz.z, kind: .enemy))
+                }
+            } else {
+                blips.append(RadarBlip(id: "ct-\(bot.id)", x: bot.xz.x, z: bot.xz.z, kind: .ally))
+            }
+        }
         onMain {
             if self.session.health != health { self.session.health = health }
             if self.session.mag != mag { self.session.mag = mag }
@@ -336,6 +368,10 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             if self.session.reloading != reloading { self.session.reloading = reloading }
             if self.session.moving != moving { self.session.moving = moving }
             if self.session.aiming != aiming { self.session.aiming = aiming }
+            if self.session.radarBlips != blips { self.session.radarBlips = blips }
+            if self.session.radarMe != me { self.session.radarMe = me }
+            if self.session.radarYaw != yaw { self.session.radarYaw = yaw }
+            if self.session.radarSpan != span { self.session.radarSpan = span }
         }
     }
 
@@ -377,9 +413,9 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         ])
         let origin3 = SIMD3(Float(start.x), Float(start.y), Float(start.z))
         return hits
-            .filter { !Self.isPlayerGeometry($0.node) && !Self.isTrim($0.node) }
+            .filter { !NodeQuery.isPlayerGeometry($0.node) && !NodeQuery.isTrim($0.node) }
             .sorted { a, b in
-                Self.hitDistance(a, from: origin3) < Self.hitDistance(b, from: origin3)
+                NodeQuery.hitDistance(a, from: origin3) < NodeQuery.hitDistance(b, from: origin3)
             }
     }
 
@@ -438,40 +474,5 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             player.keys.remove(code)
             if code == 14 { player.interacting = false }
         }
-    }
-
-    private static func hitDistance(_ hit: SCNHitTestResult, from: SIMD3<Float>) -> Float {
-        let p = hit.worldCoordinates
-        return hypot(hypot(Float(p.x) - from.x, Float(p.y) - from.y), Float(p.z) - from.z)
-    }
-
-    private static func isTrim(_ node: SCNNode) -> Bool {
-        var current: SCNNode? = node
-        while let node = current {
-            if node.name == NodeName.trim { return true }
-            current = node.parent
-        }
-        return false
-    }
-
-    private static func isSolidCover(_ node: SCNNode) -> Bool {
-        var current: SCNNode? = node
-        while let node = current {
-            if node.name == NodeName.solid || node.name == NodeName.ground { return true }
-            current = node.parent
-        }
-        return false
-    }
-
-    private static func isPlayerGeometry(_ node: SCNNode) -> Bool {
-        var current: SCNNode? = node
-        while let node = current {
-            let name = node.name ?? ""
-            if name == NodeName.player || name == NodeName.camera || name == "weaponRig" {
-                return true
-            }
-            current = node.parent
-        }
-        return false
     }
 }

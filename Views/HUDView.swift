@@ -26,6 +26,11 @@ struct HUDView: View {
             crosshair
 
             VStack(spacing: 0) {
+                HStack(alignment: .top, spacing: 12) {
+                    radar
+                    Spacer()
+                    killFeed
+                }
                 topBar
                 Spacer()
                 if !session.capturedMouse {
@@ -70,6 +75,77 @@ struct HUDView: View {
             withAnimation(.easeOut(duration: 0.4)) {
                 hurtFlash = 0
             }
+        }
+    }
+
+    private var radar: some View {
+        let size: CGFloat = 128
+        return ZStack {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color.black.opacity(0.55))
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(UDTheme.orange.opacity(0.45), lineWidth: 1)
+            ForEach(session.radarBlips) { blip in
+                let point = radarPoint(blip.x, blip.z, size: size)
+                blipMark(blip.kind)
+                    .position(point)
+            }
+        }
+        .frame(width: size, height: size)
+        .clipped()
+    }
+
+    private func blipMark(_ kind: RadarBlip.Kind) -> some View {
+        let color: Color = {
+            switch kind {
+            case .player: return UDTheme.orange
+            case .ally: return Color.cyan
+            case .enemy: return Color.red
+            case .site: return UDTheme.burnt
+            case .bomb: return Color.orange
+            }
+        }()
+        let side: CGFloat = kind == .player ? 7 : (kind == .site || kind == .bomb ? 6 : 5)
+        return Circle()
+            .fill(color)
+            .frame(width: side, height: side)
+            .overlay(Circle().stroke(Color.white.opacity(kind == .player ? 0.9 : 0.25), lineWidth: 1))
+    }
+
+    private func radarPoint(_ x: Float, _ z: Float, size: CGFloat) -> CGPoint {
+        let dx = x - session.radarMe.x
+        let dz = z - session.radarMe.z
+        let yaw = session.radarYaw
+        let c = cos(-yaw)
+        let s = sin(-yaw)
+        let rx = dx * c - dz * s
+        let rz = dx * s + dz * c
+        let scale = (size - 18) / CGFloat(max(session.radarSpan, 40))
+        return CGPoint(
+            x: size / 2 + CGFloat(rx) * scale,
+            y: size / 2 - CGFloat(rz) * scale
+        )
+    }
+
+    private var killFeed: some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            ForEach(session.killFeed) { line in
+                Text("\(sideName(line.killer))  \(sideName(line.victim))")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.black.opacity(0.45), in: Capsule())
+            }
+        }
+        .frame(minWidth: 120, alignment: .trailing)
+    }
+
+    private func sideName(_ side: CombatSide) -> String {
+        switch side {
+        case .you: return language.t(.you)
+        case .ct: return language.t(.defenderShort)
+        case .t: return language.t(.terroristShort)
         }
     }
 

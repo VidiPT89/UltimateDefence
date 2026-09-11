@@ -26,3 +26,24 @@ enum BotTeam {
     case terrorist
     case counter
 }
+
+enum CombatSide: Equatable {
+    case you, ct, t
+}
+
+struct KillLine: Identifiable, Equatable {
+    let id: Int
+    let killer: CombatSide
+    let victim: CombatSide
+}
+
+struct RadarBlip: Identifiable, Equatable {
+    let id: String
+    let x: Float
+    let z: Float
+    let kind: Kind
+
+    enum Kind: Equatable {
+        case player, ally, enemy, site, bomb
+    }
+}

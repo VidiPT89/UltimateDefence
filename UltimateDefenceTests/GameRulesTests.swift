@@ -127,6 +127,14 @@ final class GameRulesTests: XCTestCase {
         XCTAssertGreaterThan(GameRules.playerSpeed, GameRules.botSpeed)
     }
 
+    func testRunningOpensTheAimMoreThanCrouching() {
+        let run = GameRules.aimSpread(moving: true, walking: false, crouching: false, aiming: false)
+        let crouch = GameRules.aimSpread(moving: false, walking: false, crouching: true, aiming: true)
+        XCTAssertGreaterThan(run, crouch)
+        XCTAssertEqual(GameRules.freezeTime, 3)
+        XCTAssertEqual(GameRules.roundTime, 105)
+    }
+
     func testBotHitChanceFallsOffWithDistance() {
         let close = GameRules.botHitChance(distance: 2)
         let far = GameRules.botHitChance(distance: 28)

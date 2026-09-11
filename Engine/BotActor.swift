@@ -6,7 +6,6 @@ final class BotActor {
     let id: Int
     let team: BotTeam
     let node: SCNNode
-    let head: SCNNode
     var health = GameRules.botMaxHealth
     var lastShot: TimeInterval = 0
     var plantProgress: TimeInterval = 0
@@ -37,7 +36,7 @@ final class BotActor {
         node = SCNNode()
         node.name = "\(prefix)\(id)"
         node.position = SCNVector3(spawn.x, 0, spawn.z)
-        head = CharacterMesh.attach(
+        CharacterMesh.attach(
             to: node,
             team: team,
             variant: id,

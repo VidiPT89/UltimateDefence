@@ -108,8 +108,9 @@ struct GameRules {
         return spread
     }
 
-    static func botHitChance(distance: Float) -> Float {
+    static func botHitChance(distance: Float, difficulty: Difficulty = .normal) -> Float {
         let closeness = 1 - min(1, max(0, distance / 30))
-        return 0.18 + closeness * 0.44
+        let base = 0.18 + closeness * 0.44
+        return min(0.9, base * difficulty.hitScale)
     }
 }

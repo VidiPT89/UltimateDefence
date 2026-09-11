@@ -22,6 +22,38 @@ enum MatchSize: Int, CaseIterable, Identifiable {
     var label: String { "\(rawValue)v\(rawValue)" }
 }
 
+enum Difficulty: String, CaseIterable, Identifiable {
+    case easy
+    case normal
+    case hard
+
+    var id: String { rawValue }
+
+    var hitScale: Float {
+        switch self {
+        case .easy: return 0.52
+        case .normal: return 1
+        case .hard: return 1.38
+        }
+    }
+
+    var speedScale: Float {
+        switch self {
+        case .easy: return 0.82
+        case .normal: return 1
+        case .hard: return 1.14
+        }
+    }
+
+    var damageScale: Float {
+        switch self {
+        case .easy: return 0.65
+        case .normal: return 1
+        case .hard: return 1.3
+        }
+    }
+}
+
 enum BotTeam {
     case terrorist
     case counter

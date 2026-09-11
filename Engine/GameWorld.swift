@@ -201,7 +201,8 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 walls: layout.walls,
                 bombPlanted: bombPlanted,
                 planterId: terrorists.filter(\.isAlive).map(\.id).min() ?? 0,
-                others: bots
+                others: bots,
+                speedScale: session.difficulty.speedScale
             )
             switch action {
             case .idle:
@@ -239,10 +240,11 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         FX.spark(at: muzzlePos, in: scene.rootNode, color: NSColor(calibratedRed: 1, green: 0.72, blue: 0.25, alpha: 1))
         FX.tracer(from: muzzlePos, to: dest, in: scene.rootNode)
         let distance = Collision.distanceXZ(origin, targetPos)
-        guard Float.random(in: 0...1) < GameRules.botHitChance(distance: distance) else { return }
+        guard Float.random(in: 0...1) < GameRules.botHitChance(distance: distance, difficulty: session.difficulty) else { return }
         if toPlayer {
             let before = player.health
-            player.takeDamage(Int.random(in: 12...24))
+            let raw = Float.random(in: 12...24) * session.difficulty.damageScale
+            player.takeDamage(max(1, Int(raw.rounded())))
             if player.health < before {
                 onMain { self.session.damageTick += 1 }
                 sounds.playHit()
@@ -376,11 +378,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     }
 
     private func onMain(_ work: @escaping () -> Void) {
-        if Thread.isMainThread {
-            work()
-        } else {
-            DispatchQueue.main.async(execute: work)
-        }
+        DispatchQueue.main.async(execute: work)
     }
 
     private func spreadAim(_ dir: SIMD3<Float>) -> SIMD3<Float> {

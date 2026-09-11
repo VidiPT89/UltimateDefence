@@ -15,6 +15,7 @@ final class GameSession: ObservableObject {
     @Published var defendersAlive = 5
     @Published var arena: ArenaMap = .dust2
     @Published var matchSize: MatchSize = .five
+    @Published var difficulty: Difficulty = .normal
     @Published var outcome: RoundOutcome = .inProgress
     @Published var reloading = false
     @Published var capturedMouse = false

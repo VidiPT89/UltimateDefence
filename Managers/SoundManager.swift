@@ -5,8 +5,14 @@ final class SoundManager: ObservableObject {
     @AppStorage("soundEnabled") var soundEnabled = true
 
     private var players: [AVAudioPlayer] = []
+    private var lastShootAt: TimeInterval = 0
 
-    func playShoot() { play(Self.shoot) }
+    func playShoot() {
+        let now = ProcessInfo.processInfo.systemUptime
+        guard now - lastShootAt >= 0.055 else { return }
+        lastShootAt = now
+        play(Self.shoot)
+    }
     func playDry() { play(Self.dry) }
     func playHit() { play(Self.hit) }
     func playStep() { play(Self.step) }

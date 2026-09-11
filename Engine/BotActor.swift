@@ -45,7 +45,8 @@ final class BotActor {
         walls: [AABB],
         bombPlanted: Bool,
         planterId: Int,
-        others: [BotActor]
+        others: [BotActor],
+        speedScale: Float
     ) -> BotAction {
         guard isAlive else { return .idle }
         let pos = SIMD3(Float(node.position.x), 0, Float(node.position.z))
@@ -69,7 +70,8 @@ final class BotActor {
                 dt: dt,
                 walls: walls,
                 others: others,
-                slow: plantProgress > 0.2
+                slow: plantProgress > 0.2,
+                speedScale: speedScale
             )
             face(isTerrorist ? goal(from: pos, site: site, bombPlanted: bombPlanted, planterId: planterId, idleAim: idleAim) : idleAim)
         } else {
@@ -137,13 +139,14 @@ final class BotActor {
         dt: Float,
         walls: [AABB],
         others: [BotActor],
-        slow: Bool
+        slow: Bool,
+        speedScale: Float
     ) {
         var dir = SIMD3(look.x - pos.x, 0, look.z - pos.z)
         let len = simd_length(dir)
         guard len > 0.35 else { return }
         dir /= len
-        var speed = GameRules.botSpeed * (rush ? 1.05 : 0.92)
+        var speed = GameRules.botSpeed * (rush ? 1.05 : 0.92) * speedScale
         if slow { speed *= 0.28 }
         var next = pos + dir * speed * dt
         for other in others where other.id != id && other.isAlive && other.team == team {

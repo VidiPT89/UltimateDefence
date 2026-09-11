@@ -65,20 +65,20 @@ enum WeaponRig {
             root.addChildNode(box(0.09, 0.08, 0.16, x: 0.08, y: -0.2, z: -0.24, color: skin))
             root.addChildNode(box(0.1, 0.07, 0.14, x: 0.2, y: -0.19, z: -0.2, color: glove))
             root.addChildNode(box(0.05, 0.055, 0.18, x: 0.2, y: -0.15, z: -0.16, color: wood))
-            root.addChildNode(box(0.07, 0.085, 0.22, x: 0.2, y: -0.145, z: -0.32, color: dark))
+            root.addChildNode(box(0.07, 0.085, 0.22, x: 0.2, y: -0.145, z: -0.32, color: dark, metal: true))
             root.addChildNode(box(0.055, 0.06, 0.28, x: 0.2, y: -0.15, z: -0.52, color: wood))
-            root.addChildNode(box(0.03, 0.03, 0.38, x: 0.2, y: -0.13, z: -0.78, color: steel))
-            root.addChildNode(box(0.018, 0.018, 0.08, x: 0.2, y: -0.13, z: -0.98, color: dark))
-            root.addChildNode(box(0.02, 0.07, 0.03, x: 0.2, y: -0.08, z: -0.72, color: dark))
-            root.addChildNode(box(0.045, 0.16, 0.07, x: 0.2, y: -0.24, z: -0.38, color: dark))
+            root.addChildNode(box(0.03, 0.03, 0.38, x: 0.2, y: -0.13, z: -0.78, color: steel, metal: true))
+            root.addChildNode(box(0.018, 0.018, 0.08, x: 0.2, y: -0.13, z: -0.98, color: dark, metal: true))
+            root.addChildNode(box(0.02, 0.07, 0.03, x: 0.2, y: -0.08, z: -0.72, color: dark, metal: true))
+            root.addChildNode(box(0.045, 0.16, 0.07, x: 0.2, y: -0.24, z: -0.38, color: dark, metal: true))
             root.addChildNode(box(0.038, 0.12, 0.06, x: 0.2, y: -0.26, z: -0.36, color: wood))
-            root.addChildNode(box(0.04, 0.12, 0.055, x: 0.2, y: -0.22, z: -0.28, color: dark))
+            root.addChildNode(box(0.04, 0.12, 0.055, x: 0.2, y: -0.22, z: -0.28, color: dark, metal: true))
             root.addChildNode(box(0.08, 0.05, 0.09, x: 0.08, y: -0.17, z: -0.42, color: glove))
         case .pistol:
             root.addChildNode(box(0.08, 0.07, 0.14, x: 0.16, y: -0.18, z: -0.26, color: skin))
-            root.addChildNode(box(0.048, 0.055, 0.22, x: 0.18, y: -0.135, z: -0.42, color: steel))
-            root.addChildNode(box(0.04, 0.14, 0.055, x: 0.18, y: -0.24, z: -0.28, color: dark))
-            root.addChildNode(box(0.03, 0.025, 0.06, x: 0.18, y: -0.11, z: -0.5, color: dark))
+            root.addChildNode(box(0.048, 0.055, 0.22, x: 0.18, y: -0.135, z: -0.42, color: steel, metal: true))
+            root.addChildNode(box(0.04, 0.14, 0.055, x: 0.18, y: -0.24, z: -0.28, color: dark, metal: true))
+            root.addChildNode(box(0.03, 0.025, 0.06, x: 0.18, y: -0.11, z: -0.5, color: dark, metal: true))
             root.addChildNode(box(0.07, 0.05, 0.07, x: 0.12, y: -0.16, z: -0.32, color: glove))
         }
         camera.addChildNode(root)
@@ -100,9 +100,18 @@ enum WeaponRig {
     private static let skin = NSColor(calibratedRed: 0.72, green: 0.54, blue: 0.42, alpha: 1)
     private static let glove = NSColor(calibratedRed: 0.12, green: 0.12, blue: 0.1, alpha: 1)
 
-    private static func box(_ w: CGFloat, _ h: CGFloat, _ l: CGFloat, x: CGFloat, y: CGFloat, z: CGFloat, color: NSColor) -> SCNNode {
+    private static func box(
+        _ w: CGFloat,
+        _ h: CGFloat,
+        _ l: CGFloat,
+        x: CGFloat,
+        y: CGFloat,
+        z: CGFloat,
+        color: NSColor,
+        metal: Bool = false
+    ) -> SCNNode {
         let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0.006)
-        g.firstMaterial = MapTextures.goldSrc(color)
+        g.firstMaterial = metal ? MapTextures.metalSrc(color) : MapTextures.goldSrc(color)
         let n = SCNNode(geometry: g)
         n.position = SCNVector3(x, y, z)
         return n

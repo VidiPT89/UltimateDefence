@@ -2,7 +2,7 @@ import AppKit
 import SceneKit
 
 enum MapTextures {
-    static let sand = make(size: 256) { x, y, _ in
+    static let sand = make(size: 512) { x, y, _ in
         let n = noise(x, y)
         let n2 = noise(x * 3, y * 2)
         let grit = CGFloat((x * 17 + y * 11) % 13) * 0.012
@@ -31,7 +31,7 @@ enum MapTextures {
         dirt: true
     )
 
-    static let plaster = make(size: 256) { x, y, _ in
+    static let plaster = make(size: 512) { x, y, _ in
         let n = noise(x, y)
         let smear = noise(x / 2, y * 3) * 0.05
         let stain = hash(x / 40, y / 28) < 0.08 ? -0.14 : 0
@@ -39,7 +39,7 @@ enum MapTextures {
         return clamp(0.78 + n * 0.04 + smear + stain + scuff, 0.74 + n * 0.03 + stain, 0.66 + n * 0.02)
     }
 
-    static let concrete = make(size: 256) { x, y, _ in
+    static let concrete = make(size: 512) { x, y, _ in
         let n = noise(x, y)
         let n2 = noise(x * 2, y * 2)
         let crack = (x + y) % 61 == 0 || (x * 2 + y) % 89 == 0 ? -0.16 : 0
@@ -111,8 +111,34 @@ enum MapTextures {
         return (0.18, 0.18, 0.16)
     }
 
+    static let camoKhaki = camo(a: (0.50, 0.44, 0.28), b: (0.36, 0.32, 0.18), c: (0.62, 0.54, 0.34))
+    static let camoSand = camo(a: (0.70, 0.60, 0.38), b: (0.52, 0.44, 0.26), c: (0.38, 0.32, 0.18))
+    static let camoOlive = camo(a: (0.28, 0.34, 0.20), b: (0.18, 0.22, 0.12), c: (0.42, 0.40, 0.22))
+    static let camoCT = digital(a: (0.12, 0.22, 0.32), b: (0.10, 0.28, 0.24), c: (0.08, 0.10, 0.14))
+    static let camoCTDark = digital(a: (0.08, 0.12, 0.18), b: (0.10, 0.16, 0.14), c: (0.06, 0.08, 0.10))
+    static let kevlarDark = weave(base: (0.16, 0.16, 0.14))
+    static let kevlarTan = weave(base: (0.46, 0.40, 0.28))
+    static let kevlarGreen = weave(base: (0.18, 0.24, 0.16))
+    static let skinTone = make(size: 128) { x, y, _ in
+        let n = noise(x, y) * 0.06
+        return clamp(0.76 + n, 0.56 + n * 0.5, 0.42 + n * 0.3)
+    }
+    static let bootLeather = make(size: 64) { x, y, _ in
+        let n = noise(x, y)
+        return clamp(0.10 + n * 0.04, 0.08, 0.06)
+    }
+    static let gunMetal = make(size: 64) { x, y, _ in
+        let n = noise(x * 2, y)
+        let line = y % 8 == 0 ? 0.06 : 0
+        return clamp(0.22 + n * 0.05 + line, 0.22, 0.20)
+    }
+    static let gunWood = make(size: 64) { x, y, _ in
+        let grain = noise(x * 4, y) * 0.08
+        return clamp(0.42 + grain, 0.26 + grain * 0.4, 0.12)
+    }
+
     static func sky(top: NSColor, bottom: NSColor, clouds: Bool = true) -> NSImage {
-        make(size: 256) { x, y, size in
+        make(size: 512) { x, y, size in
             var tr: CGFloat = 0, tg: CGFloat = 0, tb: CGFloat = 0, a: CGFloat = 0
             var br: CGFloat = 0, bg: CGFloat = 0, bb: CGFloat = 0
             top.getRed(&tr, green: &tg, blue: &tb, alpha: &a)
@@ -130,8 +156,8 @@ enum MapTextures {
                     b += (0.86 - b) * w
                 }
             }
-            let sun = hypot(CGFloat(x - 390), CGFloat(y - 430))
-            if sun < 18 {
+            let sun = hypot(CGFloat(x - 410), CGFloat(y - 430))
+            if sun < 28 {
                 return (1, 0.95, 0.72)
             }
             return clamp(r, g, b)
@@ -139,16 +165,24 @@ enum MapTextures {
     }
 
     static func goldSrc(_ contents: Any) -> SCNMaterial {
+        phong(contents, spec: 0.05, shine: 8)
+    }
+
+    static func metalSrc(_ contents: Any) -> SCNMaterial {
+        phong(contents, spec: 0.22, shine: 24)
+    }
+
+    private static func phong(_ contents: Any, spec: CGFloat, shine: CGFloat) -> SCNMaterial {
         let mat = SCNMaterial()
-        mat.lightingModel = .lambert
+        mat.lightingModel = .phong
         mat.diffuse.contents = contents
         mat.diffuse.wrapS = .repeat
         mat.diffuse.wrapT = .repeat
         mat.diffuse.magnificationFilter = .linear
         mat.diffuse.minificationFilter = .linear
         mat.diffuse.mipFilter = .linear
-        mat.specular.contents = NSColor.black
-        mat.shininess = 0
+        mat.specular.contents = NSColor(white: spec, alpha: 1)
+        mat.shininess = shine
         mat.locksAmbientWithDiffuse = true
         mat.isDoubleSided = false
         mat.writesToDepthBuffer = true
@@ -169,7 +203,7 @@ enum MapTextures {
         mortar: (CGFloat, CGFloat, CGFloat),
         dirt: Bool
     ) -> NSImage {
-        make(size: 256) { x, y, _ in
+        make(size: 512) { x, y, _ in
             let row = y / brickH
             let shift = (row % 2) * (brickW / 2)
             let gx = (x + shift) % brickW
@@ -214,6 +248,41 @@ enum MapTextures {
         let image = NSImage(size: NSSize(width: size, height: size))
         image.addRepresentation(rep)
         return image
+    }
+
+    private static func camo(
+        a: (CGFloat, CGFloat, CGFloat),
+        b: (CGFloat, CGFloat, CGFloat),
+        c: (CGFloat, CGFloat, CGFloat)
+    ) -> NSImage {
+        make(size: 256) { x, y, _ in
+            let blob = hash(x / 10, y / 8)
+            let n = noise(x / 2, y / 2)
+            if blob < 0.28 { return clamp(b.0 + n * 0.04, b.1, b.2) }
+            if blob > 0.72 { return clamp(c.0 + n * 0.04, c.1, c.2) }
+            return clamp(a.0 + n * 0.05, a.1, a.2)
+        }
+    }
+
+    private static func digital(
+        a: (CGFloat, CGFloat, CGFloat),
+        b: (CGFloat, CGFloat, CGFloat),
+        c: (CGFloat, CGFloat, CGFloat)
+    ) -> NSImage {
+        make(size: 256) { x, y, _ in
+            let cell = hash(x / 8, y / 8)
+            if cell < 0.33 { return a }
+            if cell < 0.66 { return b }
+            return c
+        }
+    }
+
+    private static func weave(base: (CGFloat, CGFloat, CGFloat)) -> NSImage {
+        make(size: 128) { x, y, _ in
+            let stitch = CGFloat((x + y) % 4) * 0.02
+            let n = noise(x, y) * 0.04
+            return clamp(base.0 + stitch + n, base.1 + stitch * 0.5, base.2)
+        }
     }
 
     private static func clamp(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat) -> (CGFloat, CGFloat, CGFloat) {

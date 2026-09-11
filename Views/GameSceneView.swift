@@ -103,6 +103,7 @@ struct GameSceneView: NSViewRepresentable {
         view.autoenablesDefaultLighting = false
         view.antialiasingMode = .multisampling4X
         view.preferredFramesPerSecond = 60
+        view.isJitteringEnabled = true
         view.backgroundColor = NSColor(calibratedRed: 0.58, green: 0.73, blue: 0.88, alpha: 1)
         view.onKey = { code, down in world.handleKey(code, down: down) }
         view.onLook = { dx, dy in world.player.look(dx: dx, dy: dy) }

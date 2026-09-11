@@ -124,6 +124,7 @@ final class PlayerController {
         if walking { speed *= GameRules.walkMultiplier }
         if crouching { speed *= GameRules.crouchMultiplier }
         if aiming { speed *= 0.78 }
+        if shooting { speed *= GameRules.shootSpeedMultiplier }
         let target = dir * speed
         velocity += (target - velocity) * min(1, dt * 11)
         bob += dt * (walking ? 7 : crouching ? 6 : 12)

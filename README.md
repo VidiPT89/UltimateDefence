@@ -13,9 +13,9 @@
 - ✅ Match sizes from 1v1 to 6v6 with allied defender bots versus terrorist bots
 - ✅ Dying ends the round immediately
 - ✅ Humanoid CT and T models, crates, barrels and indoor/outdoor compounds
-- ✅ Walk (Shift), crouch (Ctrl), jump, aim-down-sights, recoil punch and distance-based bot accuracy
+- ✅ Walk (Shift), crouch (Ctrl), jump, aim-down-sights, recoil punch and Source-like fire slowdown
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
-- ✅ One designated attacker plants on Site A; the others take mid, long or tunnel
+- ✅ Bots rush, lurk or hold: they strafe in gunfights, rotate to mid and keep moving instead of standing still
 - ✅ HUD: health, ammo, round timer and defuse progress
 - ✅ Bilingual PT-PT / English language switch
 - ✅ Dark, Light and System appearance, with iVidi.dev orange, burnt yellow and black

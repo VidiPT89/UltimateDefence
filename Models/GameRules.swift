@@ -59,10 +59,11 @@ struct GameRules {
     static let playerMaxHealth = 100
     static let botMaxHealth = 100
     static let siteRadius: Float = 4.5
-    static let playerSpeed: Float = 6.6
+    static let playerSpeed: Float = 7.1
     static let walkMultiplier: Float = 0.52
     static let crouchMultiplier: Float = 0.34
-    static let botSpeed: Float = 4.1
+    static let botSpeed: Float = 5.8
+    static let shootSpeedMultiplier: Float = 0.34
     static let jumpVelocity: Float = 7.4
     static let gravity: Float = 22
 
@@ -99,6 +100,6 @@ struct GameRules {
 
     static func botHitChance(distance: Float) -> Float {
         let closeness = 1 - min(1, max(0, distance / 30))
-        return 0.14 + closeness * 0.36
+        return 0.18 + closeness * 0.44
     }
 }

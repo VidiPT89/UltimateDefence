@@ -33,8 +33,8 @@ final class MapKit {
     init(sky: NSImage, fog: NSColor, wall: NSImage, indoor: Bool) {
         wallTexture = wall
         scene.background.contents = sky
-        scene.fogStartDistance = indoor ? 28 : 55
-        scene.fogEndDistance = indoor ? 70 : 140
+        scene.fogStartDistance = indoor ? 38 : 70
+        scene.fogEndDistance = indoor ? 95 : 160
         scene.fogColor = fog
         addLights(indoor: indoor)
         let void = SCNBox(width: 180, height: 1, length: 180, chamferRadius: 0)
@@ -182,7 +182,7 @@ final class MapKit {
         let ambient = SCNNode()
         ambient.light = SCNLight()
         ambient.light?.type = .ambient
-        ambient.light?.intensity = indoor ? 280 : 420
+        ambient.light?.intensity = indoor ? 360 : 520
         ambient.light?.color = indoor
             ? NSColor(calibratedRed: 0.62, green: 0.64, blue: 0.60, alpha: 1)
             : NSColor(calibratedRed: 0.78, green: 0.74, blue: 0.64, alpha: 1)
@@ -190,7 +190,7 @@ final class MapKit {
         let sun = SCNNode()
         sun.light = SCNLight()
         sun.light?.type = .directional
-        sun.light?.intensity = indoor ? 700 : 980
+        sun.light?.intensity = indoor ? 850 : 1200
         sun.light?.color = indoor
             ? NSColor(calibratedRed: 0.92, green: 0.94, blue: 0.90, alpha: 1)
             : NSColor(calibratedRed: 1, green: 0.96, blue: 0.82, alpha: 1)

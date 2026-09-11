@@ -104,32 +104,32 @@ enum CharacterMesh {
         switch v {
         case 0:
             return Look(skin: skin,
-                        shirt: NSColor(calibratedRed: 0.12, green: 0.16, blue: 0.14, alpha: 1),
-                        pants: NSColor(calibratedRed: 0.1, green: 0.12, blue: 0.1, alpha: 1),
+                        shirt: NSColor(calibratedRed: 0.12, green: 0.28, blue: 0.42, alpha: 1),
+                        pants: NSColor(calibratedRed: 0.08, green: 0.14, blue: 0.22, alpha: 1),
                         boot: boot, vest: true,
-                        vestColor: NSColor(calibratedRed: 0.14, green: 0.18, blue: 0.16, alpha: 1),
+                        vestColor: NSColor(calibratedRed: 0.16, green: 0.22, blue: 0.18, alpha: 1),
                         gun: gun, hat: .helmet)
         case 1:
             return Look(skin: skin,
-                        shirt: NSColor(calibratedRed: 0.18, green: 0.2, blue: 0.22, alpha: 1),
-                        pants: NSColor(calibratedRed: 0.16, green: 0.16, blue: 0.18, alpha: 1),
+                        shirt: NSColor(calibratedRed: 0.10, green: 0.32, blue: 0.28, alpha: 1),
+                        pants: NSColor(calibratedRed: 0.08, green: 0.16, blue: 0.18, alpha: 1),
                         boot: boot, vest: true,
-                        vestColor: NSColor(calibratedRed: 0.2, green: 0.22, blue: 0.18, alpha: 1),
+                        vestColor: NSColor(calibratedRed: 0.18, green: 0.24, blue: 0.16, alpha: 1),
                         gun: gun, hat: .beanie)
         case 2:
             return Look(skin: skin,
-                        shirt: NSColor(calibratedRed: 0.14, green: 0.16, blue: 0.2, alpha: 1),
-                        pants: NSColor(calibratedRed: 0.12, green: 0.12, blue: 0.14, alpha: 1),
+                        shirt: NSColor(calibratedRed: 0.14, green: 0.22, blue: 0.38, alpha: 1),
+                        pants: NSColor(calibratedRed: 0.10, green: 0.12, blue: 0.22, alpha: 1),
                         boot: boot, vest: true,
-                        vestColor: NSColor(calibratedRed: 0.16, green: 0.18, blue: 0.2, alpha: 1),
+                        vestColor: NSColor(calibratedRed: 0.20, green: 0.22, blue: 0.18, alpha: 1),
                         gun: gun, hat: .helmet)
         default:
             return Look(skin: skin,
-                        shirt: NSColor(calibratedRed: 0.16, green: 0.18, blue: 0.22, alpha: 1),
-                        pants: NSColor(calibratedRed: 0.12, green: 0.13, blue: 0.16, alpha: 1),
+                        shirt: NSColor(calibratedRed: 0.16, green: 0.26, blue: 0.34, alpha: 1),
+                        pants: NSColor(calibratedRed: 0.10, green: 0.14, blue: 0.20, alpha: 1),
                         boot: boot, vest: true,
-                        vestColor: NSColor(calibratedRed: 0.1, green: 0.12, blue: 0.16, alpha: 1),
-                        gun: gun, hat: .balaclava)
+                        vestColor: NSColor(calibratedRed: 0.12, green: 0.16, blue: 0.22, alpha: 1),
+                        gun: gun, hat: .helmet)
         }
     }
 

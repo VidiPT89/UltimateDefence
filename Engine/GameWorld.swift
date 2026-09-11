@@ -184,7 +184,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     private func updateBots(dt: Float, now: TimeInterval) {
         let terrorists = bots.filter(\.isTerrorist)
         let defenders = bots.filter { !$0.isTerrorist }
-        let rotate = layout.attackPaths.first.flatMap { $0.dropFirst().dropFirst().first } ?? layout.siteCenter
+        let idleAim = layout.attackerSpawns.first ?? layout.siteCenter
         for bot in bots where bot.isAlive {
             let enemies = bot.isTerrorist ? defenders : terrorists
             let action = bot.update(
@@ -193,7 +193,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 player: player,
                 enemies: enemies,
                 site: layout.siteCenter,
-                rotatePoint: rotate,
+                idleAim: idleAim,
                 walls: layout.walls,
                 bombPlanted: bombPlanted,
                 planterId: terrorists.filter(\.isAlive).map(\.id).min() ?? 0,

@@ -15,7 +15,7 @@
 - ✅ Humanoid CT and T models, crates, barrels and indoor/outdoor compounds
 - ✅ Walk (Shift), crouch (Ctrl), jump, ADS, recoil punch, fire slowdown, freeze time and movement spread
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
-- ✅ Bots rush, lurk or hold: they strafe in gunfights, rotate to mid and keep moving instead of standing still
+- ✅ Bots follow their route, stop to shoot, then push the site; CTs hold their post
 - ✅ HUD: health, ammo, round timer and defuse progress
 - ✅ Bilingual PT-PT / English language switch
 - ✅ Dark, Light and System appearance, with iVidi.dev orange, burnt yellow and black

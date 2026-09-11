@@ -164,6 +164,11 @@ enum MapTextures {
         }
     }
 
+    static func skyBox(from image: NSImage) -> [NSImage] {
+        let dark = make(size: 128) { _, _, _ in (0.18, 0.16, 0.12) }
+        return [image, image, image, dark, image, image]
+    }
+
     static func goldSrc(_ contents: Any) -> SCNMaterial {
         phong(contents, spec: 0.05, shine: 8)
     }

@@ -4,15 +4,13 @@ import AppKit
 enum CharacterMesh {
     static func attach(to root: SCNNode, team: BotTeam, variant: Int, name: String, headName: String) {
         let look = palette(team: team, variant: variant)
-        let hips = capsule(0.16, 0.22, at: SCNVector3(0, 0.96, 0.02), tex: look.pants)
+        let hips = box(0.34, 0.18, 0.22, at: SCNVector3(0, 0.96, 0.02), tex: look.pants)
         root.addChildNode(hips)
+        limbLeg(root, name: "gait-l", x: -0.12, pants: look.pants, boot: look.boot)
+        limbLeg(root, name: "gait-r", x: 0.12, pants: look.pants, boot: look.boot)
 
-        leg(root, x: -0.12, pants: look.pants, boot: look.boot)
-        leg(root, x: 0.12, pants: look.pants, boot: look.boot)
-
-        let chest = capsule(0.20, 0.52, at: SCNVector3(0, 1.34, 0.03), tex: look.shirt)
+        let chest = box(0.42, 0.50, 0.24, at: SCNVector3(0, 1.34, 0.03), tex: look.shirt)
         chest.name = name
-        chest.scale = SCNVector3(1.12, 1, 0.78)
         root.addChildNode(chest)
 
         if look.vest {
@@ -22,7 +20,7 @@ enum CharacterMesh {
             pouch(root, x: 0.12, tex: look.vestTex)
         }
 
-        let neck = cylinder(0.055, 0.1, at: SCNVector3(0, 1.58, 0.03), tex: look.skin)
+        let neck = box(0.11, 0.10, 0.11, at: SCNVector3(0, 1.58, 0.03), tex: look.skin)
         root.addChildNode(neck)
         let headGeom = SCNSphere(radius: 0.115)
         headGeom.segmentCount = 18
@@ -35,9 +33,21 @@ enum CharacterMesh {
         addFace(head, skin: look.skin)
         addHeadgear(head, look: look)
 
-        arm(root, side: -1, look: look)
-        arm(root, side: 1, look: look)
+        limbArm(root, name: "gait-arm-l", side: -1, look: look)
+        limbArm(root, name: "gait-arm-r", side: 1, look: look)
         rifle(root, look: look)
+        if team == .terrorist {
+            let pack = box(0.22, 0.26, 0.12, at: SCNVector3(0, 1.32, -0.16), tex: look.vestTex)
+            root.addChildNode(pack)
+        }
+    }
+
+    static func applyGait(on root: SCNNode, phase: Float, moving: Bool) {
+        let swing = moving ? sin(phase) * 0.52 : 0
+        root.childNode(withName: "gait-l", recursively: false)?.eulerAngles.x = CGFloat(swing)
+        root.childNode(withName: "gait-r", recursively: false)?.eulerAngles.x = CGFloat(-swing)
+        root.childNode(withName: "gait-arm-l", recursively: false)?.eulerAngles.x = CGFloat(-0.15 - swing * 0.35)
+        root.childNode(withName: "gait-arm-r", recursively: false)?.eulerAngles.x = CGFloat(-0.15 + swing * 0.35)
     }
 
     private struct Look {
@@ -105,27 +115,29 @@ enum CharacterMesh {
         }
     }
 
-    private static func leg(_ root: SCNNode, x: Float, pants: NSImage, boot: NSImage) {
-        let thigh = capsule(0.09, 0.38, at: SCNVector3(x, 0.72, 0.02), tex: pants)
-        thigh.scale = SCNVector3(1, 1, 1.08)
-        root.addChildNode(thigh)
-        let calf = capsule(0.075, 0.36, at: SCNVector3(x, 0.36, 0.03), tex: pants)
-        root.addChildNode(calf)
-        let foot = box(0.12, 0.10, 0.26, at: SCNVector3(x, 0.07, 0.06), tex: boot)
-        root.addChildNode(foot)
+    private static func limbLeg(_ root: SCNNode, name: String, x: Float, pants: NSImage, boot: NSImage) {
+        let pivot = SCNNode()
+        pivot.name = name
+        pivot.position = SCNVector3(x, 0.92, 0.02)
+        pivot.addChildNode(box(0.14, 0.38, 0.16, at: SCNVector3(0, -0.20, 0), tex: pants))
+        pivot.addChildNode(box(0.12, 0.34, 0.15, at: SCNVector3(0, -0.54, 0.01), tex: pants))
+        pivot.addChildNode(box(0.12, 0.10, 0.26, at: SCNVector3(0, -0.85, 0.06), tex: boot))
+        root.addChildNode(pivot)
     }
 
-    private static func arm(_ root: SCNNode, side: Float, look: Look) {
-        let shoulder = sphere(0.09, at: SCNVector3(side * 0.30, 1.50, 0.04), tex: look.shirt)
-        root.addChildNode(shoulder)
-        let upper = capsule(0.065, 0.30, at: SCNVector3(side * 0.32, 1.38, -0.12), tex: look.shirt)
-        upper.eulerAngles.x = -0.85
-        root.addChildNode(upper)
-        let lower = capsule(0.055, 0.28, at: SCNVector3(side * 0.24, 1.30, -0.34), tex: look.skin)
-        lower.eulerAngles.x = -0.35
-        root.addChildNode(lower)
-        let hand = sphere(0.055, at: SCNVector3(side * 0.18, 1.26, -0.48), tex: look.skin)
-        root.addChildNode(hand)
+    private static func limbArm(_ root: SCNNode, name: String, side: Float, look: Look) {
+        let pivot = SCNNode()
+        pivot.name = name
+        pivot.position = SCNVector3(side * 0.30, 1.50, 0.04)
+        pivot.addChildNode(box(0.12, 0.14, 0.14, at: SCNVector3(0, 0, 0), tex: look.shirt))
+        let upper = box(0.11, 0.12, 0.28, at: SCNVector3(0, -0.04, -0.16), tex: look.shirt)
+        upper.eulerAngles.x = -0.55
+        pivot.addChildNode(upper)
+        let lower = box(0.10, 0.10, 0.24, at: SCNVector3(side * -0.04, -0.08, -0.36), tex: look.skin)
+        lower.eulerAngles.x = -0.25
+        pivot.addChildNode(lower)
+        pivot.addChildNode(box(0.09, 0.08, 0.10, at: SCNVector3(side * -0.08, -0.10, -0.50), tex: look.skin))
+        root.addChildNode(pivot)
     }
 
     private static func pouch(_ root: SCNNode, x: Float, tex: NSImage) {
@@ -140,8 +152,9 @@ enum CharacterMesh {
         let receiver = box(0.06, 0.08, 0.22, at: SCNVector3(0.14, 1.30, -0.40), tex: metal)
         receiver.eulerAngles.x = -0.12
         receiver.geometry?.firstMaterial = MapTextures.metalSrc(metal)
-        let barrel = cylinder(0.016, 0.36, at: SCNVector3(0.14, 1.32, -0.66), tex: metal)
-        barrel.eulerAngles.x = .pi / 2 - 0.12
+        let barrel = box(0.03, 0.03, 0.36, at: SCNVector3(0.14, 1.32, -0.66), tex: metal)
+        barrel.eulerAngles.x = -0.12
+        barrel.geometry?.firstMaterial = MapTextures.metalSrc(metal)
         let mag = box(0.04, 0.14, 0.06, at: SCNVector3(0.14, 1.20, -0.38), tex: metal)
         mag.eulerAngles.x = 0.18
         let grip = box(0.04, 0.12, 0.05, at: SCNVector3(0.14, 1.20, -0.28), tex: wood)
@@ -196,34 +209,8 @@ enum CharacterMesh {
         }
     }
 
-    private static func capsule(_ r: CGFloat, _ h: CGFloat, at: SCNVector3, tex: NSImage) -> SCNNode {
-        let g = SCNCapsule(capRadius: r, height: h)
-        g.firstMaterial = MapTextures.goldSrc(tex)
-        let n = SCNNode(geometry: g)
-        n.position = at
-        return n
-    }
-
-    private static func cylinder(_ r: CGFloat, _ h: CGFloat, at: SCNVector3, tex: NSImage) -> SCNNode {
-        let g = SCNCylinder(radius: r, height: h)
-        g.radialSegmentCount = 12
-        g.firstMaterial = MapTextures.goldSrc(tex)
-        let n = SCNNode(geometry: g)
-        n.position = at
-        return n
-    }
-
-    private static func sphere(_ r: CGFloat, at: SCNVector3, tex: NSImage) -> SCNNode {
-        let g = SCNSphere(radius: r)
-        g.segmentCount = 12
-        g.firstMaterial = MapTextures.goldSrc(tex)
-        let n = SCNNode(geometry: g)
-        n.position = at
-        return n
-    }
-
     private static func box(_ w: CGFloat, _ h: CGFloat, _ l: CGFloat, at: SCNVector3, tex: NSImage) -> SCNNode {
-        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0.012)
+        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0)
         g.firstMaterial = MapTextures.goldSrc(tex)
         let n = SCNNode(geometry: g)
         n.position = at
@@ -231,7 +218,7 @@ enum CharacterMesh {
     }
 
     private static func box(_ w: CGFloat, _ h: CGFloat, _ l: CGFloat, at: SCNVector3, color: NSColor) -> SCNNode {
-        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0.01)
+        let g = SCNBox(width: w, height: h, length: l, chamferRadius: 0)
         g.firstMaterial = MapTextures.goldSrc(color)
         let n = SCNNode(geometry: g)
         n.position = at

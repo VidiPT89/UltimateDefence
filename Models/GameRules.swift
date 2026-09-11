@@ -54,6 +54,9 @@ enum WeaponSlot: Int, CaseIterable {
 struct GameRules {
     static let roundTime: TimeInterval = 105
     static let freezeTime: TimeInterval = 3
+    static func freezeLeft(elapsed: TimeInterval) -> TimeInterval {
+        max(0, freezeTime - elapsed)
+    }
     static let plantTime: TimeInterval = 3.5
     static let bombTime: TimeInterval = 40
     static let defuseTime: TimeInterval = 5

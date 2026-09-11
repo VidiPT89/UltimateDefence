@@ -147,6 +147,12 @@ final class GameRulesTests: XCTestCase {
         XCTAssertGreaterThan(hard, GameRules.botHitChance(distance: 8, difficulty: .normal))
     }
 
+    func testFreezeCountsDownThenStops() {
+        XCTAssertEqual(GameRules.freezeLeft(elapsed: 0), 3)
+        XCTAssertEqual(GameRules.freezeLeft(elapsed: 1.5), 1.5)
+        XCTAssertEqual(GameRules.freezeLeft(elapsed: 4), 0)
+    }
+
     func testMatchSizeCountsAllies() {
         XCTAssertEqual(MatchSize.one.allyCount, 0)
         XCTAssertEqual(MatchSize.two.allyCount, 1)

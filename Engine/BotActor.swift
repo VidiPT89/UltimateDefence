@@ -13,6 +13,7 @@ final class BotActor {
     private let rush: Bool
     private var waypoint = 0
     private var burstLeft = 0
+    private var gait: Float = 0
 
     var isAlive: Bool { health > 0 }
     var isTerrorist: Bool { team == .terrorist }
@@ -63,8 +64,9 @@ final class BotActor {
         }
 
         let fighting = shootPlayer || target != nil
+        var walked = false
         if !fighting {
-            walk(
+            walked = walk(
                 from: pos,
                 toward: goal(from: pos, site: site, bombPlanted: bombPlanted, planterId: planterId, idleAim: idleAim),
                 dt: dt,
@@ -77,6 +79,8 @@ final class BotActor {
         } else {
             face(aim)
         }
+        gait += dt * (walked ? 9.2 : 0)
+        CharacterMesh.applyGait(on: node, phase: gait, moving: walked)
 
         let onSite = Collision.distanceXZ(pos, site) < GameRules.siteRadius
         if GameRules.canPlant(isTerrorist: isTerrorist, botId: id, planterId: planterId, planted: bombPlanted, onSite: onSite) {
@@ -141,10 +145,10 @@ final class BotActor {
         others: [BotActor],
         slow: Bool,
         speedScale: Float
-    ) {
+    ) -> Bool {
         var dir = SIMD3(look.x - pos.x, 0, look.z - pos.z)
         let len = simd_length(dir)
-        guard len > 0.35 else { return }
+        guard len > 0.35 else { return false }
         dir /= len
         var speed = GameRules.botSpeed * (rush ? 1.05 : 0.92) * speedScale
         if slow { speed *= 0.28 }
@@ -157,6 +161,7 @@ final class BotActor {
         }
         let resolved = Collision.resolve(position: pos, proposed: next, radius: 0.42, walls: walls)
         node.position = SCNVector3(resolved.x, 0, resolved.z)
+        return Collision.distanceXZ(pos, resolved) > 0.01
     }
 
     private func face(_ look: SIMD3<Float>) {

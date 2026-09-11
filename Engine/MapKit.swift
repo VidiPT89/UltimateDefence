@@ -36,7 +36,7 @@ final class MapKit {
 
     init(sky: NSImage, fog: NSColor, wall: NSImage, indoor: Bool) {
         wallTexture = wall
-        scene.background.contents = sky
+        scene.background.contents = MapTextures.skyBox(from: sky)
         scene.fogStartDistance = indoor ? 28 : 48
         scene.fogEndDistance = indoor ? 78 : 130
         scene.fogColor = fog
@@ -66,13 +66,20 @@ final class MapKit {
         node.name = collide ? NodeName.solid : NodeName.trim
         node.position = SCNVector3(x, y + h / 2, z)
         scene.rootNode.addChildNode(node)
+        let skirtH: Float = 0.16
+        let skirt = SCNBox(width: CGFloat(w + 0.02), height: CGFloat(skirtH), length: CGFloat(d + 0.02), chamferRadius: 0)
+        skirt.firstMaterial = MapTextures.goldSrc(NSColor(calibratedRed: 0.10, green: 0.09, blue: 0.07, alpha: 1))
+        let base = SCNNode(geometry: skirt)
+        base.name = NodeName.trim
+        base.position = SCNVector3(x, y + skirtH / 2, z)
+        scene.rootNode.addChildNode(base)
         if collide {
             walls.append(AABB(minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2, blocksSight: true))
         }
     }
 
     func crate(x: Float, z: Float, w: Float = 1.5, h: Float = 1.5, d: Float = 1.5, y: Float = 0) {
-        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0.03)
+        let box = SCNBox(width: CGFloat(w), height: CGFloat(h), length: CGFloat(d), chamferRadius: 0)
         box.materials = Self.tiledBox(MapTextures.crate, w: w, h: h, d: d)
         let node = SCNNode(geometry: box)
         node.name = NodeName.solid

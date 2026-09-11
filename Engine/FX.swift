@@ -67,7 +67,7 @@ enum WeaponRig {
             root.addChildNode(box(0.05, 0.055, 0.18, x: 0.2, y: -0.15, z: -0.16, color: wood))
             root.addChildNode(box(0.07, 0.085, 0.22, x: 0.2, y: -0.145, z: -0.32, color: dark, metal: true))
             root.addChildNode(box(0.055, 0.06, 0.28, x: 0.2, y: -0.15, z: -0.52, color: wood))
-            root.addChildNode(box(0.03, 0.03, 0.38, x: 0.2, y: -0.13, z: -0.78, color: steel, metal: true))
+            root.addChildNode(cyl(0.012, 0.42, x: 0.2, y: -0.13, z: -0.82, color: steel))
             root.addChildNode(box(0.018, 0.018, 0.08, x: 0.2, y: -0.13, z: -0.98, color: dark, metal: true))
             root.addChildNode(box(0.02, 0.07, 0.03, x: 0.2, y: -0.08, z: -0.72, color: dark, metal: true))
             root.addChildNode(box(0.045, 0.16, 0.07, x: 0.2, y: -0.24, z: -0.38, color: dark, metal: true))
@@ -114,6 +114,16 @@ enum WeaponRig {
         g.firstMaterial = metal ? MapTextures.metalSrc(color) : MapTextures.goldSrc(color)
         let n = SCNNode(geometry: g)
         n.position = SCNVector3(x, y, z)
+        return n
+    }
+
+    private static func cyl(_ r: CGFloat, _ h: CGFloat, x: CGFloat, y: CGFloat, z: CGFloat, color: NSColor) -> SCNNode {
+        let g = SCNCylinder(radius: r, height: h)
+        g.radialSegmentCount = 10
+        g.firstMaterial = MapTextures.metalSrc(color)
+        let n = SCNNode(geometry: g)
+        n.position = SCNVector3(x, y, z)
+        n.eulerAngles.x = .pi / 2
         return n
     }
 }

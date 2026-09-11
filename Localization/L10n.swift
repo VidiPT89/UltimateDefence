@@ -28,6 +28,7 @@ enum L10nKey: String, CaseIterable {
     case terroristShort
     case defenderShort
     case difficulty, easy, normal, hard
+    case freeze
 }
 
 enum L10n {
@@ -88,7 +89,8 @@ enum L10n {
         .difficulty: "Dificuldade",
         .easy: "Fácil",
         .normal: "Normal",
-        .hard: "Difícil"
+        .hard: "Difícil",
+        .freeze: "À espera"
     ]
 
     private static let en: [L10nKey: String] = [
@@ -143,6 +145,7 @@ enum L10n {
         .difficulty: "Difficulty",
         .easy: "Easy",
         .normal: "Normal",
-        .hard: "Hard"
+        .hard: "Hard",
+        .freeze: "Waiting"
     ]
 }

@@ -25,6 +25,21 @@ struct HUDView: View {
 
             crosshair
 
+            if session.freezeLeft > 0.05 {
+                VStack(spacing: 6) {
+                    Text(language.t(.freeze).uppercased())
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .tracking(2)
+                    Text("\(Int(session.freezeLeft.rounded(.up)))")
+                        .font(.system(size: 56, weight: .heavy, design: .rounded))
+                        .monospacedDigit()
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 28)
+                .padding(.vertical, 18)
+                .background(Color.black.opacity(0.45), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+
             VStack(spacing: 0) {
                 HStack(alignment: .top, spacing: 12) {
                     radar

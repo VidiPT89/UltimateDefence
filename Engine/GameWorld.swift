@@ -327,6 +327,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         let mag = player.currentMag
         let reserve = player.reserve[player.slot] ?? 0
         let slot = player.slot
+        let freeze = GameRules.freezeLeft(elapsed: CACurrentMediaTime() - player.roundStart)
         let timeLeft = bombPlanted ? max(0, GameRules.bombTime - bombElapsed) : max(0, GameRules.roundTime - roundElapsed)
         let planted = bombPlanted
         let defuse = min(1, player.defuseProgress / GameRules.defuseTime)
@@ -363,6 +364,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             if self.session.reserve != reserve { self.session.reserve = reserve }
             if self.session.slot != slot { self.session.slot = slot }
             if abs(self.session.timeLeft - timeLeft) > 0.05 { self.session.timeLeft = timeLeft }
+            if abs(self.session.freezeLeft - freeze) > 0.02 { self.session.freezeLeft = freeze }
             if self.session.bombPlanted != planted { self.session.bombPlanted = planted }
             if abs(self.session.defuseProgress - defuse) > 0.01 { self.session.defuseProgress = defuse }
             if self.session.attackersAlive != attackers { self.session.attackersAlive = attackers }

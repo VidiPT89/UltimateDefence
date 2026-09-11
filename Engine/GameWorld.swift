@@ -112,6 +112,11 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             sounds.playReload()
         }
         wasReloading = reloading
+        if now - player.roundStart < GameRules.freezeTime {
+            player.applyLook()
+            publishHUD()
+            return
+        }
         player.move(dt: dt, walls: layout.walls)
         if player.moving, player.grounded, now - lastStep > (player.sprinting ? 0.28 : 0.38) {
             lastStep = now
@@ -134,9 +139,9 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         sounds.playShoot()
         flashMuzzle()
         WeaponRig.kick(player.cameraNode)
-        let hits = aimHits()
+        let dir = spreadAim(cameraForward())
+        let hits = aimHits(dir: dir)
         let origin = player.cameraNode.worldPosition
-        let dir = cameraForward()
         let start = SCNVector3(
             origin.x + CGFloat(dir.x * 0.35),
             origin.y + CGFloat(dir.y * 0.35),
@@ -342,9 +347,21 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         }
     }
 
-    private func aimHits() -> [SCNHitTestResult] {
+    private func spreadAim(_ dir: SIMD3<Float>) -> SIMD3<Float> {
+        let spread = GameRules.aimSpread(
+            moving: player.moving,
+            walking: player.walking,
+            crouching: player.crouching,
+            aiming: player.aiming
+        )
+        var aimed = dir
+        aimed.x += Float.random(in: -spread...spread)
+        aimed.y += Float.random(in: -spread...spread) * 0.55
+        return simd_normalize(aimed)
+    }
+
+    private func aimHits(dir: SIMD3<Float>) -> [SCNHitTestResult] {
         let origin = player.cameraNode.worldPosition
-        let dir = cameraForward()
         let start = SCNVector3(
             origin.x + CGFloat(dir.x * 0.4),
             origin.y + CGFloat(dir.y * 0.4),

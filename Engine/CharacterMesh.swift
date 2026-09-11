@@ -2,7 +2,7 @@ import SceneKit
 import AppKit
 
 enum CharacterMesh {
-    static func attach(to root: SCNNode, team: BotTeam, variant: Int, name: String, headName: String) -> SCNNode {
+    static func attach(to root: SCNNode, team: BotTeam, variant: Int, name: String, headName: String) {
         let look = palette(team: team, variant: variant)
         let hips = box(0.34, 0.18, 0.2, at: SCNVector3(0, 0.98, 0), color: look.pants)
         root.addChildNode(hips)
@@ -51,7 +51,6 @@ enum CharacterMesh {
         root.addChildNode(receiver)
         root.addChildNode(barrel)
         root.addChildNode(mag)
-        return head
     }
 
     private struct Look {

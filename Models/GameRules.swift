@@ -52,7 +52,8 @@ enum WeaponSlot: Int, CaseIterable {
 }
 
 struct GameRules {
-    static let roundTime: TimeInterval = 90
+    static let roundTime: TimeInterval = 105
+    static let freezeTime: TimeInterval = 3
     static let plantTime: TimeInterval = 3.5
     static let bombTime: TimeInterval = 40
     static let defuseTime: TimeInterval = 5
@@ -96,6 +97,15 @@ struct GameRules {
 
     static func canPlant(isTerrorist: Bool, botId: Int, planterId: Int, planted: Bool, onSite: Bool) -> Bool {
         isTerrorist && !planted && onSite && botId == planterId
+    }
+
+    static func aimSpread(moving: Bool, walking: Bool, crouching: Bool, aiming: Bool) -> Float {
+        var spread: Float = 0.006
+        if moving { spread += 0.032 }
+        if walking { spread = 0.014 }
+        if crouching { spread *= 0.42 }
+        if aiming { spread *= 0.38 }
+        return spread
     }
 
     static func botHitChance(distance: Float) -> Float {

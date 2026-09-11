@@ -13,7 +13,7 @@
 - ✅ Match sizes from 1v1 to 6v6 with allied defender bots versus terrorist bots
 - ✅ Dying ends the round immediately
 - ✅ Humanoid CT and T models, crates, barrels and indoor/outdoor compounds
-- ✅ Walk (Shift), crouch (Ctrl), jump, aim-down-sights, recoil punch and Source-like fire slowdown
+- ✅ Walk (Shift), crouch (Ctrl), jump, ADS, recoil punch, fire slowdown, freeze time and movement spread
 - ✅ Two weapons (carbine and sidearm), magazine reloads and headshot damage
 - ✅ Bots rush, lurk or hold: they strafe in gunfights, rotate to mid and keep moving instead of standing still
 - ✅ HUD: health, ammo, round timer and defuse progress

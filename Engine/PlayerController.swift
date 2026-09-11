@@ -182,7 +182,7 @@ final class PlayerController {
         isAlive
             && shooting
             && now >= reloadingUntil
-            && now - roundStart >= 0.25
+            && now - roundStart >= GameRules.freezeTime
             && now - lastShot >= currentStats.fireInterval
             && (mag[slot] ?? 0) > 0
     }

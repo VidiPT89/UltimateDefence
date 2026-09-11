@@ -29,6 +29,7 @@ enum L10nKey: String, CaseIterable {
     case defenderShort
     case difficulty, easy, normal, hard
     case freeze
+    case crouch
 }
 
 enum L10n {
@@ -71,7 +72,7 @@ enum L10n {
         .clickToCapture: "Clica na vista se o rato não responder",
         .mouseLook: "Rato + clique",
         .sound: "Som",
-        .sprintJump: "Shift · Ctrl · Espaço",
+        .sprintJump: "Shift · C · Ctrl · Espaço",
         .sprintJumpHint: "Andar, agachar e saltar",
         .aim: "Botão direito · scroll",
         .aimHint: "Mirar e trocar de arma",
@@ -90,7 +91,8 @@ enum L10n {
         .easy: "Fácil",
         .normal: "Normal",
         .hard: "Difícil",
-        .freeze: "À espera"
+        .freeze: "À espera",
+        .crouch: "Agachar"
     ]
 
     private static let en: [L10nKey: String] = [
@@ -127,7 +129,7 @@ enum L10n {
         .clickToCapture: "Click the view if the mouse is stuck",
         .mouseLook: "Mouse + click",
         .sound: "Sound",
-        .sprintJump: "Shift · Ctrl · Space",
+        .sprintJump: "Shift · C · Ctrl · Space",
         .sprintJumpHint: "Walk, crouch and jump",
         .aim: "Right click · scroll",
         .aimHint: "Aim and switch weapon",
@@ -146,6 +148,7 @@ enum L10n {
         .easy: "Easy",
         .normal: "Normal",
         .hard: "Hard",
-        .freeze: "Waiting"
+        .freeze: "Waiting",
+        .crouch: "Crouch"
     ]
 }

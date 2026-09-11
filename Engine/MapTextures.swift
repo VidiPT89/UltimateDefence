@@ -165,7 +165,10 @@ enum MapTextures {
     }
 
     static func skyBox(from image: NSImage) -> [NSImage] {
-        let dark = make(size: 128) { _, _, _ in (0.18, 0.16, 0.12) }
+        let dark = make(size: 512) { _, y, size in
+            let t = CGFloat(y) / CGFloat(max(1, size - 1))
+            return clamp(0.22 + t * 0.08, 0.18 + t * 0.06, 0.12 + t * 0.04)
+        }
         return [image, image, image, dark, image, image]
     }
 

@@ -82,8 +82,18 @@ struct HUDView: View {
                 bottomBar
             }
             .padding(22)
+            .allowsHitTesting(false)
+
+            VStack {
+                Spacer()
+                HStack {
+                    crouchButton
+                    Spacer()
+                }
+            }
+            .padding(.leading, 28)
+            .padding(.bottom, 28)
         }
-        .allowsHitTesting(false)
         .onChange(of: session.damageTick) { _ in
             guard session.damageTick > 0 else { return }
             hurtFlash = 0.34
@@ -91,6 +101,32 @@ struct HUDView: View {
                 hurtFlash = 0
             }
         }
+    }
+
+    private var crouchButton: some View {
+        Button {
+            session.crouchWanted.toggle()
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: session.crouching || session.crouchWanted ? "chevron.down.square.fill" : "chevron.down.square")
+                    .font(.system(size: 22, weight: .bold))
+                Text(language.t(.crouch).uppercased())
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .tracking(0.8)
+            }
+            .foregroundStyle(session.crouchWanted || session.crouching ? Color("Black") : .white)
+            .frame(width: 72, height: 72)
+            .background(
+                (session.crouchWanted || session.crouching ? UDTheme.orange : Color.black.opacity(0.55)),
+                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(UDTheme.orange.opacity(0.7), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .help("C")
     }
 
     private var radar: some View {

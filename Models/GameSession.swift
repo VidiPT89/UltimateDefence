@@ -9,6 +9,8 @@ final class GameSession: ObservableObject {
     @Published var slot: WeaponSlot = .rifle
     @Published var timeLeft = GameRules.roundTime
     @Published var freezeLeft: TimeInterval = 0
+    @Published var crouchWanted = false
+    @Published var crouching = false
     @Published var bombPlanted = false
     @Published var defuseProgress: Double = 0
     @Published var plantHint = false

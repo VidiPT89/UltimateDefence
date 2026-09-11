@@ -18,16 +18,16 @@ enum MapTextures {
     static let sandstone = brick(
         brickW: 48,
         brickH: 18,
-        brick: (0.78, 0.58, 0.36),
-        mortar: (0.40, 0.30, 0.20),
+        brick: (0.86, 0.62, 0.36),
+        mortar: (0.32, 0.24, 0.16),
         dirt: true
     )
 
     static let aztecStone = brick(
         brickW: 36,
         brickH: 36,
-        brick: (0.70, 0.56, 0.38),
-        mortar: (0.34, 0.28, 0.18),
+        brick: (0.84, 0.66, 0.42),
+        mortar: (0.28, 0.22, 0.14),
         dirt: true
     )
 

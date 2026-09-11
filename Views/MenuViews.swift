@@ -118,6 +118,15 @@ struct MainMenuView: View {
                     .buttonStyle(.plain)
                 }
             }
+            Text(language.t(.difficulty))
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(UDTheme.muted(for: scheme))
+            Picker(language.t(.difficulty), selection: $session.difficulty) {
+                Text(language.t(.easy)).tag(Difficulty.easy)
+                Text(language.t(.normal)).tag(Difficulty.normal)
+                Text(language.t(.hard)).tag(Difficulty.hard)
+            }
+            .pickerStyle(.segmented)
         }
         .padding(18)
         .frame(maxWidth: 520)

@@ -192,7 +192,7 @@ final class MapKit {
         let ambient = SCNNode()
         ambient.light = SCNLight()
         ambient.light?.type = .ambient
-        ambient.light?.intensity = indoor ? 360 : 520
+        ambient.light?.intensity = indoor ? 420 : 600
         ambient.light?.color = indoor
             ? NSColor(calibratedRed: 0.62, green: 0.64, blue: 0.60, alpha: 1)
             : NSColor(calibratedRed: 0.78, green: 0.74, blue: 0.64, alpha: 1)
@@ -200,13 +200,23 @@ final class MapKit {
         let sun = SCNNode()
         sun.light = SCNLight()
         sun.light?.type = .directional
-        sun.light?.intensity = indoor ? 850 : 1200
+        sun.light?.intensity = indoor ? 980 : 1380
         sun.light?.color = indoor
             ? NSColor(calibratedRed: 0.92, green: 0.94, blue: 0.90, alpha: 1)
             : NSColor(calibratedRed: 1, green: 0.96, blue: 0.82, alpha: 1)
         sun.light?.castsShadow = false
         sun.eulerAngles = SCNVector3(-0.95, 0.55, 0)
         scene.rootNode.addChildNode(sun)
+        let fill = SCNNode()
+        fill.light = SCNLight()
+        fill.light?.type = .directional
+        fill.light?.intensity = indoor ? 220 : 280
+        fill.light?.color = indoor
+            ? NSColor(calibratedRed: 0.55, green: 0.62, blue: 0.72, alpha: 1)
+            : NSColor(calibratedRed: 0.55, green: 0.68, blue: 0.88, alpha: 1)
+        fill.light?.castsShadow = false
+        fill.eulerAngles = SCNVector3(-0.35, -0.9, 0)
+        scene.rootNode.addChildNode(fill)
     }
 
     private static func tiledBox(_ tex: NSImage, w: Float, h: Float, d: Float) -> [SCNMaterial] {

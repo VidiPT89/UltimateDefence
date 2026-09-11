@@ -150,7 +150,7 @@ enum MapTextures {
         mat.specular.contents = NSColor.black
         mat.shininess = 0
         mat.locksAmbientWithDiffuse = true
-        mat.isDoubleSided = true
+        mat.isDoubleSided = false
         mat.writesToDepthBuffer = true
         mat.readsFromDepthBuffer = true
         return mat

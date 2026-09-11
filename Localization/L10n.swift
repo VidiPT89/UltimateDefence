@@ -27,6 +27,7 @@ enum L10nKey: String, CaseIterable {
     case you
     case terroristShort
     case defenderShort
+    case difficulty, easy, normal, hard
 }
 
 enum L10n {
@@ -83,7 +84,11 @@ enum L10n {
         .teammates: "defesa",
         .you: "Tu",
         .terroristShort: "T",
-        .defenderShort: "CT"
+        .defenderShort: "CT",
+        .difficulty: "Dificuldade",
+        .easy: "Fácil",
+        .normal: "Normal",
+        .hard: "Difícil"
     ]
 
     private static let en: [L10nKey: String] = [
@@ -134,6 +139,10 @@ enum L10n {
         .teammates: "defence",
         .you: "You",
         .terroristShort: "T",
-        .defenderShort: "CT"
+        .defenderShort: "CT",
+        .difficulty: "Difficulty",
+        .easy: "Easy",
+        .normal: "Normal",
+        .hard: "Hard"
     ]
 }

@@ -179,6 +179,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
     private func updateBots(dt: Float, now: TimeInterval) {
         let terrorists = bots.filter(\.isTerrorist)
         let defenders = bots.filter { !$0.isTerrorist }
+        let rotate = layout.attackPaths.first.flatMap { $0.dropFirst().dropFirst().first } ?? layout.siteCenter
         for bot in bots where bot.isAlive {
             let enemies = bot.isTerrorist ? defenders : terrorists
             let action = bot.update(
@@ -187,6 +188,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
                 player: player,
                 enemies: enemies,
                 site: layout.siteCenter,
+                rotatePoint: rotate,
                 walls: layout.walls,
                 bombPlanted: bombPlanted,
                 planterId: terrorists.filter(\.isAlive).map(\.id).min() ?? 0,
@@ -231,7 +233,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         guard Float.random(in: 0...1) < GameRules.botHitChance(distance: distance) else { return }
         if toPlayer {
             let before = player.health
-            player.takeDamage(Int.random(in: 8...16))
+            player.takeDamage(Int.random(in: 12...24))
             if player.health < before {
                 onMain { self.session.damageTick += 1 }
                 sounds.playHit()

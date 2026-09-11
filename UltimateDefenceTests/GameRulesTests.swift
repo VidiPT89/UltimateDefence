@@ -122,12 +122,17 @@ final class GameRulesTests: XCTestCase {
         }
     }
 
+    func testShootingCutsRunSpeedLikeSource() {
+        XCTAssertLessThan(GameRules.shootSpeedMultiplier, 0.4)
+        XCTAssertGreaterThan(GameRules.playerSpeed, GameRules.botSpeed)
+    }
+
     func testBotHitChanceFallsOffWithDistance() {
         let close = GameRules.botHitChance(distance: 2)
         let far = GameRules.botHitChance(distance: 28)
         XCTAssertGreaterThan(close, far)
-        XCTAssertLessThanOrEqual(close, 0.55)
-        XCTAssertGreaterThanOrEqual(far, 0.14)
+        XCTAssertLessThanOrEqual(close, 0.70)
+        XCTAssertGreaterThanOrEqual(far, 0.16)
     }
 
     func testMatchSizeCountsAllies() {

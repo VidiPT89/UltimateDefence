@@ -56,6 +56,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         player.grounded = true
         player.aiming = false
         player.punch = 0
+        player.crouchWanted = false
         player.velocity = .zero
         player.roundStart = CACurrentMediaTime()
         wasReloading = false
@@ -90,6 +91,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
         session.clearMatchFeed()
         session.aiming = false
         session.moving = false
+        session.crouchWanted = false
         session.outcome = .inProgress
         publishHUD()
     }
@@ -103,6 +105,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             dt = 1.0 / 60.0
         }
         lastTime = time
+        player.crouchWanted = session.crouchWanted
         tick(dt: dt, now: time)
     }
 
@@ -372,6 +375,7 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             if self.session.reloading != reloading { self.session.reloading = reloading }
             if self.session.moving != moving { self.session.moving = moving }
             if self.session.aiming != aiming { self.session.aiming = aiming }
+            if self.session.crouching != self.player.crouching { self.session.crouching = self.player.crouching }
             if self.session.radarBlips != blips { self.session.radarBlips = blips }
             if self.session.radarMe != me { self.session.radarMe = me }
             if self.session.radarYaw != yaw { self.session.radarYaw = yaw }
@@ -459,6 +463,8 @@ final class GameWorld: NSObject, SCNSceneRendererDelegate {
             case 19:
                 player.selectSlot(.pistol)
                 sounds.playUI()
+            case 8: // C
+                onMain { self.session.crouchWanted.toggle() }
             case 14: player.interacting = true // E
             case 53: // Esc
                 player.shooting = false

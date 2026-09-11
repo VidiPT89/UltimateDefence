@@ -25,6 +25,7 @@ final class PlayerController {
     var aiming = false
     var walking = false
     var crouching = false
+    var crouchWanted = false
     var punch: Float = 0
     var roundStart: TimeInterval = 0
     var velocity = SIMD3<Float>(repeating: 0)
@@ -88,7 +89,7 @@ final class PlayerController {
         if keys.contains(2) || keys.contains(124) { dir += right() } // D
         let length = simd_length(dir)
         moving = length > 0.001
-        crouching = keys.contains(59)
+        crouching = keys.contains(59) || crouchWanted
         walking = keys.contains(56) && moving && !crouching
         sprinting = moving && !walking && !crouching && !aiming
         let standEye: Float = 1.64

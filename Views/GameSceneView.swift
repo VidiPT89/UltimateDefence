@@ -9,8 +9,35 @@ final class FPSSceneView: SCNView {
     var onAim: ((Bool) -> Void)?
     var onCycle: ((Int) -> Void)?
     var onFocus: ((Bool) -> Void)?
+    var onCrouch: (() -> Void)?
     var fireArmed = false
     private var tracking = false
+    private let crouchControl = NSButton(title: "C", target: nil, action: nil)
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        crouchControl.bezelStyle = .regularSquare
+        crouchControl.font = .systemFont(ofSize: 12, weight: .bold)
+        crouchControl.target = self
+        crouchControl.action = #selector(tapCrouch)
+        crouchControl.frame = NSRect(x: 24, y: 24, width: 86, height: 52)
+        crouchControl.autoresizingMask = [.maxXMargin, .maxYMargin]
+        addSubview(crouchControl)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
+    @objc private func tapCrouch() {
+        onCrouch?()
+    }
+
+    func setCrouchActive(_ on: Bool) {
+        crouchControl.title = on ? "C ▾" : "C"
+        crouchControl.state = on ? .on : .off
+        crouchControl.bezelColor = on ? NSColor.systemOrange : nil
+    }
 
     override var acceptsFirstResponder: Bool { true }
 
@@ -95,7 +122,7 @@ struct GameSceneView: NSViewRepresentable {
     @ObservedObject var session: GameSession
 
     func makeNSView(context: Context) -> FPSSceneView {
-        let view = FPSSceneView()
+        let view = FPSSceneView(frame: .zero)
         view.scene = world.scene
         view.delegate = world
         view.pointOfView = world.player.cameraNode
@@ -110,6 +137,7 @@ struct GameSceneView: NSViewRepresentable {
         view.onFire = { down in world.player.shooting = down }
         view.onAim = { down in world.player.aiming = down }
         view.onCycle = { dir in world.cycleWeapon(dir) }
+        view.onCrouch = { session.crouchWanted.toggle() }
         view.onFocus = { focused in
             DispatchQueue.main.async {
                 if session.screen == .playing {
@@ -131,6 +159,8 @@ struct GameSceneView: NSViewRepresentable {
         nsView.onFire = { down in world.player.shooting = down }
         nsView.onAim = { down in world.player.aiming = down }
         nsView.onCycle = { dir in world.cycleWeapon(dir) }
+        nsView.onCrouch = { session.crouchWanted.toggle() }
+        nsView.setCrouchActive(session.crouchWanted || session.crouching)
         nsView.window?.acceptsMouseMovedEvents = true
         if session.screen == .playing {
             nsView.window?.makeFirstResponder(nsView)

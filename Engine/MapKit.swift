@@ -7,6 +7,7 @@ enum NodeName {
     static let camera = "fpsCamera"
     static let ground = "ground"
     static let site = "siteA"
+    static let artefact = "artefact"
     static let terroristPrefix = "bot-t-"
     static let counterPrefix = "bot-ct-"
     static let headSuffix = "-head"
@@ -146,6 +147,8 @@ final class MapKit {
         let c4 = SCNBox(width: 0.42, height: 0.14, length: 0.28, chamferRadius: 0.02)
         c4.firstMaterial = MapTextures.goldSrc(NSColor(calibratedRed: 0.08, green: 0.10, blue: 0.08, alpha: 1))
         let c4Node = SCNNode(geometry: c4)
+        c4Node.name = NodeName.artefact
+        c4Node.isHidden = true
         c4Node.position = SCNVector3(center.x, 0.12, center.z)
         scene.rootNode.addChildNode(c4Node)
     }

@@ -256,4 +256,13 @@ final class GameRulesTests: XCTestCase {
         XCTAssertEqual(session.killFeed.count, 5)
         XCTAssertEqual(session.killFeed.first?.id, 3)
     }
+
+    func testArtefactStartsHiddenUntilPlant() {
+        for arena in ArenaMap.allCases {
+            let scene = MapBuilder.make(arena).0
+            let node = scene.rootNode.childNode(withName: NodeName.artefact, recursively: true)
+            XCTAssertNotNil(node, "Missing artefact on \(arena.rawValue)")
+            XCTAssertTrue(node?.isHidden ?? false)
+        }
+    }
 }

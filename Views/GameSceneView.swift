@@ -10,7 +10,6 @@ final class FPSSceneView: SCNView {
     var onCycle: ((Int) -> Void)?
     var onFocus: ((Bool) -> Void)?
     var onCrouch: (() -> Void)?
-    var fireArmed = false
     private var tracking = false
     private let crouchControl = NSButton(title: "C", target: nil, action: nil)
 
@@ -31,12 +30,18 @@ final class FPSSceneView: SCNView {
 
     @objc private func tapCrouch() {
         onCrouch?()
+        window?.makeFirstResponder(self)
     }
 
     func setCrouchActive(_ on: Bool) {
         crouchControl.title = on ? "C ▾" : "C"
         crouchControl.state = on ? .on : .off
         crouchControl.bezelColor = on ? NSColor.systemOrange : nil
+    }
+
+    var crouchControlHidden: Bool {
+        get { crouchControl.isHidden }
+        set { crouchControl.isHidden = newValue }
     }
 
     override var acceptsFirstResponder: Bool { true }
@@ -79,9 +84,7 @@ final class FPSSceneView: SCNView {
     override func mouseDown(with event: NSEvent) {
         window?.makeFirstResponder(self)
         onFocus?(true)
-        if fireArmed {
-            onFire?(true)
-        }
+        onFire?(true)
     }
 
     override func mouseUp(with event: NSEvent) {
@@ -161,14 +164,15 @@ struct GameSceneView: NSViewRepresentable {
         nsView.onCycle = { dir in world.cycleWeapon(dir) }
         nsView.onCrouch = { session.crouchWanted.toggle() }
         nsView.setCrouchActive(session.crouchWanted || session.crouching)
+        nsView.crouchControlHidden = session.screen != .playing
         nsView.window?.acceptsMouseMovedEvents = true
         if session.screen == .playing {
             nsView.window?.makeFirstResponder(nsView)
             nsView.setPointerLocked(session.capturedMouse)
-            nsView.fireArmed = session.capturedMouse
         } else {
             nsView.setPointerLocked(false)
-            nsView.fireArmed = false
+            world.player.shooting = false
+            world.player.aiming = false
         }
     }
 

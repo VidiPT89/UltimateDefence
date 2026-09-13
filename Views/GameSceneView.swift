@@ -13,8 +13,23 @@ final class FPSSceneView: SCNView {
     private var tracking = false
     private let crouchControl = NSButton(title: "C", target: nil, action: nil)
 
+    override init(frame: NSRect, options: [String: Any]?) {
+        super.init(frame: frame, options: options)
+        installCrouchControl()
+    }
+
     override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
+        super.init(frame: frameRect, options: nil)
+        installCrouchControl()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        installCrouchControl()
+    }
+
+    private func installCrouchControl() {
+        guard crouchControl.superview == nil else { return }
         crouchControl.bezelStyle = .regularSquare
         crouchControl.font = .systemFont(ofSize: 12, weight: .bold)
         crouchControl.target = self
@@ -22,10 +37,6 @@ final class FPSSceneView: SCNView {
         crouchControl.frame = NSRect(x: 24, y: 24, width: 86, height: 52)
         crouchControl.autoresizingMask = [.maxXMargin, .maxYMargin]
         addSubview(crouchControl)
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
     }
 
     @objc private func tapCrouch() {
@@ -166,13 +177,17 @@ struct GameSceneView: NSViewRepresentable {
         nsView.setCrouchActive(session.crouchWanted || session.crouching)
         nsView.crouchControlHidden = session.screen != .playing
         nsView.window?.acceptsMouseMovedEvents = true
-        if session.screen == .playing {
-            nsView.window?.makeFirstResponder(nsView)
-            nsView.setPointerLocked(session.capturedMouse)
-        } else {
-            nsView.setPointerLocked(false)
-            world.player.shooting = false
-            world.player.aiming = false
+        let playing = session.screen == .playing
+        let captured = session.capturedMouse
+        DispatchQueue.main.async {
+            if playing {
+                nsView.window?.makeFirstResponder(nsView)
+                nsView.setPointerLocked(captured)
+            } else {
+                nsView.setPointerLocked(false)
+                world.player.shooting = false
+                world.player.aiming = false
+            }
         }
     }
 
